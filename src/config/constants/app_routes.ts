@@ -1,21 +1,20 @@
 const appRoutes = Object.freeze({
   INTERNAL: {
-    App: '/',
-    Deploy: '/deploy',
-    Points: '/points',
-    FAQ: '/faq',
-    History: '/history',
+    Home: '/',
+    About: '/about',
+    Portfolio: '/portfolio',
+    Contact: '/contact',
+    Blog: '/blog',
   },
-  EXTERNAL: {
-    Docs: 'https://docs.polymerlabs.org/',
-  },
-  SOCIAL: {
-    X: 'https://x.com/PolyenaFinance',
-    Discord: '#',
-  },
-  COMPANY: {
-    X: 'https://x.com/Rayo_Labs',
-  },
+  // EXTERNAL: {
+  //   external routes here...
+  // },
+  // SOCIAL: {
+  //   social media routes here...
+  // },
+  // COMPANY: {
+  //   company routes here...
+  // },
 });
 
 export default appRoutes;
