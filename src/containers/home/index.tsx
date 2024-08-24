@@ -26,13 +26,13 @@ export default function HomeContainer() {
               <div className="flex w-fit gap-6 px-2">
                 <span className="bg-primary mt-8 h-1 w-8 rounded-md sm:w-10" />
                 <h1 className="text-primary text-nowrap text-2xl font-bold leading-tight sm:text-3xl md:text-5xl">
-                  I'm Elif Hilal Mumcu
+                  I&apos;m Elif Hilal Mumcu
                   <span className="text-foreground block">Advocate</span>
                 </h1>
               </div>
 
               <p className="custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7 mb-7 mt-4 px-2 leading-9 md:text-lg">
-                I'm Elif, a DevRel Engineer at a blockchain company in the USA.
+                I&apos;m Elif, a DevRel Engineer at a blockchain company in the USA.
                 I blend my passion for coding, blockchain, and personal growth
                 to inspire others. With experiences across Turkey, Europe, and
                 America, I share insights on technology, personal development,
