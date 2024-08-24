@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-light: 102, 102, 102;
+  --background-light: 255, 255, 255;
+  --foreground-dark: 255, 255, 255;
+  --background-dark: 17, 17, 17;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: rgb(var(--foreground-dark));
+    background-color: rgb(var(--background-dark));
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: rgb(var(--foreground-light));
+    background-color: rgb(var(--background-light));
+  }
+}
+
+body {
+  color: rgb(var(--foreground-dark));
+  background-color: rgb(var(--background-dark));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
