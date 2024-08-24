@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import Providers from "@/context/providers";
+import ThemeSwitch from "@/components/ThemeSwitch";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} selection:bg-muted selection:text-primary relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all`}
+        suppressHydrationWarning
+      >
+        <Providers>
+          <ThemeSwitch />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }
