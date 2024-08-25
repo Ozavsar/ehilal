@@ -1,9 +1,13 @@
+import CustomButton from "@/components/CustomButton";
+import { Button } from "@/components/ui/button";
+import { ArrowBigRight, ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomeContainer() {
   return (
     <main>
-      <div className="relative flex h-screen w-screen items-center justify-center max-sm:w-auto">
+      <div className="relative flex h-screen w-screen flex-col items-center justify-center max-sm:w-auto">
         <Image
           src="/images/home/profile-picture.webp"
           className="fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 rounded-3xl object-cover shadow-md shadow-slate-900 custom-lg:block"
@@ -27,19 +31,21 @@ export default function HomeContainer() {
                 <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
                 <h1 className="text-nowrap text-2xl font-bold text-primary sm:text-3xl md:text-5xl">
                   I&apos;m Elif Hilal Umucu
-                  <span className="block text-foreground sm:mt-2">
-                    Advocate
-                  </span>
+                  <span className="block sm:mt-2">Advocate</span>
                 </h1>
               </div>
-
-              <p className="mb-7 mt-4 px-2 leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7">
-                I&apos;m Elif, a DevRel Engineer at a blockchain company in the
-                USA. I blend my passion for coding, blockchain, and personal
-                growth to inspire others. With experiences across Turkey,
-                Europe, and America, I share insights on technology, personal
-                development, and blockchain education.
-              </p>
+              <div className="flex flex-col sm:gap-2">
+                <p className="mb-7 mt-4 px-2 leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7">
+                  I&apos;m Elif, a DevRel Engineer at a blockchain company in
+                  the USA. I blend my passion for coding, blockchain, and
+                  personal growth to inspire others. With experiences across
+                  Turkey, Europe, and America, I share insights on technology,
+                  personal development, and blockchain education.
+                </p>
+                <Link href="/about">
+                  <CustomButton text="MORE ABOUT ME" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
