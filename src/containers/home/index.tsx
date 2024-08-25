@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import CustomButton from "@/components/CustomButton";
 
 export default function HomeContainer() {
   const text = `I'm Elif, a DevRel Engineer at a blockchain company in the
@@ -11,10 +13,10 @@ export default function HomeContainer() {
                 development, and blockchain education.`.split("");
   return (
     <main>
-      <div className="relative flex h-screen w-screen items-center justify-center max-sm:w-auto">
+      <div className="relative flex h-screen w-screen flex-col items-center justify-center max-sm:w-auto">
         <Image
           src="/images/home/profile-picture.webp"
-          className="animate-fade-in-elif fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 rounded-3xl object-cover opacity-0 shadow-md shadow-slate-900 custom-lg:block"
+          className="fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 animate-fade-in-elif rounded-3xl object-cover opacity-0 shadow-md shadow-slate-900 custom-lg:block"
           width={700}
           height={700}
           alt="my-picture"
@@ -41,26 +43,32 @@ export default function HomeContainer() {
                 </h1>
               </div>
 
-              <motion.p
-                className="mb-7 mt-4 px-2 leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  visible: { transition: { staggerChildren: 0.02 } },
-                }}
-              >
-                {text.map((char, i) => (
-                  <motion.span
-                    key={i}
-                    variants={{
-                      hidden: { opacity: 0, y: 100 },
-                      visible: { opacity: 1, y: 0 },
-                    }}
-                  >
-                    {char}
-                  </motion.span>
-                ))}
-              </motion.p>
+              <div className="flex flex-col sm:gap-2">
+                <motion.p
+                  className="mb-7 mt-4 px-2 leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    visible: { transition: { staggerChildren: 0.02 } },
+                  }}
+                >
+                  {text.map((char, i) => (
+                    <motion.span
+                      key={i}
+                      variants={{
+                        hidden: { opacity: 0, y: 100 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </motion.p>
+
+                <Link href="/about">
+                  <CustomButton text="MORE ABOUT ME" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

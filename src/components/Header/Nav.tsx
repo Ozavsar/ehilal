@@ -65,10 +65,10 @@ export default function Nav() {
                 size="icon"
                 onMouseOver={() => setHoveredItem(link.title)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary" : ""} ${isHovered ? "pr-12 sm:w-fit sm:justify-end sm:pl-6" : ""}`}
+                className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
               >
                 <span
-                  className={`duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
+                  className={`text-white duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
                 >
                   {isHovered ? link.title : null}
                 </span>

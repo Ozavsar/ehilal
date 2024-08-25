@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        circle: "rounded-full bg-muted text-foreground hover:bg-primary",
+        circle: "rounded-full bg-muted hover:bg-primary",
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
@@ -23,7 +23,7 @@ const buttonVariants = cva(
       size: {
         default: "h-12 px-4 py-2",
         sm: "h-9 rounded-md px-3",
-        lg: "h-12 rounded-md px-8",
+        lg: "h-12 px-8",
         icon: "size-12",
       },
     },
