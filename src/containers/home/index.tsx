@@ -31,7 +31,9 @@ export default function HomeContainer() {
                 <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
                 <h1 className="text-nowrap text-2xl font-bold text-primary sm:text-3xl md:text-5xl">
                   I&apos;m Elif Hilal Umucu
-                  <span className="block sm:mt-2">Advocate</span>
+                  <span className="block text-foreground sm:mt-2">
+                    Advocate
+                  </span>
                 </h1>
               </div>
               <div className="flex flex-col sm:gap-2">
