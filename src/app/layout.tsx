@@ -3,7 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import Providers from "@/context/providers";
-import ThemeSwitch from "@/components/ThemeSwitch";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,11 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} selection:bg-muted selection:text-primary relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all`}
+        className={`${GeistSans.variable} ${GeistMono.variable} te relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all selection:bg-muted selection:text-primary`}
         suppressHydrationWarning
       >
         <Providers>
-          <ThemeSwitch />
+          <Header />
           {children}
         </Providers>
       </body>
