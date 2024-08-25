@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const navLinks = [
   {
@@ -39,33 +40,44 @@ export default function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mx-auto flex flex-row gap-6 p-4 sm:my-auto sm:flex-col sm:p-8">
-      {navLinks.map((link) => {
+    <motion.nav
+      variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+      initial="hidden"
+      whileInView="visible"
+      className="mx-auto flex flex-row gap-6 p-4 sm:my-auto sm:flex-col sm:p-8"
+    >
+      {navLinks.map((link, i) => {
         const isActive = pathname === link.url;
         const isHovered = hoveredItem === link.title;
         return (
-          <Link
+          <motion.div
             key={link.title}
-            href={link.url}
+            variants={{
+              hidden: { opacity: 0, scale: 0.5 },
+              visible: { opacity: 1, scale: 1 },
+            }}
+            transition={{ type: "spring" }}
             className="self-end rounded-full"
           >
-            <Button
-              variant="circle"
-              size="icon"
-              onMouseOver={() => setHoveredItem(link.title)}
-              onMouseLeave={() => setHoveredItem(null)}
-              className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary" : ""} ${isHovered ? "pr-12 sm:w-fit sm:justify-end sm:pl-6" : ""}`}
-            >
-              <span
-                className={`duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
+            <Link key={link.title} href={link.url}>
+              <Button
+                variant="circle"
+                size="icon"
+                onMouseOver={() => setHoveredItem(link.title)}
+                onMouseLeave={() => setHoveredItem(null)}
+                className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary" : ""} ${isHovered ? "pr-12 sm:w-fit sm:justify-end sm:pl-6" : ""}`}
               >
-                {isHovered ? link.title : null}
-              </span>
-              <div className="absolute right-0 pr-3">{link.icon}</div>
-            </Button>
-          </Link>
+                <span
+                  className={`duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
+                >
+                  {isHovered ? link.title : null}
+                </span>
+                <div className="absolute right-0 pr-3">{link.icon}</div>
+              </Button>
+            </Link>
+          </motion.div>
         );
       })}
-    </nav>
+    </motion.nav>
   );
 }

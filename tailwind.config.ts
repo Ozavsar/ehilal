@@ -70,10 +70,20 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in-right": {
+          from: { opacity: "0", transform: "translateX(32px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        "fade-in-elif": {
+          from: { opacity: "0", transform: "rotate(-10deg) translateX(-100px)" },
+          to: { opacity: "1", transform: "rotate(0deg) translateX(0px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in-elif": "fade-in-elif 0.5s ease-out forwards 1s",
+        "fade-in-right": "fade-in-right 0.5s ease-out forwards",
       },
     },
   },
