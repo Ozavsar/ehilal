@@ -87,7 +87,7 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in-elif": "fade-in-elif 0.5s ease-out forwards 1s",
+        "fade-in-elif": "fade-in-elif 0.7s ease-out forwards 0.3s",
         "fade-in-right": "fade-in-right 0.5s ease-out forwards",
       },
     },

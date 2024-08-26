@@ -13,15 +13,17 @@ const characterVariants = {
   },
 };
 
+interface AnimatedTextProps {
+  text: string | string[];
+  className?: string;
+  props?: any;
+}
+
 export default function AnimatedText({
   text,
   className,
   ...props
-}: {
-  text: string | string[];
-  className?: string;
-  props?: any;
-}) {
+}: AnimatedTextProps) {
   const ref = useRef<HTMLParagraphElement>(null);
   const isInView = useInView(ref, { amount: 0.5, once: true });
   const textArray = Array.isArray(text) ? text : [text];
@@ -33,7 +35,7 @@ export default function AnimatedText({
       {...props}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      transition={{ staggerChildren: 0.05, delayChildren: 1 }}
+      transition={{ staggerChildren: 0.05, delayChildren: 0.5 }}
       aria-hidden
     >
       {textArray.map((line, index) => (

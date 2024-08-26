@@ -18,7 +18,7 @@ export default function ThemeSwitch() {
       aria-label="Toggle Dark Mode"
       type="button"
       variant="circle"
-      className="fixed right-4 top-4 z-10 sm:right-8 sm:top-8"
+      className="fixed right-2 top-2 z-10 sm:right-8 sm:top-8"
       size="icon"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >

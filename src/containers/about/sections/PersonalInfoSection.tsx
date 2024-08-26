@@ -1,9 +1,9 @@
 "use client";
 
-import CustomButton from "@/components/CustomButton";
-import { Download } from "lucide-react";
-import StatCard from "../components/StatCard";
 import Image from "next/image";
+import { Download } from "lucide-react";
+import CustomButton from "@/components/CustomButton";
+import StatCard from "../components/StatCard";
 
 const personalInfoData = [
   { title: "name", value: "Elif Hilal" },
@@ -35,11 +35,11 @@ const handleDownloadCV = () => {
 export default function PersonalInfoSection() {
   return (
     <section className="grid grid-cols-1 sm:container max-sm:pt-20 xl:grid-cols-2">
-      <div className="flex flex-col px-10">
-        <h1 className="pb-6 text-2xl font-bold uppercase">Personal Infos</h1>
+      <div className="mb-10 flex flex-col justify-between px-10">
+        <h1 className="py-4 text-2xl font-bold uppercase">Personal Infos</h1>
         <Image
           src="/images/home/profile-picture.webp"
-          className="xs:!hidden border-black-3 mx-auto mb-10 hidden size-64 rounded-full border-4 border-solid max-sm:block"
+          className="xs:!hidden border-black-3 mx-auto mb-10 hidden size-52 rounded-full border-4 border-solid max-sm:block"
           width={270}
           height={270}
           alt="my-picture"
@@ -58,20 +58,17 @@ export default function PersonalInfoSection() {
           text="Download CV"
           icon={Download}
           onClick={handleDownloadCV}
-          className="mb-10 mt-4"
         />
       </div>
-      <div className="flex flex-col px-10">
-        <ul className="grid-auto-rows-min grid grid-cols-2 gap-6">
-          {statsData.map((item, index) => (
-            <StatCard
-              key={index}
-              value={item.value}
-              description={item.description}
-            />
-          ))}
-        </ul>
-      </div>
+      <ul className="grid-auto-rows-min grid grid-cols-2 gap-6 px-10">
+        {statsData.map((item, index) => (
+          <StatCard
+            key={index}
+            value={item.value}
+            description={item.description}
+          />
+        ))}
+      </ul>
     </section>
   );
 }
