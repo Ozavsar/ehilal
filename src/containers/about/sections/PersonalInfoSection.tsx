@@ -34,9 +34,9 @@ const handleDownloadCV = () => {
 
 export default function PersonalInfoSection() {
   return (
-    <section className="grid grid-cols-1 sm:container max-sm:pt-20 xl:grid-cols-2">
-      <div className="mb-10 flex flex-col justify-between px-4 sm:px-10">
-        <h1 className="pb-4 text-2xl font-bold uppercase">Personal Infos</h1>
+    <section className="container grid grid-cols-1 max-sm:pt-20 xl:grid-cols-2">
+      <div className="mb-10 flex flex-col justify-between">
+        <h1 className="pb-4 text-3xl font-bold uppercase">Personal Infos</h1>
         <Image
           src="/images/home/profile-picture.webp"
           className="xs:!hidden border-black-3 mx-auto mb-10 hidden size-52 rounded-full border-4 border-solid max-sm:block"
@@ -60,7 +60,7 @@ export default function PersonalInfoSection() {
           onClick={handleDownloadCV}
         />
       </div>
-      <ul className="grid-auto-rows-min grid grid-cols-2 gap-2 px-4 sm:gap-6 sm:px-10">
+      <ul className="grid-auto-rows-min grid grid-cols-2 gap-2 sm:gap-6">
         {statsData.map((item, index) => (
           <StatCard
             key={index}
