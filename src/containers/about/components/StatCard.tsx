@@ -10,7 +10,7 @@ export default function StatCard({
 }) {
   return (
     <li className="relative row-span-2 grid grid-rows-subgrid rounded-[5px] border border-muted p-4 sm:p-7">
-      <h3 className="relative w-fit text-5xl font-bold leading-snug text-primary">
+      <h3 className="relative w-fit text-3xl sm:text-5xl font-bold leading-snug text-primary">
         <AnimatedCounter from={0} to={+value} />
         <Plus size={24} className="absolute -right-6 top-4 text-primary" />
         &nbsp;
