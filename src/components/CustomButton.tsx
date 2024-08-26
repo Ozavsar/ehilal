@@ -5,7 +5,7 @@ interface CustomButtonProps {
   text: string;
   className?: string;
   onClick?: () => void;
-  icon?: LucideIcon; // İkonu dışarıdan almak için ekledik
+  icon?: LucideIcon;
   [key: string]: any;
 }
 
@@ -13,7 +13,7 @@ export default function CustomButton({
   text,
   className = "",
   onClick,
-  icon: Icon = ArrowRight, // Varsayılan olarak ArrowRight kullanıyoruz
+  icon: Icon = ArrowRight,
   ...props
 }: CustomButtonProps) {
   return (
@@ -25,7 +25,6 @@ export default function CustomButton({
       {text}
       <span className="relative flex size-14 items-center justify-center rounded-full bg-primary">
         <Icon className="text-white" />{" "}
-        {/* Dışarıdan alınan ikonu burada kullanıyoruz */}
       </span>
       <span className="absolute right-0 -z-10 h-14 w-0 rounded-full bg-primary transition-all duration-700 ease-out group-hover:w-96" />
     </Button>

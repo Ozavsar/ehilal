@@ -32,10 +32,13 @@ const Progress = React.forwardRef<
             className="h-full w-full flex-1 bg-primary transition-all"
             style={{ transform: `translateX(-${100 - (progress || 0)}%)` }}
           />
+          <span
+            className={`absolute top-0 -ml-6 w-full transform text-xs font-semibold text-muted`}
+            style={{ transform: `translateX(${progress}%)` }}
+          >
+            {progress}%
+          </span>
         </ProgressPrimitive.Root>
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-xs font-semibold">
-          {progress}%
-        </span>
       </div>
     </div>
   );
