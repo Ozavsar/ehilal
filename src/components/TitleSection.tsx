@@ -10,7 +10,7 @@ export default function TitleSection({
   backgroundText,
 }: TitleSectionProps) {
   return (
-    <section className="z-10">
+    <section>
       <div className="relative flex flex-col items-center justify-center py-[70px] max-sm:hidden">
         <h2 className="text-[56px] font-black uppercase">
           {plainText} <span className="text-primary">{coloredText}</span>
@@ -19,7 +19,7 @@ export default function TitleSection({
           {backgroundText}
         </span>
       </div>
-      <div className="fixed left-0 top-0 w-full bg-muted py-4 pl-6 sm:hidden">
+      <div className="fixed left-0 top-0 z-50 w-full bg-muted py-4 pl-6 sm:hidden">
         <h2 className="text-2xl font-black uppercase">
           {plainText} <span className="text-primary">{coloredText}</span>
         </h2>

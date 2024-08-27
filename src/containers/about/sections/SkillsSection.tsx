@@ -12,7 +12,7 @@ const skills = [
 
 export default function SkillsSection() {
   return (
-    <section className="container flex flex-col gap-10">
+    <section className="flex flex-col gap-10">
       <h2 className="text-center text-3xl font-bold uppercase">Skills</h2>
       <div className="grid grid-cols-2 gap-4">
         {skills.map((skill) => (

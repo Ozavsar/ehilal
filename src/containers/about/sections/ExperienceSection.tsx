@@ -54,7 +54,7 @@ const experienceData = [
 
 export default function ExperienceSection() {
   return (
-    <section className="container flex flex-col gap-10 px-8">
+    <section className="flex flex-col gap-10 px-4">
       <h2 className="text-center text-3xl font-bold uppercase">
         Experience & Education
       </h2>

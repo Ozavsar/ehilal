@@ -8,7 +8,7 @@ export default function HomeContainer() {
     "I'm Elif, a DevRel Engineer at a blockchain company in the USA. I blend my passion for coding, blockchain, and personal growth to inspire others. With experiences across Turkey, Europe, and America, I share insights on technology, personal development, and blockchain education.";
 
   return (
-    <main>
+    <main className="container max-sm:-my-20">
       <div className="relative flex h-screen w-screen flex-col items-center justify-center max-sm:w-auto">
         <Image
           src="/images/home/profile-picture.webp"
@@ -29,9 +29,9 @@ export default function HomeContainer() {
               alt="my-picture"
             />
             <div className="flex flex-col gap-4 sm:gap-6 md:gap-10">
-              <div className="flex w-fit gap-4 px-2">
+              <div className="flex w-fit gap-4">
                 <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
-                <h1 className="text-nowrap text-2xl font-bold text-primary sm:text-3xl md:text-5xl">
+                <h1 className="text-nowrap text-2xl font-bold text-primary md:text-5xl">
                   I&apos;m Elif Hilal Umucu
                   <span className="block text-foreground sm:mt-2">
                     Advocate
@@ -42,7 +42,7 @@ export default function HomeContainer() {
               <div className="flex flex-col sm:gap-2">
                 <AnimatedText
                   text={text}
-                  className="mb-7 mt-4 px-2 leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7"
+                  className="mb-7 mt-4 text-sm leading-6 md:text-lg custom-lg:mb-6 custom-lg:mt-[2.5px] custom-lg:leading-7"
                 />
 
                 <Link href="/about">

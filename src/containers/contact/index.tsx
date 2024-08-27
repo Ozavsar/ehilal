@@ -1,6 +1,7 @@
 import TitleSection from "@/components/TitleSection";
-import { Mail, MailOpenIcon, PhoneCall } from "lucide-react";
+import { MailOpenIcon, PhoneCall } from "lucide-react";
 import Link from "next/link";
+import FormSection from "./sections/FormSection";
 
 export default function ContactContainer() {
   return (
@@ -10,7 +11,7 @@ export default function ContactContainer() {
         plainText="get in"
         coloredText="touch"
       />
-      <section className="container grid grid-flow-row-dense grid-cols-3 gap-12 max-sm:pt-20">
+      <div className="grid grid-flow-row-dense grid-cols-3 gap-12">
         <div className="">
           <h1 className="pb-4 text-3xl font-bold uppercase">
             Don&apos;t Be Shy!
@@ -47,14 +48,15 @@ export default function ContactContainer() {
             </div>
           </div>
         </div>
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <input
             type="text"
             placeholder="YOUR NAME"
             className="rounded-full bg-muted px-6 py-3 outline-1 outline-primary focus-visible:outline"
           />
-        </div>
-      </section>
+        </div> */}
+        <FormSection className="col-span-2 sm:max-lg:pr-12" />
+      </div>
     </main>
   );
 }

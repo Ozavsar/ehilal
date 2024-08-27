@@ -5,16 +5,16 @@ import SkillsSection from "./sections/SkillsSection";
 
 export default function AboutContainer() {
   return (
-    <main className="flex flex-col sm:pb-20">
+    <main className="container">
       <TitleSection
         backgroundText="resume"
         plainText="about"
         coloredText="me"
       />
       <PersonalInfoSection />
-      <span className="my-24 h-[1px] w-1/3 self-center bg-muted" />
+      <span className="mx-auto my-24 flex h-[1px] w-1/3 bg-muted" />
       <SkillsSection />
-      <span className="my-24 h-[1px] w-1/3 self-center bg-muted" />
+      <span className="mx-auto my-24 flex h-[1px] w-1/3 bg-muted" />
       <ExperienceSection />
     </main>
   );
