@@ -6,9 +6,10 @@ const appRoutes = Object.freeze({
     Contact: '/contact',
     Blog: '/blog',
   },
-  // EXTERNAL: {
-  //   external routes here...
-  // },
+  EXTERNAL: {
+    Tel: 'tel:+905555555555',
+    Mail: 'mailto:elif@mail.com',
+  },
   // SOCIAL: {
   //   social media routes here...
   // },

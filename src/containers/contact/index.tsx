@@ -1,7 +1,8 @@
-import TitleSection from "@/components/TitleSection";
-import { MailOpenIcon, PhoneCall } from "lucide-react";
 import Link from "next/link";
+import { MailOpenIcon, PhoneCall } from "lucide-react";
+import TitleSection from "@/components/TitleSection";
 import FormSection from "./sections/FormSection";
+import appRoutes from "@/config/constants/app_routes";
 
 export default function ContactContainer() {
   return (
@@ -26,11 +27,11 @@ export default function ContactContainer() {
             <div className="flex flex-col">
               <h3 className="uppercase text-opacity-30">mail me</h3>
               <Link
-                href="mailto:elifmumcu@mail.com"
+                href={appRoutes.EXTERNAL.Mail}
                 target="_blank"
                 className="font-semibold"
               >
-                elifmumcu@mail.com
+                {appRoutes.EXTERNAL.Mail.split(":")[1]}
               </Link>
             </div>
           </div>
@@ -39,11 +40,11 @@ export default function ContactContainer() {
             <div className="flex flex-col">
               <h3 className="uppercase text-opacity-30">call me</h3>
               <Link
-                href="tel:+905555555555"
+                href={appRoutes.EXTERNAL.Tel}
                 target="_blank"
                 className="font-semibold"
               >
-                +905555555555
+                {appRoutes.EXTERNAL.Tel.split(":")[1]}
               </Link>
             </div>
           </div>
