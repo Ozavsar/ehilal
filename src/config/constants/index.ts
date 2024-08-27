@@ -1,0 +1,1 @@
+export const MEDIUM_USER_URL = "https://medium.com/@Elifhilalumucu"
