@@ -1,6 +1,6 @@
 export interface IArticlePreview {
   title: string;
-  image: string;
   url: string;
+  image?: string;
   description?: string;
 }
