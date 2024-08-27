@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 import { MEDIUM_USER_URL } from "@/config/constants";
 import { IArticlePreview } from "@/config/types";
 import ArticleCard from "./components/ArticleCard";
+import TitleSection from "@/components/TitleSection";
 
 const articles = [
   {
@@ -104,15 +105,13 @@ export default async function BlogContainer() {
   await browser.close(); */
 
   return (
-    <main>
-      <div className="from-brand-dark to-brand-light bg-gradient-radial flex h-screen w-screen items-center justify-center">
-        <h1 className="text-4xl font-bold">Blog Page</h1>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <ArticleCard key={article.url} {...article} />
-          ))}
-        </div>
-      </div>
+    <main className="container flex flex-col sm:pb-20">
+      <TitleSection plainText="my" coloredText="blog" backgroundText="posts" />
+      <ul className="grid gap-6 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        {articles.map((article) => (
+          <ArticleCard key={article.url} {...article} />
+        ))}
+      </ul>
     </main>
   );
 }
