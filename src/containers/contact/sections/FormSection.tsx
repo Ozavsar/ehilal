@@ -1,21 +1,18 @@
 "use client";
-
 import { z, ZodErrorMap } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
+import CustomButton from "@/components/CustomButton";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 
 const customErrorMap: ZodErrorMap = (issue, ctx) => {
   if (issue.code === "invalid_type" && issue.received === "undefined") {
@@ -36,7 +33,7 @@ const formSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
   subject: z
     .string()
-    .nonempty("Subject is required. Please provide the subject."),
+    .min(5, "Subject is required. Please provide the subject."),
   message: z
     .string()
     .min(5, "Your message should contain at least 5 characters."),
@@ -76,33 +73,56 @@ export default function FormSection({
     <section className={`${className}`}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {formFields.map((field) => (
-            <FormField
-              key={field.name}
-              control={form.control}
-              name={field.name as keyof typeof formSchema._type}
-              render={({ field: formField }) => (
-                <FormItem>
-                  <FormLabel>{field.label}</FormLabel>
-                  <FormControl>
-                    {field.type === "input" ? (
-                      <Input placeholder={field.placeholder} {...formField} />
-                    ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {formFields.slice(0, 3).map((field) => (
+              <FormField
+                key={field.name}
+                control={form.control}
+                name={field.name as keyof typeof formSchema._type}
+                render={({ field: formField }) => (
+                  <FormItem>
+                    <FormLabel>{field.label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={field.placeholder}
+                        {...formField}
+                        className="rounded-3xl bg-muted px-4 py-2 text-lg focus-visible:ring-1 focus-visible:ring-primary"
+                      />
+                    </FormControl>
+                    <FormMessage>
+                      {form.formState.errors[field.name]?.message?.toString()}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+
+          <div>
+            {formFields.slice(3).map((field) => (
+              <FormField
+                key={field.name}
+                control={form.control}
+                name={field.name as keyof typeof formSchema._type}
+                render={({ field: formField }) => (
+                  <FormItem>
+                    <FormLabel>{field.label}</FormLabel>
+                    <FormControl>
                       <Textarea
                         placeholder={field.placeholder}
                         {...formField}
+                        className="rounded-3xl bg-muted px-4 py-2 text-lg focus-visible:ring-1 focus-visible:ring-primary"
                       />
-                    )}
-                  </FormControl>
-                  <FormMessage>
-                    {form.formState.errors[field.name]?.message?.toString()}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-          ))}
-
-          <Button type="submit">Submit</Button>
+                    </FormControl>
+                    <FormMessage>
+                      {form.formState.errors[field.name]?.message?.toString()}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+          <CustomButton type="submit" text="send message" />
         </form>
       </Form>
     </section>
