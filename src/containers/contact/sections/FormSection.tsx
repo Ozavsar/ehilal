@@ -1,5 +1,7 @@
 "use client";
 import { z, ZodErrorMap } from "zod";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import CustomButton from "@/components/CustomButton";
@@ -29,14 +31,17 @@ z.setErrorMap(customErrorMap);
 const formSchema = z.object({
   name: z
     .string()
-    .min(2, "Please enter a username with at least 2 characters."),
+    .min(2, "Please enter a username with at least 2 characters.")
+    .max(50, "Username should not exceed 50 characters."),
   email: z.string().email("Please enter a valid email address."),
   subject: z
     .string()
-    .min(5, "Subject is required. Please provide the subject."),
+    .min(5, "Subject is required. Please provide the subject.")
+    .max(50, "Subject should not exceed 50 characters."),
   message: z
     .string()
-    .min(5, "Your message should contain at least 5 characters."),
+    .min(5, "Your message should contain at least 5 characters.")
+    .max(500, "Message should not exceed 500 characters."),
 });
 
 const formFields = [
@@ -67,6 +72,13 @@ export default function FormSection({
 
   const onSubmit = (data: Record<string, string>) => {
     console.log(data);
+    toast.success("Form successfully submitted!");
+    form.reset({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
   };
 
   return (
@@ -111,6 +123,7 @@ export default function FormSection({
                       <Textarea
                         placeholder={field.placeholder}
                         {...formField}
+                        rows={5}
                         className="rounded-3xl bg-muted px-4 py-2 text-lg focus-visible:ring-1 focus-visible:ring-primary"
                       />
                     </FormControl>
@@ -122,7 +135,8 @@ export default function FormSection({
               />
             ))}
           </div>
-          <CustomButton type="submit" text="send message" />
+          <CustomButton type="submit" text="Send Message" />
+          <ToastContainer />
         </form>
       </Form>
     </section>
