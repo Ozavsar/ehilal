@@ -32,6 +32,8 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        "blog-text-color": "hsl(var(--blog-text-color))",
+        "secondary-blog-text-color": "hsl(var(--secondary-blog-text-color))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

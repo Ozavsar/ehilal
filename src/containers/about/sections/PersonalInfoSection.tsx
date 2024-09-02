@@ -34,7 +34,7 @@ const handleDownloadCV = () => {
 
 export default function PersonalInfoSection() {
   return (
-    <section className="grid grid-cols-1 xl:grid-cols-2">
+    <section className="grid grid-cols-1 lg:grid-cols-2">
       <div className="mb-10 flex flex-col justify-between">
         <h1 className="pb-4 text-3xl font-bold uppercase">Personal Infos</h1>
         <Image

@@ -25,8 +25,10 @@ const ArticleCard = ({ image, title, url, description }: IArticlePreview) => {
           </Link>
           <p className="dark:text-white/50">{description}</p>
         </div>
-        <Link href={`/blog/${url}`}>
-          <span className="mt-4 text-blue-500 hover:underline">Read more</span>
+        <Link href={localArticleUrl}>
+          <span className="mt-4 text-sm text-primary hover:underline">
+            Read more...
+          </span>
         </Link>
       </div>
     </li>
