@@ -19,9 +19,9 @@ export default function ExperienceCard({
     <div className="relative row-span-3 grid grid-rows-subgrid gap-4 border-l border-muted pl-10">
       <span className="absolute -left-5 z-10 flex size-10 items-center justify-center rounded-full bg-primary p-1">
         {type === "work" ? (
-          <BriefcaseBusiness size={24} />
+          <BriefcaseBusiness size={24} className="text-muted" />
         ) : (
-          <GraduationCap size={24} />
+          <GraduationCap size={24} className="text-muted" />
         )}
       </span>
       <span className="mt-1 w-fit rounded-full bg-muted px-2 py-1 text-xs font-semibold tracking-wider">

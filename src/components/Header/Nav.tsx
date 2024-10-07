@@ -4,6 +4,7 @@ import {
   HomeIcon,
   NotebookPenIcon,
   UserRoundIcon,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -26,6 +27,11 @@ const navLinks = [
     title: "Blog",
     url: "/blog",
     icon: <NotebookPenIcon />,
+  },
+  {
+    title: "Videos",
+    url: "/videos",
+    icon: <Video />,
   },
   {
     title: "Contact",
