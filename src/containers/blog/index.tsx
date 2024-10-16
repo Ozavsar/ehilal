@@ -1,5 +1,3 @@
-import puppeteer, { Page } from "puppeteer";
-import { MEDIUM_USER_URL } from "@/config/constants";
 import { IArticlePreview } from "@/config/types";
 import ArticleCard from "./components/ArticleCard";
 import TitleSection from "@/components/TitleSection";
