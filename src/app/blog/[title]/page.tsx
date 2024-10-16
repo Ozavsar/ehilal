@@ -1,6 +1,10 @@
 import { MEDIUM_USER_URL } from "@/config/constants";
 import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
 
+export const revalidate = 60 * 60 * 24; // 24 hours
+
+export const dynamicParams = false; // 404 on unknown paths instead of dynamically generating the page
+
 export default async function Blog({ params }: { params: { title: string } }) {
   const { content, rawText } = await getSingleArticle(
     `${MEDIUM_USER_URL}/${params.title}`,
