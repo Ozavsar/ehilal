@@ -6,10 +6,6 @@ import {
 } from "@/lib/youtube";
 import { notFound } from "next/navigation";
 
-export const revalidate = 60 * 60 * 24; // 24 hours
-
-export const dynamicParams = false; // 404 on unknown paths instead of dynamically generating the page
-
 export default async function Video({ params }: { params: { v: string } }) {
   const video = await getYoutubeVideoById(params.v);
   /*   const captions = await getVideoCaptions(params.v);
@@ -50,7 +46,7 @@ export async function generateStaticParams() {
   const videos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
 
   // Get the paths we want to pre-render based on posts
-  return videos?.map((video) => ({
+  return videos!.map((video) => ({
     v: video.id,
   }));
 }
