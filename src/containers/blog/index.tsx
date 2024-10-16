@@ -238,68 +238,11 @@ const articles = [
   }, */
 ];
 
-async function autoScroll(page: Page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 100; // Scroll distance
-      const timer = setInterval(() => {
-        const scrollHeight = document.body.scrollHeight;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve({});
-        }
-      }, 100);
-    });
-  });
+interface Props {
+  articles: IArticlePreview[];
 }
 
-export default async function BlogContainer() {
-  /*   const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
-  await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2" });
-
-  await autoScroll(page); // Perform auto-scrolling to load more articles
-
-  const articles = await page.evaluate(() => {
-    const articleElements = document.querySelectorAll("article");
-    const articleList: IArticlePreview[] = [];
-
-    articleElements.forEach((article) => {
-      const titleElement = article.querySelector("h2");
-      const linkElements = article.querySelectorAll("a");
-      const imageElement = article.querySelectorAll("img")[1];
-      const descriptionElement = article.querySelector("h3");
-
-      let validUrl = null;
-
-      linkElements.forEach((link) => {
-        if (link.href.startsWith("https://medium.com/@Elifhilalumucu/")) {
-          validUrl = link.href;
-        }
-      });
-
-      if (titleElement && validUrl) {
-        articleList.push({
-          title: titleElement.innerText,
-          url: validUrl,
-          image: imageElement?.src.replace(/\/resize:fill:\d+:\d+\//, "/"),
-          description: descriptionElement?.innerText,
-        });
-      }
-    });
-
-    return articleList;
-  });
-
-  await browser.close();
-
-  console.log(articles); */
-
+export default async function BlogContainer({ articles }: Props) {
   return (
     <main className="container flex flex-col sm:pb-20">
       <TitleSection plainText="my" coloredText="blog" backgroundText="posts" />

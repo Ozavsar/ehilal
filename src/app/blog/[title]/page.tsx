@@ -1,27 +1,14 @@
-import puppeteer from "puppeteer";
+import { MEDIUM_USER_URL } from "@/config/constants";
+import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
 
-export default async function Blog({
-  params: { title },
-}: {
-  params: { title: string };
-}) {
-  const blogUrl = `https://medium.com/@Elifhilalumucu/${title}`;
+export const revalidate = 60 * 60 * 24; // 24 hours
 
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
+export const dynamicParams = false; // 404 on unknown paths instead of dynamically generating the page
 
-  await page.goto(blogUrl, { waitUntil: "networkidle2" });
-
-  const { content, rawText } = await page.evaluate(() => {
-    const article = document.querySelector("article");
-    const content = article ? article.innerHTML : "";
-
-    const rawText = article ? article.innerText : "";
-
-    return { content, rawText };
-  });
-
-  await browser.close();
+export default async function Blog({ params }: { params: { title: string } }) {
+  const { content, rawText } = await getSingleArticle(
+    `${MEDIUM_USER_URL}/${params.title}`,
+  );
 
   const lines = rawText
     .split("\n")
@@ -54,13 +41,13 @@ export default async function Blog({
   );
 
   return (
-    <div className="text-blog-text-color mx-auto my-8 max-w-2xl rounded-lg bg-muted p-8 shadow-lg">
+    <div className="mx-auto my-8 max-w-2xl rounded-lg bg-muted p-8 text-blog-text-color shadow-lg">
       <div className="mb-6">
-        <h1 className="text-blog-text-color mb-2 text-3xl font-bold">
+        <h1 className="mb-2 text-3xl font-bold text-blog-text-color">
           {blogTitle}
         </h1>
         <div className="mb-4 flex items-center">
-          <div className="text-secondary-blog-text-color text-sm">
+          <div className="text-sm text-secondary-blog-text-color">
             <p className="leading-none text-primary">{authorName}</p>
             <p className="text-gray-600">
               {publishDate} • {readTime}
@@ -75,4 +62,14 @@ export default async function Blog({
       />
     </div>
   );
+}
+
+// This function gets called at build time
+export async function generateStaticParams() {
+  const articles = await getAllArticlePreviews();
+
+  // Get the paths we want to pre-render based on posts
+  return articles.map((article) => ({
+    title: article.title,
+  }));
 }
