@@ -20,62 +20,17 @@ import {
 import Link from "next/link";
 import { SearchForm } from "@/components/SearchForm";
 import TitleSection from "@/components/TitleSection";
+import { getUploadedVideos } from "@/lib/youtube";
+import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
 
 export default async function YouTubeVideos({
   searchParams,
 }: {
   searchParams: { q?: string; page?: string };
 }) {
+  const videos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
   const query = searchParams.q || "";
   const page = Number(searchParams.page) || 1;
-  const pageSize = 9;
-
-  // const { videos, totalPages } = await getYoutubeVideos(query, page, pageSize);
-
-  const videos = [
-    {
-      id: "1",
-      title: "React Hooks Explained",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "10K",
-      date: "2023-05-15",
-    },
-    {
-      id: "2",
-      title: "Building a Portfolio with Next.js",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "5K",
-      date: "2023-06-01",
-    },
-    {
-      id: "3",
-      title: "CSS Grid Layout Tutorial",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "8K",
-      date: "2023-06-15",
-    },
-    {
-      id: "4",
-      title: "JavaScript ES6 Features",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "12K",
-      date: "2023-07-01",
-    },
-    {
-      id: "5",
-      title: "TypeScript for Beginners",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "7K",
-      date: "2023-07-15",
-    },
-    {
-      id: "6",
-      title: "Responsive Web Design Tips",
-      thumbnail: "/placeholder.svg?height=720&width=1280",
-      views: "9K",
-      date: "2023-08-01",
-    },
-  ];
 
   return (
     <main className="container">
@@ -86,28 +41,32 @@ export default async function YouTubeVideos({
       />
       <SearchForm initialQuery={query} />
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {videos.map((video) => (
+        {videos?.map((video) => (
           <Card key={video.id} className="overflow-hidden">
-            <CardHeader className="p-0">
-              <AspectRatio ratio={16 / 9}>
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="h-full w-full object-cover"
-                />
-              </AspectRatio>
-            </CardHeader>
+            <Link href={`/videos/watch/${video.id}`}>
+              <CardHeader className="p-0">
+                <AspectRatio ratio={16 / 9}>
+                  <img
+                    src={video.thumbnail || ""}
+                    alt={video.title || ""}
+                    className="h-full w-full object-cover"
+                  />
+                </AspectRatio>
+              </CardHeader>
+            </Link>
             <CardContent className="p-4">
-              <CardTitle className="mb-2 line-clamp-2 text-lg">
-                {video.title}
-              </CardTitle>
+              <Link href={`/videos/watch/${video.id}`}>
+                <CardTitle className="mb-2 line-clamp-2 text-lg">
+                  {video.title}
+                </CardTitle>
+              </Link>
               <p className="text-sm text-muted-foreground">
-                {video.views} views • {video.date}
+                {0} views • {video.publishedAt}
               </p>
             </CardContent>
             <CardFooter className="flex justify-between p-4 pt-0">
               <Button asChild variant="outline">
-                <Link href={`/youtube-videos/${video.id}`}>Watch on Site</Link>
+                <Link href={`/videos/watch/${video.id}`}>Watch on Site</Link>
               </Button>
               <Button asChild variant="outline">
                 <a
