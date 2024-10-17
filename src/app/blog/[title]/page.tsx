@@ -17,27 +17,20 @@ export default async function Blog({ params }: { params: { title: string } }) {
   const publishDate =
     lines.find((line) => /\b\d{4}\b/.test(line)) || "No Publish Date Found";
 
-  let cleanedContent = content
+  const cleanedContent = content
     .replace(new RegExp(blogTitle, "gi"), "")
     .replace(new RegExp(authorName, "gi"), "")
     .replace(new RegExp(readTime, "gi"), "")
     .replace(new RegExp(publishDate, "gi"), "")
-    .replace(/<div[^>]*>(Follow|Share|Clap|Comment|\.|[0-9]+)<\/div>/gi, "")
-    .replace(/<figure[^>]*>.*?<\/figure>/gi, "")
-    .replace(/<\/?a[^>]*>/gi, "")
-    .replace(/<img[^>]*>/gi, "")
-    .replace(/<button[^>]*>.*?<\/button>/gi, "")
-    .replace(/<svg[^>]*>.*?<\/svg>/gi, "")
-    .replace(/·/g, "")
-    .replace(/^\s*[\r\n]/gm, "");
-
-  cleanedContent = cleanedContent.replace(
-    /(Follow|Share|Clap|Comment|\b\d+\b|[.|•]+)/gi,
-    "",
-  );
+    .replace(/<span\b[^>]*>\s*·\s*<\/span>/gi, "") // for replacing ·
+    .replace(/<a\b[^>]*>(.*?)<\/a>/gi, "") // for removing anchor tags
+    .replace(/<button[^>]*>.*?<\/button>/gi, "") // for removing buttons
+    .replace(/<aside[^>]*>.*?<\/aside>/gi, "") // for removing asides
+    .replace(/(Follow|Share|Clap|Comment|)/gi, ""); // for removing Follow, Share, Clap, Comment
+  // .replace(/^\s*[\r\n]/gm, ""); // for removing empty lines
 
   return (
-    <div className="mx-auto my-8 max-w-2xl rounded-lg bg-muted p-8 text-blog-text-color shadow-lg">
+    <div className="mx-auto my-8 max-w-2xl rounded-lg p-8 text-blog-text-color shadow-lg">
       <div className="mb-6">
         <h1 className="mb-2 text-3xl font-bold text-blog-text-color">
           {blogTitle}
@@ -65,7 +58,13 @@ export async function generateStaticParams() {
   const articles = await getAllArticlePreviews();
 
   // Get the paths we want to pre-render based on posts
-  return articles.map((article) => ({
-    title: article.title,
-  }));
+  return articles
+    .map((article, i) => {
+      if (i === 0) {
+        return {
+          title: article.title,
+        };
+      } else return undefined;
+    })
+    .filter((article) => article !== undefined);
 }

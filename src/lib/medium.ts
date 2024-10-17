@@ -78,6 +78,8 @@ export const getSingleArticle = async (url: string) => {
 
     const rawText = article ? article.innerText : "";
 
+    console.log(content, rawText);
+
     return { content, rawText };
   });
 
