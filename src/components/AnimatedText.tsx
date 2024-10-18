@@ -35,7 +35,7 @@ export default function AnimatedText({
       {...props}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      transition={{ staggerChildren: 0.05, delayChildren: 0.5 }}
+      transition={{ staggerChildren: 0.03, delayChildren: 0.3 }}
       aria-hidden
     >
       {textArray.map((line, index) => (

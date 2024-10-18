@@ -11,27 +11,34 @@ import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import appRoutes from "@/config/constants/app_routes";
+import UdemyIcon from "@/assets/icons/UdemyIcon";
 
 const navLinks = [
   {
     title: "Home",
-    url: "/",
+    url: appRoutes.INTERNAL.Home,
     icon: <HomeIcon />,
   },
   {
     title: "About",
-    url: "/about",
+    url: appRoutes.INTERNAL.About,
     icon: <UserRoundIcon />,
   },
   {
     title: "Blog",
-    url: "/blog",
+    url: appRoutes.INTERNAL.Blog,
     icon: <NotebookPenIcon />,
   },
   {
     title: "Videos",
-    url: "/videos",
+    url: appRoutes.INTERNAL.Videos,
     icon: <Video />,
+  },
+  {
+    title: "My Courses",
+    url: appRoutes.INTERNAL.Udemy,
+    icon: <UdemyIcon width={24} height={24} />,
   },
   {
     title: "Contact",

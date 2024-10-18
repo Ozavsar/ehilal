@@ -1,38 +1,46 @@
 import Link from "next/link";
 import Image from "next/image";
 import { IArticlePreview } from "@/config/types";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 
-const ArticleCard = ({ image, title, url, description }: IArticlePreview) => {
+export default function ArticleCard({
+  image,
+  title,
+  url,
+  description,
+}: IArticlePreview) {
   const localArticleUrl = `/blog/${url.split("/").pop()}`;
   return (
-    <li className="row-span-2 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted">
-      <div className="h-72 w-full overflow-hidden border-b-8 border-primary">
+    <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
+      <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
         <Link href={localArticleUrl}>
           <Image
             src={image || "/images/blog/default-blog.jpg"}
             alt={title}
             width={800}
             height={800}
-            objectFit="cover"
-            className="h-72 w-full border-b-8 border-primary object-cover transition-transform duration-300 hover:scale-110"
+            className="aspect-square object-cover transition-transform duration-300 hover:scale-110"
           />
         </Link>
-      </div>
-      <div className="row-span-3 flex flex-col justify-between bg-muted p-4">
-        <div>
-          <Link href={localArticleUrl}>
-            <h2 className="text-lg font-bold">{title}</h2>
-          </Link>
-          <p className="dark:text-white/50">{description}</p>
-        </div>
+      </CardHeader>
+      <CardContent className="row-span-1 flex flex-col gap-2 p-4 pb-2">
         <Link href={localArticleUrl}>
-          <span className="mt-4 text-sm text-primary hover:underline">
+          <h2 className="text-lg font-bold">{title}</h2>
+        </Link>
+        <p className="dark:text-gray-400">{description}</p>
+      </CardContent>
+      <CardFooter className="row-span-1 flex justify-end p-4 pt-1">
+        <Link href={localArticleUrl}>
+          <span className="text-sm text-primary hover:underline">
             Read more...
           </span>
         </Link>
-      </div>
-    </li>
+      </CardFooter>
+    </Card>
   );
-};
-
-export default ArticleCard;
+}

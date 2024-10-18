@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "miro.medium.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        port: "",
+      },
     ],
   },
 };

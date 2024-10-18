@@ -2,9 +2,10 @@ const appRoutes = Object.freeze({
   INTERNAL: {
     Home: '/',
     About: '/about',
-    Portfolio: '/portfolio',
-    Contact: '/contact',
     Blog: '/blog',
+    Videos: '/videos',
+    Udemy: '/my-courses',
+    Contact: '/contact',
   },
   EXTERNAL: {
     Tel: 'tel:+905555555555',
