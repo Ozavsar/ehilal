@@ -1,26 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
-import { IArticlePreview } from "@/config/types";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { IBlog } from "@/config/types";
 
 export default function ArticleCard({
-  image,
+  thumbnailUrl,
   title,
-  url,
+  mediumUrl,
+  slug,
   description,
-}: IArticlePreview) {
-  const localArticleUrl = `/blog/${url.split("/").pop()}`;
+}: IBlog) {
+  const localArticleUrl = `/blog/${mediumUrl ? mediumUrl.split("/").pop() : slug}`;
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
       <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
         <Link href={localArticleUrl}>
           <Image
-            src={image || "/images/blog/default-blog.jpg"}
+            src={thumbnailUrl || "/images/blog/default-blog.jpg"}
             alt={title}
             width={800}
             height={800}

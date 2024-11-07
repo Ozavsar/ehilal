@@ -1,8 +1,8 @@
 import { MEDIUM_USER_URL } from "@/config/constants";
-import { IArticlePreview } from "@/config/types";
+import { IBlog } from "@/config/types";
 import puppeteer, { Page } from "puppeteer";
 
-export const getAllArticlePreviews = async (): Promise<IArticlePreview[]> => {
+export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -12,7 +12,7 @@ export const getAllArticlePreviews = async (): Promise<IArticlePreview[]> => {
 
   const articles = await page.evaluate(() => {
     const articleElements = document.querySelectorAll("article");
-    const articleList: IArticlePreview[] = [];
+    const articleList: IBlog[] = [];
 
     articleElements.forEach((article) => {
       const titleElement = article.querySelector("h2");
@@ -32,8 +32,8 @@ export const getAllArticlePreviews = async (): Promise<IArticlePreview[]> => {
       if (titleElement && validUrl) {
         articleList.push({
           title: titleElement.innerText,
-          url: validUrl,
-          image: imageElement?.src.replace(/\/resize:fill:\d+:\d+\//, "/"),
+          mediumUrl: validUrl,
+          thumbnailUrl: imageElement?.src.replace(/\/resize:fill:\d+:\d+\//, "/"),
           description: descriptionElement?.innerText,
         });
       }

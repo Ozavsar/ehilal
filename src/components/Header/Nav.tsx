@@ -78,14 +78,16 @@ export default function Nav() {
                 size="icon"
                 onMouseOver={() => setHoveredItem(link.title)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
+                className={`relative flex items-center justify-center gap-4 border border-background font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
               >
                 <span
                   className={`text-white duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
                 >
                   {isHovered ? link.title : null}
                 </span>
-                <div className="absolute right-0 pr-3">{link.icon}</div>
+                <div className="absolute right-[11px] flex items-center justify-center">
+                  {link.icon}
+                </div>
               </Button>
             </Link>
           </motion.div>

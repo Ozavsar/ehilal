@@ -1,6 +1,5 @@
-"use client";
 import TitleSection from "@/components/TitleSection";
-import { Editor } from "./components/Editor";
+import Editor from "./components/Editor";
 
 export default function WriteContainer() {
   return (

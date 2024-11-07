@@ -2,8 +2,49 @@ import { MEDIUM_USER_URL } from "@/config/constants";
 import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
 
 export default async function Blog({ params }: { params: { title: string } }) {
+  const { title } = params;
+
+  // Try to fetch the article from the database
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/blogs/${title}`
+  );
+  console.log("res", res);
+  let dbArticle;
+
+  if (res.ok) {
+    const data = await res.json();
+    dbArticle = data.blog;
+  }
+
+  if (dbArticle) {
+    // If found in the database, render the database article
+    return (
+      <div className="mx-auto my-8 max-w-2xl rounded-lg p-8 text-blog-text-color shadow-lg">
+        <div className="mb-6">
+          <h1 className="mb-2 text-3xl font-bold text-blog-text-color">
+            {dbArticle.title}
+          </h1>
+          <div className="mb-4 flex items-center">
+            <div className="text-sm text-secondary-blog-text-color">
+              <p className="leading-none text-primary">Database Author</p>
+              <p className="text-gray-600">
+                {new Date(dbArticle.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          dangerouslySetInnerHTML={{ __html: dbArticle.content }}
+          className="prose lg:prose-lg text-blog-text-color"
+        />
+      </div>
+    );
+  }
+
+  // If not found in the database, fetch it from Medium
   const { content, rawText } = await getSingleArticle(
-    `${MEDIUM_USER_URL}/${params.title}`,
+    `${MEDIUM_USER_URL}/${title}`,
   );
 
   const lines = rawText
@@ -22,12 +63,11 @@ export default async function Blog({ params }: { params: { title: string } }) {
     .replace(new RegExp(authorName, "gi"), "")
     .replace(new RegExp(readTime, "gi"), "")
     .replace(new RegExp(publishDate, "gi"), "")
-    .replace(/<span\b[^>]*>\s*·\s*<\/span>/gi, "") // for replacing ·
-    .replace(/<a\b[^>]*>(.*?)<\/a>/gi, "") // for removing anchor tags
-    .replace(/<button[^>]*>.*?<\/button>/gi, "") // for removing buttons
-    .replace(/<aside[^>]*>.*?<\/aside>/gi, "") // for removing asides
-    .replace(/(Follow|Share|Clap|Comment|)/gi, ""); // for removing Follow, Share, Clap, Comment
-  // .replace(/^\s*[\r\n]/gm, ""); // for removing empty lines
+    .replace(/<span\b[^>]*>\s*·\s*<\/span>/gi, "")
+    .replace(/<a\b[^>]*>(.*?)<\/a>/gi, "")
+    .replace(/<button[^>]*>.*?<\/button>/gi, "")
+    .replace(/<aside[^>]*>.*?<\/aside>/gi, "")
+    .replace(/(Follow|Share|Clap|Comment|)/gi, "");
 
   return (
     <div className="mx-auto my-8 max-w-2xl rounded-lg p-8 text-blog-text-color shadow-lg">
@@ -53,11 +93,10 @@ export default async function Blog({ params }: { params: { title: string } }) {
   );
 }
 
-// This function gets called at build time
+// This function generates static paths for Medium articles
 export async function generateStaticParams() {
   const articles = await getAllArticlePreviews();
 
-  // Get the paths we want to pre-render based on posts
   return articles
     .map((article, i) => {
       if (i === 0) {
