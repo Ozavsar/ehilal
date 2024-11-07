@@ -7,6 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { IBlog } from "@/config/types";
+import { truncateDescription } from "@/lib/utils";
 
 export default function ArticleCard({
   thumbnailUrl,
@@ -33,7 +34,9 @@ export default function ArticleCard({
         <Link href={localArticleUrl}>
           <h2 className="text-lg font-bold">{title}</h2>
         </Link>
-        <p className="dark:text-gray-400">{description}</p>
+        <p className="dark:text-gray-400">
+          {truncateDescription(description!)}
+        </p>
       </CardContent>
       <CardFooter className="row-span-1 flex justify-end p-4 pt-1">
         <Link href={localArticleUrl}>

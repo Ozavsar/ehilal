@@ -1,12 +1,12 @@
 import { MEDIUM_USER_URL } from "@/config/constants";
 import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
 
-export default async function Blog({ params }: { params: { title: string } }) {
-  const { title } = params;
+export default async function Blog({ params }: { params: { slug: string } }) {
+  const { slug } = params;
 
   // Try to fetch the article from the database
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/blogs/${title}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/blogs/${slug}`,
   );
   console.log("res", res);
   let dbArticle;
@@ -19,7 +19,7 @@ export default async function Blog({ params }: { params: { title: string } }) {
   if (dbArticle) {
     // If found in the database, render the database article
     return (
-      <div className="mx-auto my-8 max-w-2xl rounded-lg p-8 text-blog-text-color shadow-lg">
+      <div className="mx-auto my-8 flex w-1/3 flex-col rounded-lg bg-muted p-8 text-blog-text-color shadow-lg">
         <div className="mb-6">
           <h1 className="mb-2 text-3xl font-bold text-blog-text-color">
             {dbArticle.title}
@@ -27,7 +27,7 @@ export default async function Blog({ params }: { params: { title: string } }) {
           <div className="mb-4 flex items-center">
             <div className="text-sm text-secondary-blog-text-color">
               <p className="leading-none text-primary">Database Author</p>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 {new Date(dbArticle.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -44,7 +44,7 @@ export default async function Blog({ params }: { params: { title: string } }) {
 
   // If not found in the database, fetch it from Medium
   const { content, rawText } = await getSingleArticle(
-    `${MEDIUM_USER_URL}/${title}`,
+    `${MEDIUM_USER_URL}/${slug}`,
   );
 
   const lines = rawText
@@ -70,7 +70,7 @@ export default async function Blog({ params }: { params: { title: string } }) {
     .replace(/(Follow|Share|Clap|Comment|)/gi, "");
 
   return (
-    <div className="mx-auto my-8 max-w-2xl rounded-lg p-8 text-blog-text-color shadow-lg">
+    <div className="mx-auto my-8 flex w-1/3 flex-col rounded-lg bg-muted p-8 text-blog-text-color shadow-lg">
       <div className="mb-6">
         <h1 className="mb-2 text-3xl font-bold text-blog-text-color">
           {blogTitle}
@@ -78,7 +78,7 @@ export default async function Blog({ params }: { params: { title: string } }) {
         <div className="mb-4 flex items-center">
           <div className="text-sm text-secondary-blog-text-color">
             <p className="leading-none text-primary">{authorName}</p>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               {publishDate} • {readTime}
             </p>
           </div>
