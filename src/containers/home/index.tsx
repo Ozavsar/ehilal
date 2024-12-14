@@ -31,8 +31,8 @@ export default function HomeContainer() {
           <div className="flex w-fit gap-4">
             <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
             <h1 className="text-nowrap text-2xl font-bold text-primary md:text-5xl">
-              I&apos;m Elif Hilal Umucu
-              <span className="block text-foreground sm:mt-2">Advocate</span>
+              I&apos;m Elif Hilal Umucu Kara
+              <span className="block text-foreground sm:mt-2">DevRel</span>
             </h1>
           </div>
 
