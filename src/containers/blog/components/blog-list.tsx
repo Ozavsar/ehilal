@@ -1,6 +1,6 @@
 "use client";
 import ArticleCard from "./article-card";
-import type { IArticlePreview, IBlog } from "@/types.d";
+import type { IBlog } from "@/types.d";
 
 const BlogList = (articles: IBlog[]) => {
   return (

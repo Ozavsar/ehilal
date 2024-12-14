@@ -1,6 +1,6 @@
-import { MEDIUM_USER_URL } from "@/config/constants";
-import { IBlog } from "@/config/types";
 import puppeteer, { Page } from "puppeteer";
+import { MEDIUM_USER_URL } from "@/config/constants";
+import type { IBlog } from "@/types.d";
 
 export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
   const browser = await puppeteer.launch({ headless: true });
@@ -33,7 +33,10 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
         articleList.push({
           title: titleElement.innerText,
           mediumUrl: validUrl,
-          thumbnailUrl: imageElement?.src.replace(/\/resize:fill:\d+:\d+\//, "/"),
+          thumbnailUrl: imageElement?.src.replace(
+            /\/resize:fill:\d+:\d+\//,
+            "/",
+          ),
           description: descriptionElement?.innerText,
         });
       }

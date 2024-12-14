@@ -1,22 +1,16 @@
-const appRoutes = Object.freeze({
+const appRoutes = {
   INTERNAL: {
-    Home: '/',
-    About: '/about',
-    Blog: '/blog',
-    Videos: '/videos',
-    Udemy: '/my-courses',
-    Contact: '/contact',
+    Home: "/",
+    About: "/about",
+    Blog: "/blog",
+    Videos: "/videos",
+    Udemy: "/my-courses",
+    Contact: "/contact",
   },
   EXTERNAL: {
-    Tel: 'tel:+905555555555',
-    Mail: 'mailto:elif@mail.com',
+    Tel: "tel:+905555555555",
+    Mail: "mailto:elif@mail.com",
   },
-  // SOCIAL: {
-  //   social media routes here...
-  // },
-  // COMPANY: {
-  //   company routes here...
-  // },
-});
+} as const;
 
 export default appRoutes;

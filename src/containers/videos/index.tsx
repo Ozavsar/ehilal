@@ -6,11 +6,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SearchForm } from "@/components/SearchForm";
-import TitleSection from "@/components/TitleSection";
-import { getUploadedVideos } from "@/lib/youtube";
+import { SearchForm } from "@/components/search-form";
+import TitleSection from "@/components/title-section";
+import VideoCard from "./components/video-card";
 import { VIDEO_REVALIDATE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
-import VideoCard from "./components/VideoCard";
+import { getUploadedVideos } from "@/lib/youtube";
 
 export const revalidate = VIDEO_REVALIDATE;
 

@@ -1,10 +1,6 @@
-import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
-import {
-  getUploadedVideos,
-  getVideoCaptions,
-  getYoutubeVideoById,
-} from "@/lib/youtube";
 import { notFound } from "next/navigation";
+import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
+import { getUploadedVideos, getYoutubeVideoById } from "@/lib/youtube";
 
 export default async function Video({ params }: { params: { v: string } }) {
   const video = await getYoutubeVideoById(params.v);

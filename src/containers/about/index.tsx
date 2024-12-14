@@ -1,7 +1,7 @@
-import TitleSection from "@/components/TitleSection";
-import ExperienceSection from "./sections/ExperienceSection";
-import PersonalInfoSection from "./sections/PersonalInfoSection";
-import SkillsSection from "./sections/SkillsSection";
+import TitleSection from "@/components/title-section";
+import PersonalInfoSection from "./personal-info-section";
+import ExperienceSection from "./experience-section";
+import SkillsSection from "./skills-section";
 
 export default function AboutContainer() {
   return (

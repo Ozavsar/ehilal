@@ -1,24 +1,18 @@
-import { IBlog } from "@/config/types";
-import ArticleCard from "./components/ArticleCard";
-import TitleSection from "@/components/TitleSection";
-import { useState } from "react";
-import BlogList from "./components/BlogList";
-import { BudemyIcon, SudemyIcon, UdemyIcon } from "@/assets/icons";
+import TitleSection from "@/components/title-section";
+import ArticleCard from "./components/article-card";
+import BlogList from "./components/blog-list";
+import type { IBlog } from "@/types.d";
 
-
-interface Props {
+export default async function BlogContainer({
+  articles,
+}: {
   articles: IBlog[];
-}
-
-export default async function BlogContainer({ articles }: Props) {
+}) {
   return (
     <main className="container flex flex-col sm:pb-20">
       <TitleSection plainText="my" coloredText="blog" backgroundText="posts" />
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <UdemyIcon />
-        <SudemyIcon />
-        <BudemyIcon />
-        <BlogList />
+        {/* <BlogList articles={articles} /> */}
         {articles.map((article) => (
           <ArticleCard key={article.mediumUrl} {...article} />
         ))}
