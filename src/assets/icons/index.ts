@@ -1,1 +1,1 @@
-export {default as UdemyIcon} from './UdemyIcon';
+export {default as UdemyIcon} from './udemy-icon';

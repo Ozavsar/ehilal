@@ -17,10 +17,3 @@ export interface IBlog {
   createdAt?: string;
   updatedAt?: string;
 }
-
-export interface IArticlePreview {
-  title: string;
-  url: string;
-  image?: string;
-  description?: string;
-}

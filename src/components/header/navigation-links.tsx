@@ -1,4 +1,9 @@
 "use client";
+
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   ContactIcon,
   HomeIcon,
@@ -6,13 +11,9 @@ import {
   UserRoundIcon,
   Video,
 } from "lucide-react";
-import Link from "next/link";
+import UdemyIcon from "@/assets/icons/udemy-icon";
 import { Button } from "../ui/button";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import appRoutes from "@/config/constants/app_routes";
-import UdemyIcon from "@/assets/icons/UdemyIcon";
+import appRoutes from "@/config/constants/app-routes";
 
 const navLinks = [
   {

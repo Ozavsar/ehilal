@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import CustomButton from "@/components/custom-button";
 import AnimatedText from "@/components/animated-text";
-import appRoutes from "@/config/constants/app_routes";
+import appRoutes from "@/config/constants/app-routes";
 
 export default function HomeContainer() {
   const text =

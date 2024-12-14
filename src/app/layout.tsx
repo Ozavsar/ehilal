@@ -3,7 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import Providers from "@/context/providers";
 import type { Metadata } from "next";
-import Header from "@/components/headerr";
+import Header from "@/components/header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
