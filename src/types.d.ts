@@ -10,7 +10,7 @@ export interface IBlog {
   _id?: string;
   title: string;
   slug?: string;
-  mediumUrl?: string;
+  mediumUrl: string;
   description?: string;
   content?: string;
   thumbnailUrl?: string;

@@ -72,7 +72,6 @@ export default function FormSection({
   });
 
   const onSubmit = (data: Record<string, string>) => {
-    console.log(data);
     toast.success("Form successfully submitted!");
     form.reset({
       name: "",

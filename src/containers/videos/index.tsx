@@ -1,18 +1,9 @@
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { SearchForm } from "@/components/search-form";
 import TitleSection from "@/components/title-section";
 import VideoCard from "./components/video-card";
-import { VIDEO_REVALIDATE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
+import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos } from "@/lib/youtube";
-
-export const revalidate = VIDEO_REVALIDATE;
+import Pagination from "@/components/pagination";
 
 export default async function VideosContainer({
   searchParams,
@@ -21,20 +12,19 @@ export default async function VideosContainer({
 }) {
   const query = searchParams.q || "";
   const currentPage = parseInt(searchParams.page || "1", 10);
-  const videosPerPage = 9;
 
   const allVideos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
-  const totalPages = Math.ceil(allVideos.length / videosPerPage);
+  const totalPages = Math.ceil(allVideos.length / ITEMS_PER_PAGE);
 
   const videos = allVideos
     ? allVideos.slice(
-        (currentPage - 1) * videosPerPage,
-        currentPage * videosPerPage,
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE,
       )
     : [];
 
   return (
-    <main className="container">
+    <main className="container flex flex-col">
       <TitleSection
         backgroundText="videos"
         plainText="my"
@@ -44,34 +34,7 @@ export default async function VideosContainer({
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {videos?.map((video) => <VideoCard key={video.id} {...video} />)}
       </div>
-      <Pagination className="mt-8">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href={`/videos?page=${currentPage - 1}&q=${query}`}
-              isActive={currentPage > 1}
-            />
-          </PaginationItem>
-
-          {[...Array(totalPages)].map((_, i) => (
-            <PaginationItem key={i}>
-              <PaginationLink
-                href={`/videos?page=${i + 1}&q=${query}`}
-                isActive={currentPage === i + 1}
-              >
-                {i + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-
-          <PaginationItem>
-            <PaginationNext
-              href={`/videos?page=${currentPage + 1}&q=${query}`}
-              isActive={currentPage < totalPages}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Pagination totalPages={totalPages} />
     </main>
   );
 }

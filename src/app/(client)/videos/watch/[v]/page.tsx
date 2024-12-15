@@ -4,9 +4,7 @@ import { getUploadedVideos, getYoutubeVideoById } from "@/lib/youtube";
 
 export default async function Video({ params }: { params: { v: string } }) {
   const video = await getYoutubeVideoById(params.v);
-  /*   const captions = await getVideoCaptions(params.v);
-
-  console.log("captions: ", captions); */
+  // const captions = await getVideoCaptions(params.v);
 
   if (!video) {
     return notFound();

@@ -3,7 +3,7 @@ import { MEDIUM_USER_URL } from "@/config/constants";
 import type { IBlog } from "@/types.d";
 
 export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: false }); // Medium doesn't allow headless browsing
   const page = await browser.newPage();
 
   await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2" });
@@ -70,7 +70,8 @@ async function autoScroll(page: Page) {
 }
 
 export const getSingleArticle = async (url: string) => {
-  const browser = await puppeteer.launch({ headless: true });
+  console.log("url: ", url);
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
   await page.goto(url, { waitUntil: "networkidle2" });
@@ -80,8 +81,6 @@ export const getSingleArticle = async (url: string) => {
     const content = article ? article.innerHTML : "";
 
     const rawText = article ? article.innerText : "";
-
-    console.log(content, rawText);
 
     return { content, rawText };
   });

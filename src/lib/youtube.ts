@@ -48,7 +48,7 @@ export async function getYoutubeVideoById(id: string) {
   });
 
   const video = response.data.items?.[0];
-  console.log("Video:", video);
+  // console.log("Video:", video);
   if (!video) return null;
 
   return {
