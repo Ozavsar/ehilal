@@ -22,7 +22,7 @@ export const getAllArticlePreviews = async (): Promise<
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
   );
 
-  await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2" });
+  await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2", timeout: 0 });
   await autoScroll(page);
 
   const articles = await page.evaluate(() => {
@@ -79,7 +79,7 @@ export const getSingleArticle = async (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
   );
 
-  await page.goto(url, { waitUntil: "networkidle2" });
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
 
   const { content, rawText } = await page.evaluate(() => {
     const article = document.querySelector("article");
