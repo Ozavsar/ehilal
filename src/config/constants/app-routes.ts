@@ -2,8 +2,8 @@ const appRoutes = {
   INTERNAL: {
     Home: "/",
     About: "/about",
-    Blog: "/blog",
-    Videos: "/videos",
+    Blog: "/blog/1",
+    Videos: "/videos/1",
     Udemy: "/my-courses",
     Contact: "/contact",
   },

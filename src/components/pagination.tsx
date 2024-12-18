@@ -1,20 +1,17 @@
 "use client";
 
-import clsx from "clsx";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { generatePagination } from "@/lib/utils";
-import { usePathname, useSearchParams } from "next/navigation";
+import clsx from "clsx";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { generatePagination } from "@/lib/utils";
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentPage = Number(searchParams.get("page")) || 1;
+  const currentPage = +pathname.split("/").pop()!;
 
   const createPageURL = (pageNumber: number | string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
-    return `${pathname}?${params.toString()}`;
+    return pathname.replace(/\/\d+$/, `/${pageNumber}`);
   };
 
   const allPages = generatePagination(currentPage, totalPages);

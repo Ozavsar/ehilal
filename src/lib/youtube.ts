@@ -34,7 +34,9 @@ export async function getUploadedVideos(channelIds: string[]) {
         : "",
     }));
 
-    return videos || [];
+    const limitedVideos = videos?.slice(0, 3);
+
+    return limitedVideos || [];
   } catch (err) {
     console.error("Error fetching videos:", err);
     return [];

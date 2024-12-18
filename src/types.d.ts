@@ -7,13 +7,8 @@ export interface IVideoPreview {
 }
 
 export interface IBlog {
-  _id?: string;
   title: string;
-  slug?: string;
   mediumUrl: string;
   description?: string;
-  content?: string;
   thumbnailUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }

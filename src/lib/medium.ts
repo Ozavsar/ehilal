@@ -1,14 +1,29 @@
-import puppeteer, { Page } from "puppeteer";
-import { MEDIUM_USER_URL } from "@/config/constants";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import type { Page } from "puppeteer";
 import type { IBlog } from "@/types.d";
 
-export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
-  const browser = await puppeteer.launch({ headless: false }); // Medium doesn't allow headless browsing
+puppeteer.use(StealthPlugin()); // Stealth Plugin
+
+const MEDIUM_USER_URL = "https://medium.com/@Elifhilalumucu";
+
+// Medium makalelerini al
+export const getAllArticlePreviews = async (): Promise<
+  { title: string; mediumUrl: string }[]
+> => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
   const page = await browser.newPage();
 
-  await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2" });
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  );
 
-  await autoScroll(page); // Perform auto-scrolling to load more articles
+  await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2" });
+  await autoScroll(page);
 
   const articles = await page.evaluate(() => {
     const articleElements = document.querySelectorAll("article");
@@ -19,7 +34,6 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
       const linkElements = article.querySelectorAll("a");
       const imageElement = article.querySelectorAll("img")[1];
       const descriptionElement = article.querySelector("h3");
-
       let validUrl = null;
 
       linkElements.forEach((link) => {
@@ -45,16 +59,44 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
     return articleList;
   });
 
-  await browser.close();
+  // Maksimum 3 makale döndür
+  const limitedArticles = articles.slice(0, 3);
 
-  return articles;
+  await browser.close();
+  return limitedArticles;
 };
 
-async function autoScroll(page: Page) {
+export const getSingleArticle = async (
+  url: string,
+): Promise<{ content: string; rawText: string }> => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
+  const page = await browser.newPage();
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  );
+
+  await page.goto(url, { waitUntil: "networkidle2" });
+
+  const { content, rawText } = await page.evaluate(() => {
+    const article = document.querySelector("article");
+    const content = article?.innerHTML || "No Content";
+    const rawText = article?.innerText || "No Raw Text";
+    return { content, rawText };
+  });
+
+  await browser.close();
+  return { content, rawText };
+};
+
+async function autoScroll(page: Page): Promise<void> {
   await page.evaluate(async () => {
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       let totalHeight = 0;
-      const distance = 100; // Scroll distance
+      const distance = 100;
       const timer = setInterval(() => {
         const scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
@@ -62,30 +104,9 @@ async function autoScroll(page: Page) {
 
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
-          resolve({});
+          resolve();
         }
       }, 100);
     });
   });
 }
-
-export const getSingleArticle = async (url: string) => {
-  console.log("url: ", url);
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-
-  await page.goto(url, { waitUntil: "networkidle2" });
-
-  const { content, rawText } = await page.evaluate(() => {
-    const article = document.querySelector("article");
-    const content = article ? article.innerHTML : "";
-
-    const rawText = article ? article.innerText : "";
-
-    return { content, rawText };
-  });
-
-  await browser.close();
-
-  return { content, rawText };
-};

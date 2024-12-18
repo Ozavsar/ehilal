@@ -1,5 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Puppeteer modüllerini Webpack'in dışında tut
+      config.externals = [
+        ...config.externals,
+        "puppeteer",
+        "puppeteer-extra",
+        "puppeteer-extra-plugin-stealth",
+      ];
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {

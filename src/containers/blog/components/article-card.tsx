@@ -13,10 +13,9 @@ export default function ArticleCard({
   thumbnailUrl,
   title,
   mediumUrl,
-  slug,
   description,
 }: IBlog) {
-  const localArticleUrl = `/blog/${mediumUrl ? mediumUrl.split("/").pop() : slug}`;
+  const localArticleUrl = `/blog/${mediumUrl.split("/").pop()}`;
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
       <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
