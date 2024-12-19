@@ -18,7 +18,7 @@ export default function ArticleCard({
   const localArticleUrl = `/blog/${mediumURL.split("/").pop()}`;
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
-      <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
+      <CardHeader className="overflow-hidden border-b-8 border-primary bg-primary p-0">
         <Link href={localArticleUrl}>
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}

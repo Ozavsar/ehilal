@@ -20,7 +20,7 @@ export default function VideoCard({
 
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
-      <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
+      <CardHeader className="overflow-hidden border-b-8 border-primary bg-primary p-0">
         <a href={videoUrl} target="_blank" rel="noopener noreferrer">
           <Image
             src={thumbnail || "/images/blog/default-blog.jpg"}
