@@ -10,18 +10,18 @@ import { truncateDescription } from "@/lib/utils";
 import type { IBlog } from "@/types.d";
 
 export default function ArticleCard({
-  thumbnailUrl,
+  thumbnailURL,
   title,
-  mediumUrl,
+  mediumURL,
   description,
 }: IBlog) {
-  const localArticleUrl = `/blog/${mediumUrl.split("/").pop()}`;
+  const localArticleUrl = `/blog/${mediumURL.split("/").pop()}`;
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
       <CardHeader className="overflow-hidden border-b-8 border-primary bg-red-400 p-0">
         <Link href={localArticleUrl}>
           <Image
-            src={thumbnailUrl || "/images/blog/default-blog.jpg"}
+            src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title}
             width={800}
             height={800}

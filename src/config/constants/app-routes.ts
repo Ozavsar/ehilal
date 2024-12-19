@@ -4,7 +4,7 @@ const appRoutes = {
     About: "/about",
     Blog: "/blog/1",
     Videos: "/videos/1",
-    Udemy: "/my-courses",
+    Udemy: "/courses/1",
     Contact: "/contact",
   },
   EXTERNAL: {

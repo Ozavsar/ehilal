@@ -77,7 +77,7 @@ export async function generateStaticParams() {
 
   return [
     ...articles.map((article, i) => {
-      const url = decodeURIComponent(article.mediumUrl);
+      const url = decodeURIComponent(article.mediumURL);
       const slug = url.split("/").pop()?.split("?")[0];
       return {
         slug,

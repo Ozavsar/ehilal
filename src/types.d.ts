@@ -8,7 +8,19 @@ export interface IVideoPreview {
 
 export interface IBlog {
   title: string;
-  mediumUrl: string;
+  mediumURL: string;
   description?: string;
-  thumbnailUrl?: string;
+  thumbnailURL?: string;
+}
+
+interface ICourse {
+  title: string;
+  headline: string;
+  contentInfo: string;
+  numLectures: string;
+  instructionalLevel: string;
+  numReviews: string;
+  udemyURL: string;
+  rating: string | null;
+  thumbnailURL: string | null;
 }

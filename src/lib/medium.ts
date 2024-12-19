@@ -1,15 +1,13 @@
+import type { Page } from "puppeteer";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import type { Page } from "puppeteer";
+import { MEDIUM_USER_URL } from "@/config/constants";
 import type { IBlog } from "@/types.d";
 
-puppeteer.use(StealthPlugin()); // Stealth Plugin
+puppeteer.use(StealthPlugin());
 
-const MEDIUM_USER_URL = "https://medium.com/@Elifhilalumucu";
-
-// Medium makalelerini al
 export const getAllArticlePreviews = async (): Promise<
-  { title: string; mediumUrl: string }[]
+  { title: string; mediumURL: string }[]
 > => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -46,8 +44,8 @@ export const getAllArticlePreviews = async (): Promise<
       if (titleElement && validUrl) {
         articleList.push({
           title: titleElement.innerText,
-          mediumUrl: validUrl,
-          thumbnailUrl: imageElement?.src.replace(
+          mediumURL: validUrl,
+          thumbnailURL: imageElement?.src.replace(
             /\/resize:fill:\d+:\d+\//,
             "/",
           ),

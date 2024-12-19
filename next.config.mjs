@@ -16,6 +16,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "img-c.udemycdn.com",
+        port: "",
+      },
+      {
+        protocol: "https",
         hostname: "miro.medium.com",
         port: "",
       },

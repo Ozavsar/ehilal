@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import TitleSection from "@/components/title-section";
 import Pagination from "@/components/pagination";
-import VideoCard from "./components/video-card";
+import VideoCard from "./video-card";
 import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos } from "@/lib/youtube";
 import type { IVideoPreview } from "@/types.d";
