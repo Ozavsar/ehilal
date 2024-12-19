@@ -33,7 +33,7 @@ const Progress = React.forwardRef<
             style={{ transform: `translateX(-${100 - (progress || 0)}%)` }}
           />
           <span
-            className={`absolute top-0 -ml-6 w-full transform text-xs font-bold text-muted`}
+            className={`absolute top-0 -ml-7 w-full transform text-xs font-bold text-muted`}
             style={{ transform: `translateX(${progress}%)` }}
           >
             {progress}%

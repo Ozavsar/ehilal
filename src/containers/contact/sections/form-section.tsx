@@ -1,10 +1,11 @@
 "use client";
-import { z, ZodErrorMap } from "zod";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import CustomButton from "@/components/CustomButton";
+import { z, ZodErrorMap } from "zod";
+import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
@@ -71,7 +72,6 @@ export default function FormSection({
   });
 
   const onSubmit = (data: Record<string, string>) => {
-    console.log(data);
     toast.success("Form successfully submitted!");
     form.reset({
       name: "",

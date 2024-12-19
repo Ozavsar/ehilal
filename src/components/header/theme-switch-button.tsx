@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { SunMoon } from "lucide-react";
 import { Button } from "../ui/button";
-import { useTheme } from "next-themes";
 
-export default function ThemeSwitch() {
+export default function ThemeSwitchButton() {
   const [mounted, setMounted] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
 

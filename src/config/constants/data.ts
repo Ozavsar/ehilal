@@ -1,6 +1,4 @@
-import ExperienceCard from "../components/ExperienceCard";
-
-const experienceData = [
+export const experienceData = [
   {
     title: "Software Engineer",
     company: "Google",
@@ -50,26 +48,24 @@ const experienceData = [
       "Worked on the Microsoft Office team to improve the user experience of Word.",
     type: "education",
   },
-];
+] as const;
 
-export default function ExperienceSection() {
-  return (
-    <section className="flex flex-col gap-10 px-4 pb-24">
-      <h2 className="text-center text-3xl font-bold uppercase">
-        Experience & Education
-      </h2>
-      <div className="grid-auto-rows-min grid grid-cols-1 gap-10 sm:grid-cols-2">
-        {experienceData.map((experience, i) => (
-          <ExperienceCard
-            key={i}
-            title={experience.title}
-            company={experience.company}
-            duration={experience.duration}
-            description={experience.description}
-            type={experience.type}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
+export const personalInfoData = [
+  { title: "name", value: "Elif Hilal" },
+  { title: "surname", value: "Umucu" },
+  { title: "Age", value: "27 Years" },
+  { title: "Nationality", value: "Turkish" },
+  { title: "Freelance", value: "Available" },
+  { title: "Address", value: "Türkiye" },
+  { title: "phone", value: "+905555555555" },
+  { title: "Email", value: "elifhilal@mail.com" },
+  { title: "Skype", value: "elif.umucu" },
+  { title: "languages", value: "French, English" },
+] as const;
+
+export const statsData = [
+  { value: "12", description: "years of experience" },
+  { value: "97", description: "completed projects" },
+  { value: "81", description: "Happy customers" },
+  { value: "53", description: "awards won" },
+] as const;

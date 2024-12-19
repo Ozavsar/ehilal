@@ -1,5 +1,5 @@
-import AnimatedCounter from "@/components/AnimatedCounter";
 import { Plus } from "lucide-react";
+import AnimatedCounter from "@/components/animated-counter";
 
 interface StatCardProps {
   value: string;

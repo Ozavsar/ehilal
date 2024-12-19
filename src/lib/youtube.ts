@@ -1,4 +1,3 @@
-import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { google } from "googleapis";
 
 const youtube = google.youtube({
@@ -6,12 +5,10 @@ const youtube = google.youtube({
   auth: process.env.YOUTUBE_API_KEY,
 });
 
-// Function to fetch uploaded videos from a channel
 export async function getUploadedVideos(channelIds: string[]) {
   try {
-    // Fetch the playlist ID for uploads
     const channelResponse = await youtube.channels.list({
-      part: ["contentDetails", "statistics"],
+      part: ["contentDetails"],
       id: channelIds,
     });
 
@@ -19,30 +16,30 @@ export async function getUploadedVideos(channelIds: string[]) {
       channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists
         ?.uploads;
 
-    console.log("Uploads Playlist ID:", uploadsPlaylistId);
+    if (!uploadsPlaylistId) throw new Error("Uploads playlist ID not found");
 
-    // Fetch the uploaded videos from the playlist
     const videoResponse = await youtube.playlistItems.list({
       part: ["snippet"],
       playlistId: uploadsPlaylistId,
-      maxResults: 10, // Limit number of videos
+      maxResults: 50, // Maksimum 50 video alabiliriz
     });
 
     const videos = videoResponse.data.items?.map((item) => ({
       id: item.snippet?.resourceId?.videoId,
-      title: item.snippet?.title,
-      description: item.snippet?.description,
-      thumbnail: item.snippet?.thumbnails?.high?.url,
+      title: item.snippet?.title || "",
+      description: item.snippet?.description || "",
+      thumbnail: item.snippet?.thumbnails?.high?.url || "",
       publishedAt: item.snippet?.publishedAt
         ? new Date(item.snippet.publishedAt).toLocaleDateString()
         : "",
     }));
 
-    console.log("Uploaded Videos:", videos);
+    const limitedVideos = videos?.slice(0, 3);
 
-    return videos;
+    return limitedVideos || [];
   } catch (err) {
     console.error("Error fetching videos:", err);
+    return [];
   }
 }
 
@@ -53,7 +50,7 @@ export async function getYoutubeVideoById(id: string) {
   });
 
   const video = response.data.items?.[0];
-  console.log("Video:", video);
+  // console.log("Video:", video);
   if (!video) return null;
 
   return {

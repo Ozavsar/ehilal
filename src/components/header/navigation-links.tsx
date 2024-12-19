@@ -1,4 +1,9 @@
 "use client";
+
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   ContactIcon,
   HomeIcon,
@@ -6,32 +11,35 @@ import {
   UserRoundIcon,
   Video,
 } from "lucide-react";
-import Link from "next/link";
+import UdemyIcon from "@/assets/icons/udemy-icon";
 import { Button } from "../ui/button";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import appRoutes from "@/config/constants/app-routes";
 
 const navLinks = [
   {
     title: "Home",
-    url: "/",
+    url: appRoutes.INTERNAL.Home,
     icon: <HomeIcon />,
   },
   {
     title: "About",
-    url: "/about",
+    url: appRoutes.INTERNAL.About,
     icon: <UserRoundIcon />,
   },
   {
     title: "Blog",
-    url: "/blog",
+    url: appRoutes.INTERNAL.Blog,
     icon: <NotebookPenIcon />,
   },
   {
     title: "Videos",
-    url: "/videos",
+    url: appRoutes.INTERNAL.Videos,
     icon: <Video />,
+  },
+  {
+    title: "My Courses",
+    url: appRoutes.INTERNAL.Udemy,
+    icon: <UdemyIcon width={24} height={24} />,
   },
   {
     title: "Contact",
@@ -71,14 +79,16 @@ export default function Nav() {
                 size="icon"
                 onMouseOver={() => setHoveredItem(link.title)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`relative flex gap-4 font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
+                className={`relative flex items-center justify-center gap-4 border border-background font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
               >
                 <span
                   className={`text-white duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
                 >
                   {isHovered ? link.title : null}
                 </span>
-                <div className="absolute right-0 pr-3">{link.icon}</div>
+                <div className="absolute right-[11px] flex items-center justify-center">
+                  {link.icon}
+                </div>
               </Button>
             </Link>
           </motion.div>

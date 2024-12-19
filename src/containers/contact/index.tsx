@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MailOpenIcon, PhoneCall } from "lucide-react";
-import TitleSection from "@/components/TitleSection";
-import FormSection from "./sections/FormSection";
-import appRoutes from "@/config/constants/app_routes";
+import TitleSection from "@/components/title-section";
+import FormSection from "./sections/form-section";
+import appRoutes from "@/config/constants/app-routes";
 
 export default function ContactContainer() {
   return (

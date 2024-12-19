@@ -2,28 +2,9 @@
 
 import Image from "next/image";
 import { Download } from "lucide-react";
-import CustomButton from "@/components/CustomButton";
-import StatCard from "../components/StatCard";
-
-const personalInfoData = [
-  { title: "name", value: "Elif Hilal" },
-  { title: "surname", value: "Umucu" },
-  { title: "Age", value: "27 Years" },
-  { title: "Nationality", value: "Turkish" },
-  { title: "Freelance", value: "Available" },
-  { title: "Address", value: "Türkiye" },
-  { title: "phone", value: "+905555555555" },
-  { title: "Email", value: "elifhilal@mail.com" },
-  { title: "Skype", value: "elif.umucu" },
-  { title: "languages", value: "French, English" },
-];
-
-const statsData = [
-  { value: "12", description: "years of experience" },
-  { value: "97", description: "completed projects" },
-  { value: "81", description: "Happy customers" },
-  { value: "53", description: "awards won" },
-];
+import CustomButton from "@/components/custom-button";
+import StatCard from "./components/stat-card";
+import { personalInfoData, statsData } from "@/config/constants/data";
 
 const handleDownloadCV = () => {
   const link = document.createElement("a");

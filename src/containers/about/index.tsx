@@ -1,7 +1,6 @@
-import TitleSection from "@/components/TitleSection";
-import ExperienceSection from "./sections/ExperienceSection";
-import PersonalInfoSection from "./sections/PersonalInfoSection";
-import SkillsSection from "./sections/SkillsSection";
+import TitleSection from "@/components/title-section";
+import PersonalInfoSection from "./personal-info-section";
+import ExperienceSection from "./experience-section";
 
 export default function AboutContainer() {
   return (
@@ -12,8 +11,8 @@ export default function AboutContainer() {
         coloredText="me"
       />
       <PersonalInfoSection />
-      <span className="mx-auto my-24 flex h-[1px] w-1/3 bg-muted" />
-      <SkillsSection />
+      {/* <span className="mx-auto my-24 flex h-[1px] w-1/3 bg-muted" />
+      <SkillsSection /> */}
       <span className="mx-auto my-24 flex h-[1px] w-1/3 bg-muted" />
       <ExperienceSection />
     </main>
