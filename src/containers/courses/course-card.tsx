@@ -21,8 +21,8 @@ export default function CourseCard({
   numReviews,
 }: ICourse) {
   return (
-    <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
-      <CardHeader className="overflow-hidden border-b-8 border-primary bg-primary p-0">
+    <Card>
+      <CardHeader>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
@@ -33,7 +33,7 @@ export default function CourseCard({
           />
         </a>
       </CardHeader>
-      <CardContent className="row-span-1 flex flex-col gap-2 p-4 pb-2">
+      <CardContent>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <h2 className="line-clamp-2 text-xl font-bold">{title}</h2>
         </a>
@@ -51,7 +51,7 @@ export default function CourseCard({
               <div className="relative">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-muted text-muted" />
+                    <Star key={i} className="h-4 w-4 text-muted-foreground" />
                   ))}
                 </div>
                 <div
@@ -77,7 +77,7 @@ export default function CourseCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="row-span-1 flex justify-between p-4 pt-1">
+      <CardFooter>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <Button variant={"link"} className="h-fit p-0 text-foreground">
             View on <span className="text-[#a435f0]">&nbsp;Udemy</span>

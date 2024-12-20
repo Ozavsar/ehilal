@@ -2,7 +2,7 @@
 const nextConfig = {
   webpack: (config, { isServer }) => {
     if (isServer) {
-      // Puppeteer modüllerini Webpack'in dışında tut
+      // Keep puppeteer out of the server bundle
       config.externals = [
         ...config.externals,
         "puppeteer",
@@ -14,6 +14,12 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // @todo: remove picsum pattern before production build
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        port: "",
+      },
       {
         protocol: "https",
         hostname: "img-c.udemycdn.com",

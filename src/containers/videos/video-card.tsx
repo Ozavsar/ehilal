@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 export default function VideoCard({
   id,
-  thumbnail,
+  thumbnailURL,
   title,
   description,
   publishedAt,
@@ -23,7 +23,7 @@ export default function VideoCard({
       <CardHeader className="overflow-hidden border-b-8 border-primary bg-primary p-0">
         <a href={videoUrl} target="_blank" rel="noopener noreferrer">
           <Image
-            src={thumbnail || "/images/blog/default-blog.jpg"}
+            src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title || ""}
             width={800}
             height={800}

@@ -4,7 +4,7 @@ import { getUploadedVideos, getYoutubeVideoById } from "@/lib/youtube";
 import VideosContainer from "@/containers/videos";
 
 export const revalidate = 60 * 60 * 24;
-export const dynamicParams = false; // show 404 if the page is not found
+export const dynamicParams = false;
 
 export default async function Video({ params }: { params: { slug: string } }) {
   if (!Number.isNaN(params.slug)) {
@@ -48,7 +48,6 @@ export async function generateStaticParams() {
   const pageCount = Math.ceil(videos.length / ITEMS_PER_PAGE);
   const pageCounts = Array.from({ length: pageCount }, (_, i) => i + 1);
 
-  // Get the paths we want to pre-render based on posts
   return [
     ...videos!.map((video) => ({
       slug: video.id,

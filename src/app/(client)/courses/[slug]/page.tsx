@@ -20,7 +20,6 @@ export default async function Courses({
 
 export async function generateStaticParams() {
   const courses = await getAllCourses();
-  console.log("titleElement", courses[0].title);
   const pageCount = Math.ceil(courses.length / ITEMS_PER_PAGE);
   const pageCounts = Array.from({ length: pageCount }, (_, i) => i + 1);
 
