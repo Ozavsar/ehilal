@@ -18,7 +18,7 @@ export default function SocialLinks() {
   return (
     <div className="flex gap-2 sm:gap-4">
       {socialLinkContents.map(({ href, icon: Icon }) => (
-        <a href={href} target="_blank" rel="noopener noreferrer">
+        <a key={href} href={href} target="_blank" rel="noopener noreferrer">
           <Button
             key={href}
             aria-label={href}
