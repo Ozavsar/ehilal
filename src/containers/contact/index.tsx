@@ -36,19 +36,6 @@ export default function ContactContainer() {
                 </Link>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <PhoneCall className="size-10 text-primary" />
-              <div className="flex flex-col">
-                <h3 className="uppercase text-opacity-30">call me</h3>
-                <Link
-                  href={appRoutes.EXTERNAL.Tel}
-                  target="_blank"
-                  className="font-semibold"
-                >
-                  {appRoutes.EXTERNAL.Tel.split(":")[1]}
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
         <FormSection className="col-span-3 sm:max-lg:pr-12 md:col-span-2" />

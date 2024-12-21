@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import CustomButton from "@/components/custom-button";
 import AnimatedText from "@/components/animated-text";
+import CustomButton from "@/components/custom-button";
 import appRoutes from "@/config/constants/app-routes";
+import SocialLinks from "@/components/social-links";
 
 export default function HomeContainer() {
   const text =
@@ -42,9 +43,12 @@ export default function HomeContainer() {
               className="mb-7 mt-4 text-sm leading-6 md:text-lg lg:mb-6 lg:mt-[2.5px] lg:leading-7"
             />
 
-            <Link href={appRoutes.INTERNAL.About}>
-              <CustomButton text="MORE ABOUT ME" />
-            </Link>
+            <div className="flex gap-2 sm:gap-4">
+              <Link href={appRoutes.INTERNAL.About}>
+                <CustomButton text="MORE ABOUT ME" />
+              </Link>
+              <SocialLinks />
+            </div>
           </div>
         </div>
       </div>

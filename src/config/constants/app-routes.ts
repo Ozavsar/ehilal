@@ -8,8 +8,11 @@ const appRoutes = {
     Contact: "/contact",
   },
   EXTERNAL: {
-    Tel: "tel:+905555555555",
     Mail: "mailto:elif@mail.com",
+  },
+  SOCIAL: {
+    LINKEDIN: "https://www.linkedin.com/in/elif-hilal-umucu/",
+    X: "https://x.com/elifhilalumucu",
   },
 } as const;
 
