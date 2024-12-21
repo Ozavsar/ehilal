@@ -8,8 +8,8 @@ import {
   ContactIcon,
   HomeIcon,
   NotebookPenIcon,
-  UserRoundIcon,
-  Video,
+  PresentationIcon,
+  VideoIcon,
 } from "lucide-react";
 import UdemyIcon from "@/assets/icons/udemy-icon";
 import { Button } from "../ui/button";
@@ -22,9 +22,9 @@ const navLinks = [
     icon: <HomeIcon />,
   },
   {
-    title: "About",
-    url: appRoutes.INTERNAL.About,
-    icon: <UserRoundIcon />,
+    title: "Conferences",
+    url: appRoutes.INTERNAL.Conferences,
+    icon: <PresentationIcon />,
   },
   {
     title: "Blog",
@@ -34,7 +34,7 @@ const navLinks = [
   {
     title: "Videos",
     url: appRoutes.INTERNAL.Videos,
-    icon: <Video />,
+    icon: <VideoIcon />,
   },
   {
     title: "My Courses",

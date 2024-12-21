@@ -1,7 +1,5 @@
 import type { IBlog, ICourse, IVideoPreview } from "@/types.d";
 
-// @todo: Delete this dummy data before the production build
-
 export const videoPreviewDummyData: IVideoPreview[] = [
   {
     id: "video-1",

@@ -10,7 +10,7 @@ const youtube = google.youtube({
 export async function getUploadedVideos(
   channelIds: string[],
 ): Promise<IVideoPreview[]> {
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     // Return dummy data instead of fetching from YouTube API
     return videoPreviewDummyData;
   } else {
@@ -41,7 +41,7 @@ export async function getUploadedVideos(
           ? new Date(item.snippet.publishedAt).toLocaleDateString()
           : "",
       }));
-      
+
       // @todo: Remove limit before the final product
       const limitedVideos = videos?.slice(0, 3);
 
@@ -56,7 +56,7 @@ export async function getUploadedVideos(
 export async function getYoutubeVideoById(
   id: string,
 ): Promise<IVideoPreview | null> {
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     try {
       // Find the dummy video by ID
       const video = videoPreviewDummyData.find((video) => video.id === id);
@@ -91,7 +91,7 @@ export async function getYoutubeVideoById(
 }
 
 export async function getVideoCaptions(videoId: string): Promise<any[]> {
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     try {
       // Dummy captions data
       const captions = [

@@ -44,7 +44,7 @@ export default function HomeContainer() {
             />
 
             <div className="flex gap-2 sm:gap-4">
-              <Link href={appRoutes.INTERNAL.About}>
+              <Link href={appRoutes.INTERNAL.Conferences}>
                 <CustomButton text="MORE ABOUT ME" />
               </Link>
               <SocialLinks />

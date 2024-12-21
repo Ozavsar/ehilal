@@ -71,3 +71,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  @apply bottom-0 top-0 m-0 h-full px-8 text-background dark:text-primary max-sm:px-4;
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  @apply text-3xl sm:text-4xl;
+}
+
+.swiper-button-prev {
+  @apply left-0 bg-gradient-to-r from-muted from-[10%] to-transparent;
+}
+
+.swiper-button-next {
+  @apply right-0 bg-gradient-to-l from-muted from-[10%] to-transparent;
+}

@@ -1,9 +1,11 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import "./globals.css";
 import Providers from "@/context/providers";
 import type { Metadata } from "next";
 import Header from "@/components/header";
+import "swiper/css";
+import "swiper/css/navigation";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",

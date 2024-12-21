@@ -5,10 +5,10 @@ import { MEDIUM_USER_URL } from "@/config/constants";
 import { autoScroll } from "./utils";
 import type { IBlog } from "@/types.d";
 
-process.env.DEVELOPMENT === "false" && puppeteer.use(StealthPlugin());
+process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
 export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     // Instead of scraping, return dummy data
     return blogDummyData;
   } else {
@@ -71,7 +71,7 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
 export const getSingleArticle = async (
   url: string,
 ): Promise<{ content: string; rawText: string }> => {
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     // Instead of scraping, return dummy data
     const content = `<p>Dummy content for ${url}</p>`;
     const rawText = `Dummy raw text for ${url}`;

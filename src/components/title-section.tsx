@@ -1,6 +1,6 @@
 interface TitleSectionProps {
   plainText: string;
-  coloredText: string;
+  coloredText?: string;
   backgroundText: string;
 }
 
@@ -19,9 +19,10 @@ export default function TitleSection({
           {backgroundText}
         </span>
       </div>
-      <div className="fixed left-0 top-0 z-50 w-full bg-muted py-4 pl-6 sm:hidden">
+      <div className="fixed left-0 top-0 z-40 w-full bg-muted py-4 pl-6 sm:hidden">
         <h2 className="text-2xl font-black uppercase">
-          {plainText} <span className="text-primary">{coloredText}</span>
+          {plainText}
+          {coloredText && <span className="text-primary">{coloredText}</span>}
         </h2>
       </div>
     </section>

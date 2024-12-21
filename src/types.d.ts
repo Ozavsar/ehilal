@@ -1,3 +1,5 @@
+import { StaticImageData } from "next/image";
+
 export interface IVideoPreview {
   id: string | null | undefined;
   thumbnailURL: string | null | undefined;
@@ -14,7 +16,7 @@ export interface IBlog {
   thumbnailURL?: string;
 }
 
-interface ICourse {
+export interface ICourse {
   title: string;
   headline: string;
   contentInfo: string;
@@ -24,4 +26,11 @@ interface ICourse {
   udemyURL: string;
   rating: string | null;
   thumbnailURL: string | null;
+}
+
+export interface IConference {
+  title: string;
+  location: string;
+  timestamp: number;
+  images: StaticImageData[];
 }

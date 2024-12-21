@@ -1,14 +1,14 @@
 const appRoutes = {
   INTERNAL: {
     Home: "/",
-    About: "/about",
+    Conferences: "/conferences/1",
     Blog: "/blog/1",
     Videos: "/videos/1",
     Udemy: "/courses/1",
     Contact: "/contact",
   },
   EXTERNAL: {
-    Mail: "mailto:elif@mail.com",
+    Mail: "mailto:elifhilalumucu@gmail.com",
   },
   SOCIAL: {
     LINKEDIN: "https://www.linkedin.com/in/elif-hilal-umucu/",

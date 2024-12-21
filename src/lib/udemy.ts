@@ -5,11 +5,11 @@ import { UDEMY_USER_URL } from "@/config/constants";
 import { autoScroll } from "./utils";
 import type { ICourse } from "@/types.d";
 
-process.env.DEVELOPMENT === "false" && puppeteer.use(StealthPlugin());
+process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
 export const getAllCourses = async (): Promise<ICourse[]> => {
   // Instead of scraping, return dummy data
-  if (process.env.DEVELOPMENT === "true") {
+  if (process.env.NODE_ENV === "development") {
     return courseDummyData;
   } else {
     const browser = await puppeteer.launch({
