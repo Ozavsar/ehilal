@@ -56,6 +56,13 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
         );
         const thumbnailElement = courseElement.querySelector("img");
 
+        const thumbnailElementBig = thumbnailElement
+          ?.getAttribute("srcset")
+          ?.split(",")[1]
+          .trim()
+          .slice(0, -3)
+          .trim();
+
         if (titleElement) {
           courseList.push({
             title:
@@ -75,7 +82,7 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
             udemyURL:
               "https://www.udemy.com" + titleElement.getAttribute("href") ||
               "No URL",
-            thumbnailURL: thumbnailElement?.getAttribute("src") || null,
+            thumbnailURL: thumbnailElementBig || null,
           });
         }
       });
