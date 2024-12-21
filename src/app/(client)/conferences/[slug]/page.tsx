@@ -443,8 +443,6 @@ const conferences: IConference[] = [
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
 
-console.log(conferences);
-
 export default function Conferences({ params }: { params: { slug: string } }) {
   return (
     <ConferencesContainer conferences={conferences} pageNumber={params.slug} />
