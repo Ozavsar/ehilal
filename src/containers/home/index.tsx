@@ -6,8 +6,10 @@ import appRoutes from "@/config/constants/app-routes";
 import SocialLinks from "@/components/social-links";
 
 export default function HomeContainer() {
-  const text =
-    "I'm Elif, a DevRel Engineer at a blockchain company in the USA. I blend my passion for coding, blockchain, and personal growth to inspire others. With experiences across Turkey, Europe, and America, I share insights on technology, personal development, and blockchain education.";
+  const text = [
+    `I speak two powerful languages: code and law. And yes, blockchain!`,
+    "Ready to explore new ideas, share knowledge, and create meaningful connections?",
+  ];
 
   return (
     <main className="container flex min-h-screen items-center justify-center max-sm:-my-20">
@@ -32,8 +34,7 @@ export default function HomeContainer() {
           <div className="flex w-fit gap-4">
             <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
             <h1 className="text-nowrap text-2xl font-bold text-primary md:text-5xl">
-              I&apos;m Elif Hilal Umucu Kara
-              <span className="block text-foreground sm:mt-2">DevRel</span>
+              Hey! That&apos;s me, Elif Hilal👋🏻
             </h1>
           </div>
 
