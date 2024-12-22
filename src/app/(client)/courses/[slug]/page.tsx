@@ -12,7 +12,7 @@ export default async function Courses({
 }) {
   if (!Number.isNaN(params.slug ? params.slug : "1")) {
     const courses = await getAllCourses();
-    return <CourseContainer courses={courses} pageNumber={params.slug} />;
+    return <CourseContainer courses={courses}  />;
   } else {
     return null;
   }

@@ -58,7 +58,7 @@ export default function Nav() {
       variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
       initial="hidden"
       whileInView="visible"
-      className="mx-auto flex flex-row gap-6 p-4 sm:my-auto sm:flex-col sm:p-8"
+      className="mx-auto flex flex-row gap-4 sm:gap-6 p-4 sm:my-auto sm:flex-col sm:p-8"
     >
       {navLinks.map((link, i) => {
         const isActive = pathname === link.url;

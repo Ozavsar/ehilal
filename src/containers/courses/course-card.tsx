@@ -35,7 +35,9 @@ export default function CourseCard({
       </CardHeader>
       <CardContent>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
-          <h2 className="line-clamp-2 text-xl font-bold">{title}</h2>
+          <h2 className="line-clamp-2 text-xl font-bold sm:text-3xl">
+            {title}
+          </h2>
         </a>
         <p className="line-clamp-2 text-sm text-muted-foreground">{headline}</p>
         <div className="flex items-center gap-2 text-sm">
@@ -78,8 +80,13 @@ export default function CourseCard({
         </div>
       </CardContent>
       <CardFooter>
-        <a href={udemyURL} target="_blank" rel="noopener noreferrer">
-          <Button variant={"link"} className="h-fit p-0 text-foreground">
+        <a
+          href={udemyURL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full"
+        >
+          <Button className="w-full hover:bg-yellow-600">
             View on <span className="text-[#a435f0]">&nbsp;Udemy</span>
           </Button>
         </a>
