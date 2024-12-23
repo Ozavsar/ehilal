@@ -89,3 +89,44 @@
 .swiper-button-next {
   @apply right-0 bg-gradient-to-l from-muted from-[10%] to-transparent;
 }
+
+/* rocket cursor */
+.rocket {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+
+  & svg {
+    fill: #ff8811;
+    stroke: transparent;
+    height: 44px;
+    width: 32px;
+  }
+}
+
+.glow {
+  width: 0;
+  height: 0;
+  box-shadow: 0 0 200px 40px #f6ae2d;
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+
+.heart {
+  position: absolute;
+  top: -24px;
+  right: 50%;
+  transform: rotate(-65deg);
+  color: red;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+@keyframes fadeout {
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

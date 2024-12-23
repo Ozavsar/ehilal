@@ -6,6 +6,7 @@ import Header from "@/components/header";
 import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";
+import RocketCursor from "@/components/rocket-cursor";
 
 export const metadata: Metadata = {
   title: "Elif Hilal - Portfolio",
@@ -81,6 +82,8 @@ export default function RootLayout({
           <Header />
           {children}
         </Providers>
+
+        <RocketCursor />
       </body>
     </html>
   );
