@@ -17,7 +17,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <div className="mx-auto mt-8 flex self-end">
+    <div className="z-[9] mx-auto mt-8 flex self-end">
       <PaginationArrow
         direction="left"
         href={createPageURL(currentPage - 1)}
@@ -70,7 +70,7 @@ function PaginationNumber({
     {
       "rounded-l-md": position === "first" || position === "single",
       "rounded-r-md": position === "last" || position === "single",
-      "z-10 bg-primary border-accent text-muted": isActive,
+      "bg-primary border-accent text-muted": isActive,
       "hover:bg-muted": !isActive && position !== "middle",
       "text-gray-300": position === "middle",
     },

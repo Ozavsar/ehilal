@@ -2,9 +2,14 @@ import { notFound } from "next/navigation";
 import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos, getYoutubeVideoById } from "@/lib/youtube";
 import VideosContainer from "@/containers/videos";
+import { Metadata } from "next";
 
 export const revalidate = 60 * 60 * 24;
 export const dynamicParams = false;
+
+export const metadata: Metadata = {
+  title: "Videos",
+};
 
 export default async function Video({ params }: { params: { slug: string } }) {
   if (!Number.isNaN(params.slug)) {

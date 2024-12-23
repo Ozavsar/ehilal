@@ -19,7 +19,7 @@ export default function TitleSection({
           {backgroundText}
         </span>
       </div>
-      <div className="fixed left-0 top-0 z-40 w-full bg-muted py-4 pl-6 sm:hidden">
+      <div className="fixed left-0 top-0 z-20 w-full bg-muted py-4 pl-6 sm:hidden">
         <h2 className="text-2xl font-black uppercase">
           {plainText}
           {coloredText && <span className="text-primary">{coloredText}</span>}

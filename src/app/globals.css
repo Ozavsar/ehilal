@@ -95,7 +95,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 8;
 
   & svg {
     fill: #ff8811;
@@ -129,4 +129,48 @@
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+/* light-dark-mode-effects */
+/* flying-bird */
+/* globals.css */
+@keyframes fly-across {
+  0% {
+    transform: translateX(80vw) translateY(-50%) scale(1);
+    rotate: 0deg;
+    opacity: 0;
+  }
+  25% {
+    transform: translateX(70vw) translateY(-50%) scale(1.2);
+    rotate: 20deg;
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(60vw) translateY(-50%) scale(1.2);
+    rotate: 0deg;
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50vw) translateY(-50%) scale(1);
+    rotate: 0deg;
+    opacity: 0;
+  }
+}
+
+@keyframes rotate-wings {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 20deg;
+  }
+}
+
+.flying-bird {
+  position: fixed;
+  top: 20%; /* Adjust the height of the bird */
+  width: 100px; /* Adjust bird size */
+  animation: fly-across 5s ease-in-out forwards;
+  display: none; /* Hidden by default */
+  z-index: 9999; /* Ensure it's above other elements */
 }

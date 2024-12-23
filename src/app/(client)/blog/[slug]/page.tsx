@@ -1,9 +1,14 @@
 import { ITEMS_PER_PAGE, MEDIUM_USER_URL } from "@/config/constants";
 import BlogContainer from "@/containers/blog";
 import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
+import { Metadata } from "next";
 
 export const revalidate = 60 * 60 * 24;
 export const dynamicParams = false; // show 404 if the page is not found
+
+export const metadata: Metadata = {
+  title: "Blog",
+};
 
 export default async function Blog({ params }: { params: { slug: string } }) {
   if (!Number.isNaN(params.slug)) {
@@ -89,6 +94,4 @@ export async function generateStaticParams() {
       };
     }),
   ];
-
- 
 }
