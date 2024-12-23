@@ -19,7 +19,7 @@ export default function ArticleCard({
   return (
     <Card>
       <CardHeader>
-        <Link href={localArticleUrl}>
+        <a href={mediumURL} target="_blank">
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title}
@@ -27,22 +27,22 @@ export default function ArticleCard({
             height={800}
             className="aspect-video object-cover transition-transform duration-300 hover:scale-110"
           />
-        </Link>
+        </a>
       </CardHeader>
       <CardContent>
-        <Link href={localArticleUrl}>
+        <a href={mediumURL} target="_blank">
           <h2 className="text-lg font-bold">{title}</h2>
-        </Link>
+        </a>
         <p className="dark:text-gray-400">
           {truncateDescription(description!)}
         </p>
       </CardContent>
       <CardFooter>
-        <Link href={localArticleUrl}>
+        <a href={mediumURL} target="_blank">
           <span className="text-sm text-primary hover:underline">
             Read more...
           </span>
-        </Link>
+        </a>
       </CardFooter>
     </Card>
   );
