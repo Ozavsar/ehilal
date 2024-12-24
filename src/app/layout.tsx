@@ -9,7 +9,10 @@ import "./globals.css";
 import RocketCursor from "@/components/rocket-cursor";
 
 export const metadata: Metadata = {
-  title: "Elif Hilal - Portfolio",
+  title: {
+    template: "%s | Elif Hilal Umucu",
+    default: "Portfolio | Elif Hilal",
+  },
   icons: {
     icon: [
       {
@@ -81,9 +84,10 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
-        </Providers>
 
-        <RocketCursor />
+          <RocketCursor />
+          {/* <LightDarkModeEffects /> */}
+        </Providers>
       </body>
     </html>
   );

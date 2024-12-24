@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z, ZodErrorMap } from "zod";
+import { Resend } from "resend";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import appRoutes from "@/config/constants/app-routes";
+import { submitAction } from "@/lib/resend";
+import axios from "axios";
 
 const customErrorMap: ZodErrorMap = (issue, ctx) => {
   if (issue.code === "invalid_type" && issue.received === "undefined") {
@@ -71,7 +75,14 @@ export default function FormSection({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: Record<string, string>) => {
+  const onSubmit = async (data: Record<string, string>) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("subject", data.subject);
+    formData.append("message", data.message);
+
+    await axios.post("/api/send", formData);
     toast.success("Form successfully submitted!");
     form.reset({
       name: "",
@@ -84,7 +95,11 @@ export default function FormSection({
   return (
     <section className={`${className}`}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          action={submitAction}
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8"
+        >
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             {formFields.slice(0, 3).map((field) => (
               <FormField

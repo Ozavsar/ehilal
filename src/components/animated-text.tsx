@@ -42,9 +42,9 @@ export default function AnimatedText({
         <span key={index} className="block">
           {line.split(" ").map((word, index) => (
             <span key={index} className="inline-block">
-              {word.split("").map((char) => (
+              {word.split("").map((char, i) => (
                 <motion.span
-                  key={char}
+                  key={char + i}
                   variants={characterVariants}
                   className="inline-block"
                 >

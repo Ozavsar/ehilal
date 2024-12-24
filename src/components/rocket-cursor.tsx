@@ -32,7 +32,7 @@ export default function RocketCursor() {
     let fps = 10;
 
     const handleMouseMove = (e: MouseEvent) => {
-      mousePosition = { x: e.pageX, y: e.pageY };
+      mousePosition = { x: e.clientX, y: e.clientY };
     };
 
     const calculateNewRocketPosition = (
@@ -116,6 +116,7 @@ export default function RocketCursor() {
           display: flex; 
           align-items: flex-end; 
           justify-content: center;
+          z-index: 7;
         `;
 
         const span = document.createElement("span");
@@ -128,6 +129,7 @@ export default function RocketCursor() {
           animation: fadeout 1s ease-in forwards; 
           opacity: 0.6; 
           box-shadow: 0 0 100px #ffffff20;
+          z-index: 7;
         `;
         div.append(span);
         body.append(div);

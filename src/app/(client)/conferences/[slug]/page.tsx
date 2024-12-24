@@ -136,6 +136,7 @@ import tech_research_coffee_day_3 from "/public/images/about/tech_research_coffe
 import tech_research_coffee_day_4 from "/public/images/about/tech_research_coffee_day/ (4).jpg";
 import tech_research_coffee_day_5 from "/public/images/about/tech_research_coffee_day/ (5).jpg";
 import type { IConference } from "@/types.d";
+import { Metadata } from "next";
 
 const conferences: IConference[] = [
   {
@@ -442,6 +443,10 @@ const conferences: IConference[] = [
     ],
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
+
+export const metadata: Metadata = {
+  title: "Conferences",
+};
 
 export default function Conferences({ params }: { params: { slug: string } }) {
   return (
