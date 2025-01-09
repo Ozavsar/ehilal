@@ -135,13 +135,24 @@ import tech_research_coffee_day_2 from "/public/images/about/tech_research_coffe
 import tech_research_coffee_day_3 from "/public/images/about/tech_research_coffee_day/ (3).jpg";
 import tech_research_coffee_day_4 from "/public/images/about/tech_research_coffee_day/ (4).jpg";
 import tech_research_coffee_day_5 from "/public/images/about/tech_research_coffee_day/ (5).jpg";
+
+import tedxtrabzon_1 from "/public/images/about/tedxtrabzon/(1).jpg";
+import tedxtrabzon_2 from "/public/images/about/tedxtrabzon/(2).jpg";
+import tedxtrabzon_3 from "/public/images/about/tedxtrabzon/(3).jpg";
+import tedxtrabzon_4 from "/public/images/about/tedxtrabzon/(4).jpg";
+
+import lawx_1 from "/public/images/about/lawx/(1).jpg";
+import lawx_2 from "/public/images/about/lawx/(2).jpg";
+import lawx_3 from "/public/images/about/lawx/(3).jpg";
+import lawx_4 from "/public/images/about/lawx/(4).jpg";
+
 import type { IConference } from "@/types.d";
 import { Metadata } from "next";
 
 const conferences: IConference[] = [
   {
     title: "Computer Society Day",
-    location: "Baskent Universitesi - Ankara",
+    location: "Baskent University - Ankara",
     timestamp: 1709856000,
     images: [
       baskent_universitesi_1,
@@ -331,7 +342,7 @@ const conferences: IConference[] = [
   },
   {
     title: "MIT Workshop",
-    location: "Boston",
+    location: "Boston, MIT",
     timestamp: 1713225600,
     images: [MIT_workshop_1, MIT_workshop_2],
   },
@@ -389,7 +400,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Smart Contract Day",
-    location: "Harvard",
+    location: "Harvard University",
     timestamp: 1697500800,
     images: [
       smart_contract_day_harvard_1,
@@ -399,7 +410,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Smart Contract Deployment Workshop",
-    location: "Istanbul",
+    location: "Ankara",
     timestamp: 1650672000,
     images: [
       smart_contract_deployment_workshop_1,
@@ -422,7 +433,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Tech Literacy Day",
-    location: "Gazi Universitesi - Ankara",
+    location: "Gazi University - Ankara",
     timestamp: 1698278400,
     images: [
       tech_literacy_day_gazi_universitesi_1,
@@ -441,6 +452,18 @@ const conferences: IConference[] = [
       tech_research_coffee_day_4,
       tech_research_coffee_day_5,
     ],
+  },
+  {
+    title: "TEDx Trabzon",
+    location: "Trabzon",
+    timestamp: 1735916400,
+    images: [tedxtrabzon_1, tedxtrabzon_2, tedxtrabzon_3, tedxtrabzon_4],
+  },
+  {
+    title: "LawX",
+    location: "Adana",
+    timestamp: 1735311600,
+    images: [lawx_1, lawx_2, lawx_3, lawx_4],
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
 
