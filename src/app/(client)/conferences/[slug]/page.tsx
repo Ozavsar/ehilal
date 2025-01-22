@@ -161,8 +161,8 @@ import { Metadata } from "next";
 
 const conferences: IConference[] = [
   {
-    title: "Computer Society Day",
-    location: "Baskent University - Ankara",
+    title: "Computer Science Lecture",
+    location: "Ankara, Gazi University",
     timestamp: 1709856000,
     images: [
       baskent_universitesi_1,
@@ -194,7 +194,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Blockchain Innovation Day",
-    location: "Boston",
+    location: "Boston, MA",
     timestamp: 1720569600,
     images: [
       blockchain_innovation_day_boston_1,
@@ -308,7 +308,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Chocolate Day",
-    location: "Istanbul",
+    location: "Ankara",
     timestamp: 1723161600,
     images: [chocolate_day_1, chocolate_day_2],
   },
@@ -351,8 +351,8 @@ const conferences: IConference[] = [
     ],
   },
   {
-    title: "MIT Workshop",
-    location: "Boston, MIT",
+    title: "MIT Smart Contract Bootcamp",
+    location: "Boston, MIT University",
     timestamp: 1713225600,
     images: [MIT_workshop_1, MIT_workshop_2],
   },
@@ -409,8 +409,8 @@ const conferences: IConference[] = [
     ],
   },
   {
-    title: "Smart Contract Day",
-    location: "Harvard University",
+    title: "Harvard ETH Smart Contract Bootcamp",
+    location: "Boston, Harvard University",
     timestamp: 1697500800,
     images: [
       smart_contract_day_harvard_1,
@@ -453,7 +453,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Tech Research Coffee Day",
-    location: "Istanbul",
+    location: "Ankara",
     timestamp: 1692403200,
     images: [
       tech_research_coffee_day_1,
@@ -471,7 +471,7 @@ const conferences: IConference[] = [
   },
   {
     title: "LawX",
-    location: "Adana",
+    location: "Adana, Adana Barosu",
     timestamp: 1735311600,
     images: [lawx_1, lawx_2, lawx_3, lawx_4],
   },
