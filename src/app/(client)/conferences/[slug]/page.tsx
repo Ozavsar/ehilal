@@ -146,13 +146,23 @@ import lawx_2 from "/public/images/about/lawx/(2).jpg";
 import lawx_3 from "/public/images/about/lawx/(3).jpg";
 import lawx_4 from "/public/images/about/lawx/(4).jpg";
 
+import ankara_barosu_1 from "/public/images/about/ankara_barosu/(1).jpg";
+import ankara_barosu_2 from "/public/images/about/ankara_barosu/(2).jpg";
+import ankara_barosu_3 from "/public/images/about/ankara_barosu/(3).jpg";
+import ankara_barosu_4 from "/public/images/about/ankara_barosu/(4).jpg";
+
+import ilham_kahvesi_1 from "/public/images/about/ilham_kahvesi/(1).jpg";
+import ilham_kahvesi_2 from "/public/images/about/ilham_kahvesi/(2).jpg";
+import ilham_kahvesi_3 from "/public/images/about/ilham_kahvesi/(3).jpg";
+import ilham_kahvesi_4 from "/public/images/about/ilham_kahvesi/(4).jpg";
+
 import type { IConference } from "@/types.d";
 import { Metadata } from "next";
 
 const conferences: IConference[] = [
   {
-    title: "Computer Society Day",
-    location: "Baskent University - Ankara",
+    title: "Computer Science Lecture",
+    location: "Ankara, Gazi University",
     timestamp: 1709856000,
     images: [
       baskent_universitesi_1,
@@ -184,7 +194,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Blockchain Innovation Day",
-    location: "Boston",
+    location: "Boston, MA",
     timestamp: 1720569600,
     images: [
       blockchain_innovation_day_boston_1,
@@ -298,7 +308,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Chocolate Day",
-    location: "Istanbul",
+    location: "Ankara",
     timestamp: 1723161600,
     images: [chocolate_day_1, chocolate_day_2],
   },
@@ -341,8 +351,8 @@ const conferences: IConference[] = [
     ],
   },
   {
-    title: "MIT Workshop",
-    location: "Boston, MIT",
+    title: "MIT Smart Contract Bootcamp",
+    location: "Boston, MIT University",
     timestamp: 1713225600,
     images: [MIT_workshop_1, MIT_workshop_2],
   },
@@ -399,8 +409,8 @@ const conferences: IConference[] = [
     ],
   },
   {
-    title: "Smart Contract Day",
-    location: "Harvard University",
+    title: "Harvard ETH Smart Contract Bootcamp",
+    location: "Boston, Harvard University",
     timestamp: 1697500800,
     images: [
       smart_contract_day_harvard_1,
@@ -443,7 +453,7 @@ const conferences: IConference[] = [
   },
   {
     title: "Tech Research Coffee Day",
-    location: "Istanbul",
+    location: "Ankara",
     timestamp: 1692403200,
     images: [
       tech_research_coffee_day_1,
@@ -461,9 +471,31 @@ const conferences: IConference[] = [
   },
   {
     title: "LawX",
-    location: "Adana",
+    location: "Adana, Adana Barosu",
     timestamp: 1735311600,
     images: [lawx_1, lawx_2, lawx_3, lawx_4],
+  },
+  {
+    title: "Teknoloji Okuryazarlığı ve Teknoloji Hukuku",
+    location: "Ankara, Ankara Baro’su",
+    timestamp: 1736596800,
+    images: [
+      ankara_barosu_1,
+      ankara_barosu_2,
+      ankara_barosu_3,
+      ankara_barosu_4,
+    ],
+  },
+  {
+    title: "İlham Kahvesi",
+    location: "Ankara Cumhurbaşkanlığı",
+    timestamp: 1736251200,
+    images: [
+      ilham_kahvesi_1,
+      ilham_kahvesi_2,
+      ilham_kahvesi_3,
+      ilham_kahvesi_4,
+    ],
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
 
