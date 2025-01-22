@@ -8,7 +8,7 @@ const appRoutes = {
     Contact: "/contact",
   },
   EXTERNAL: {
-    Mail: "mailto:elifhilalumucu@gmail.com",
+    Mail: "mailto:elif@ehilal.net",
   },
   SOCIAL: {
     LINKEDIN: "https://www.linkedin.com/in/elif-hilal-umucu/",
