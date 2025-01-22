@@ -146,6 +146,11 @@ import lawx_2 from "/public/images/about/lawx/(2).jpg";
 import lawx_3 from "/public/images/about/lawx/(3).jpg";
 import lawx_4 from "/public/images/about/lawx/(4).jpg";
 
+import ankara_barosu_1 from "/public/images/about/ankara_barosu/(1).jpg";
+import ankara_barosu_2 from "/public/images/about/ankara_barosu/(2).jpg";
+import ankara_barosu_3 from "/public/images/about/ankara_barosu/(3).jpg";
+import ankara_barosu_4 from "/public/images/about/ankara_barosu/(4).jpg";
+
 import type { IConference } from "@/types.d";
 import { Metadata } from "next";
 
@@ -464,6 +469,17 @@ const conferences: IConference[] = [
     location: "Adana",
     timestamp: 1735311600,
     images: [lawx_1, lawx_2, lawx_3, lawx_4],
+  },
+  {
+    title: "Teknoloji Okuryazarlığı ve Teknoloji Hukuku",
+    location: "Ankara , Ankara Baro’su",
+    timestamp: 1736596800,
+    images: [
+      ankara_barosu_1,
+      ankara_barosu_2,
+      ankara_barosu_3,
+      ankara_barosu_4,
+    ],
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
 
