@@ -151,6 +151,11 @@ import ankara_barosu_2 from "/public/images/about/ankara_barosu/(2).jpg";
 import ankara_barosu_3 from "/public/images/about/ankara_barosu/(3).jpg";
 import ankara_barosu_4 from "/public/images/about/ankara_barosu/(4).jpg";
 
+import ilham_kahvesi_1 from "/public/images/about/ilham_kahvesi/(1).jpg";
+import ilham_kahvesi_2 from "/public/images/about/ilham_kahvesi/(2).jpg";
+import ilham_kahvesi_3 from "/public/images/about/ilham_kahvesi/(3).jpg";
+import ilham_kahvesi_4 from "/public/images/about/ilham_kahvesi/(4).jpg";
+
 import type { IConference } from "@/types.d";
 import { Metadata } from "next";
 
@@ -472,8 +477,19 @@ const conferences: IConference[] = [
   },
   {
     title: "Teknoloji Okuryazarlığı ve Teknoloji Hukuku",
-    location: "Ankara , Ankara Baro’su",
+    location: "Ankara, Ankara Baro’su",
     timestamp: 1736596800,
+    images: [
+      ankara_barosu_1,
+      ankara_barosu_2,
+      ankara_barosu_3,
+      ankara_barosu_4,
+    ],
+  },
+  {
+    title: "İlham Kahvesi",
+    location: "Ankara Cumhurbaşkanlığı",
+    timestamp: 1736251200,
     images: [
       ankara_barosu_1,
       ankara_barosu_2,
