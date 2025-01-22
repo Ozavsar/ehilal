@@ -491,10 +491,10 @@ const conferences: IConference[] = [
     location: "Ankara Cumhurbaşkanlığı",
     timestamp: 1736251200,
     images: [
-      ankara_barosu_1,
-      ankara_barosu_2,
-      ankara_barosu_3,
-      ankara_barosu_4,
+      ilham_kahvesi_1,
+      ilham_kahvesi_2,
+      ilham_kahvesi_3,
+      ilham_kahvesi_4,
     ],
   },
 ].sort((a, b) => b.timestamp - a.timestamp);
