@@ -1,0 +1,22 @@
+{
+  "kind": "singleType",
+  "collectionName": "home_contents",
+  "info": {
+    "singularName": "home-content",
+    "pluralName": "home-contents",
+    "displayName": "HomeContent"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Greeting": {
+      "type": "string",
+      "required": true
+    },
+    "Introduction": {
+      "type": "text",
+      "required": true
+    }
+  }
+}
