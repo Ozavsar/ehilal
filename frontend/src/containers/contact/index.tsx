@@ -1,27 +1,28 @@
 import Link from "next/link";
-import { MailOpenIcon, PhoneCall } from "lucide-react";
+import { MailOpenIcon } from "lucide-react";
 import TitleSection from "@/components/title-section";
 import FormSection from "./sections/form-section";
 import appRoutes from "@/config/constants/app-routes";
+import type { IStrapiContactPage } from "@/types.d";
+import { PAGE_CONTENTS } from "@/constants/page-contents";
 
-export default function ContactContainer() {
+interface IContactContainerProps {
+  content: IStrapiContactPage;
+}
+
+export default function ContactContainer({ content }: IContactContainerProps) {
   return (
     <main className="container">
       <TitleSection
-        backgroundText="contact"
-        plainText="get in"
-        coloredText="touch"
+        backgroundText={content.page_title_background}
+        text={content.page_title ?? PAGE_CONTENTS.CONTACT.page_title}
       />
       <div className="grid grid-flow-row-dense grid-cols-3 gap-12">
         <div className="max-md:col-span-3">
           <h1 className="pb-4 text-3xl font-bold uppercase">
-            Don&apos;t Be Shy!
+            {content.title ?? PAGE_CONTENTS.CONTACT.title}
           </h1>
-          <p>
-            Feel free to get in touch with me. I am always open to discussing
-            new projects, creative ideas or opportunities to be part of your
-            visions.
-          </p>
+          <p>{content.description ?? PAGE_CONTENTS.CONTACT.description}</p>
           <div className="flex flex-col gap-6 py-6 max-md:items-center">
             <div className="flex items-center gap-2">
               <MailOpenIcon className="size-10 text-primary" />

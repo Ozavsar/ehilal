@@ -2,7 +2,7 @@ import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { courseDummyData } from "@/config/constants/dummy-data";
 import { UDEMY_USER_URL } from "@/config/constants";
-import { autoScroll } from "./utils";
+import { autoScroll } from "../utils";
 import type { ICourse } from "@/types.d";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());

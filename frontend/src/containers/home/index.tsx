@@ -4,13 +4,14 @@ import AnimatedText from "@/components/animated-text";
 import CustomButton from "@/components/custom-button";
 import appRoutes from "@/config/constants/app-routes";
 import SocialLinks from "@/components/social-links";
+import type { IStrapiHomePage } from "@/types.d";
+import { PAGE_CONTENTS } from "@/constants/page-contents";
 
-export default function HomeContainer() {
-  const text = [
-    `I speak two powerful languages: code and law. And yes, blockchain!`,
-    "Ready to explore new ideas, share knowledge, and create meaningful connections?",
-  ];
+interface IHomeContainerProps {
+  content: IStrapiHomePage;
+}
 
+export default function HomeContainer({ content }: IHomeContainerProps) {
   return (
     <main className="container flex min-h-screen items-center justify-center max-sm:-my-20">
       <Image
@@ -34,13 +35,13 @@ export default function HomeContainer() {
           <div className="flex w-fit gap-4">
             <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
             <h1 className="text-nowrap text-2xl font-bold text-primary md:text-5xl">
-              Hey! That&apos;s me, Elif Hilal👋🏻
+              {content.greeting ?? PAGE_CONTENTS.HOME.greeting}
             </h1>
           </div>
 
           <div className="flex flex-col sm:gap-2">
             <AnimatedText
-              text={text}
+              text={content.introduction ?? PAGE_CONTENTS.HOME.introduction}
               className="mb-7 mt-4 text-sm leading-6 md:text-lg lg:mb-6 lg:mt-[2.5px] lg:leading-7"
             />
 

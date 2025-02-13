@@ -3,7 +3,7 @@ import TitleSection from "@/components/title-section";
 import Pagination from "@/components/pagination";
 import VideoCard from "./video-card";
 import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
-import { getUploadedVideos } from "@/lib/youtube";
+import { getUploadedVideos } from "@/lib/services/youtube";
 import type { IVideoPreview } from "@/types.d";
 
 export default async function VideosContainer({
@@ -29,8 +29,7 @@ export default async function VideosContainer({
       <div className="flex flex-col">
         <TitleSection
           backgroundText="youtube"
-          plainText="my"
-          coloredText="videos"
+          text="my videos"
         />
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {videos?.map((video) => <VideoCard key={video.id} {...video} />)}

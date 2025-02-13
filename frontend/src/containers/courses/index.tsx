@@ -22,8 +22,7 @@ export default async function CourseContainer({
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <TitleSection
-          plainText="my"
-          coloredText="courses"
+          text="my courses"
           backgroundText="udemy"
         />
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">

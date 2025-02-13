@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import appRoutes from "@/config/constants/app-routes";
-import { submitAction } from "@/lib/resend";
+import { submitAction } from "@/lib/services/resend";
 import axios from "axios";
 
 const customErrorMap: ZodErrorMap = (issue, ctx) => {

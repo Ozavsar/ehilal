@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import Pagination from "@/components/pagination";
 import TitleSection from "@/components/title-section";
-import type { IConference } from "@/types.d";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import ConferenceCard from "./conference-card";
+import type { IConference } from "@/types.d";
 
 export default function ConferencesContainer({
   conferences,
@@ -22,7 +22,7 @@ export default function ConferencesContainer({
     : [];
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8">
-      <TitleSection backgroundText="Speeches" plainText="Conferences" />
+      <TitleSection backgroundText="Speeches" text="Conferences" />
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {conferences.map((conference) => (
           <ConferenceCard key={conference.title} {...conference} />

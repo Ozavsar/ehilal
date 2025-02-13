@@ -1,6 +1,6 @@
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import CourseContainer from "@/containers/courses";
-import { getAllCourses } from "@/lib/udemy";
+import { getAllCourses } from "@/lib/services/udemy";
 import { Metadata } from "next";
 
 export const revalidate = 60 * 60 * 24;

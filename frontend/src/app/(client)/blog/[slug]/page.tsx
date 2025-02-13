@@ -1,6 +1,6 @@
 import { ITEMS_PER_PAGE, MEDIUM_USER_URL } from "@/config/constants";
 import BlogContainer from "@/containers/blog";
-import { getAllArticlePreviews, getSingleArticle } from "@/lib/medium";
+import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
 import { Metadata } from "next";
 
 export const revalidate = 60 * 60 * 24;

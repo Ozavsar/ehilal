@@ -1,5 +1,7 @@
 import HomeContainer from "@/containers/home";
+import { getHomePageContent } from "@/lib/services/pages";
 
-export default function Home() {
-  return <HomeContainer />;
+export default async function Home() {
+  const content = await getHomePageContent();
+  return <HomeContainer content={content} />;
 }

@@ -34,3 +34,28 @@ export interface IConference {
   timestamp: number;
   images: StaticImageData[];
 }
+
+export interface IStrapiBasePage {
+  id: number;
+  documentId: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface IStrapiHomePage extends IStrapiBasePage {
+  greeting: string;
+  introduction: string;
+}
+
+export interface IStrapiContactPage extends IStrapiBasePage {
+  title: string;
+  description: string;
+  page_title: string;
+  page_title_background: string;
+}
+
+export interface IStrapiResponse<T> {
+  data: T;
+  meta: Record<string, unknown>;
+}

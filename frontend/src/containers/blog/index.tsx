@@ -27,8 +27,7 @@ export default async function BlogContainer({
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <TitleSection
-          plainText="my"
-          coloredText="blog"
+          text="my blog"
           backgroundText="medium"
         />
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
