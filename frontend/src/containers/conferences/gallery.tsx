@@ -5,17 +5,17 @@ import { useState } from "react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import FullScreenGallery from "./full-screen-gallery";
+import { IImage } from "@/types";
 
 interface Props {
-  images: StaticImageData[];
+  images: IImage[];
   title: string;
 }
 
 export default function Gallery({ images, title }: Props) {
-  const [fullScreenImage, setFullScreenImage] =
-    useState<StaticImageData | null>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
-  const openFullScreen = (image: StaticImageData) => {
+  const openFullScreen = (image: string) => {
     setFullScreenImage(image);
   };
 
@@ -32,11 +32,11 @@ export default function Gallery({ images, title }: Props) {
         {images.map((image, index) => (
           <SwiperSlide key={index}>
             <Image
-              src={image}
+              src={image.url}
               alt={title || ""}
               width={800}
               height={800}
-              onClick={() => openFullScreen(image)}
+              onClick={() => openFullScreen(image.formats.large.url)}
               className="aspect-video cursor-pointer object-cover object-center"
             />
           </SwiperSlide>

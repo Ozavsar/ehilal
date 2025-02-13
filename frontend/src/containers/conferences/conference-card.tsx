@@ -1,24 +1,19 @@
-import Image, { StaticImageData } from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { truncateDescription } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Gallery from "./gallery";
-import { IConference } from "@/types";
+import type { IStrapiConference } from "@/types.d";
 
 export default function ConferenceCard({
-  timestamp,
-  location,
   title,
+  date,
+  location,
   images,
-}: IConference) {
-  const date = new Date(timestamp * 1000).toLocaleDateString();
+}: IStrapiConference) {
   return (
     <Card className="row-span-3 grid aspect-video grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
       <CardHeader className="overflow-hidden border-b-8 border-primary bg-primary p-0">

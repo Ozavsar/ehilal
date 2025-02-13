@@ -26,10 +26,7 @@ export default async function BlogContainer({
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
-        <TitleSection
-          text="my blog"
-          backgroundText="medium"
-        />
+        <TitleSection text="my blog" backgroundText="medium" />
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
             <ArticleCard key={article.mediumURL} {...article} />
@@ -37,7 +34,7 @@ export default async function BlogContainer({
         </div>
       </div>
       <Suspense fallback={null}>
-        <Pagination totalPages={totalPages} />
+        <Pagination totalPages={totalPages} currentPage={currentPage} />
       </Suspense>
     </main>
   );

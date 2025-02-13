@@ -36,7 +36,7 @@ export default async function VideosContainer({
         </div>
       </div>
       <Suspense fallback={null}>
-        <Pagination totalPages={totalPages} />
+        <Pagination totalPages={totalPages} currentPage={currentPage} />
       </Suspense>
     </main>
   );

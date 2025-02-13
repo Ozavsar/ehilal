@@ -6,9 +6,16 @@ import clsx from "clsx";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { generatePagination } from "@/lib/utils";
 
-export default function Pagination({ totalPages }: { totalPages: number }) {
+interface IPaginationProps {
+  totalPages: number;
+  currentPage: number;
+}
+
+export default function Pagination({
+  totalPages,
+  currentPage,
+}: IPaginationProps) {
   const pathname = usePathname();
-  const currentPage = +pathname.split("/").pop()!;
 
   const createPageURL = (pageNumber: number | string) => {
     return pathname.replace(/\/\d+$/, `/${pageNumber}`);

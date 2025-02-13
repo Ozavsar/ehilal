@@ -4,7 +4,7 @@ import TitleSection from "@/components/title-section";
 import FormSection from "./sections/form-section";
 import appRoutes from "@/config/constants/app-routes";
 import type { IStrapiContactPage } from "@/types.d";
-import { PAGE_CONTENTS } from "@/constants/page-contents";
+import { PAGE_CONTENTS } from "@/config/constants/page-contents";
 
 interface IContactContainerProps {
   content: IStrapiContactPage;

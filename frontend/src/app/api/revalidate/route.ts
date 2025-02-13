@@ -3,7 +3,6 @@ import { revalidateTag } from "next/cache";
 
 // @todo: Add body type control after docs added to the project
 export async function POST(req: NextRequest) {
-  console.log(req.headers.get("Revalidation-Key"));
   try {
     if (req.headers.get("Revalidation-Key") !== process.env.REVALIDATE_KEY) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

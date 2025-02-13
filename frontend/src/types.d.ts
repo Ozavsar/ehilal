@@ -1,5 +1,45 @@
 import { StaticImageData } from "next/image";
 
+interface IImageFormat {
+  ext: string;
+  url: string;
+  hash: string;
+  mime: string;
+  name: string;
+  path: string | null;
+  size: number;
+  width: number;
+  height: number;
+  sizeInBytes: number;
+}
+
+interface IImage {
+  id: number;
+  documentId: string;
+  name: string;
+  alternativeText: string | null;
+  caption: string | null;
+  width: number;
+  height: number;
+  formats: {
+    large: IImageFormat;
+    small: IImageFormat;
+    medium: IImageFormat;
+    thumbnail: IImageFormat;
+  };
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  previewUrl: string | null;
+  provider: string;
+  provider_metadata: any | null;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 export interface IVideoPreview {
   id: string | null | undefined;
   thumbnailURL: string | null | undefined;
@@ -55,7 +95,23 @@ export interface IStrapiContactPage extends IStrapiBasePage {
   page_title_background: string;
 }
 
+export interface IStrapiConference extends IStrapiBasePage {
+  title: string;
+  location: string;
+  date: string;
+  images: IImage[];
+}
+
 export interface IStrapiResponse<T> {
   data: T;
-  meta: Record<string, unknown>;
+  meta: {
+    pagination: {
+      start?: number;
+      limit?: number;
+      page?: number;
+      pageSize?: number;
+      pageCount?: number;
+      total: number;
+    };
+  };
 }

@@ -2,9 +2,10 @@ import Image, { StaticImageData } from "next/image";
 import { XIcon } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { IImage } from "@/types";
 
 interface FullScreenImageProps {
-  images: StaticImageData[];
+  images: IImage[];
   title: string;
   onClose: () => void;
 }
@@ -31,7 +32,7 @@ export default function FullScreenImage({
         {images.map((image, index) => (
           <SwiperSlide key={index}>
             <Image
-              src={image}
+              src={image.url}
               alt={`${title} - Image ${index + 1}`}
               width={1920}
               height={1920}

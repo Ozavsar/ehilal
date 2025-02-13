@@ -5,7 +5,7 @@ import CustomButton from "@/components/custom-button";
 import appRoutes from "@/config/constants/app-routes";
 import SocialLinks from "@/components/social-links";
 import type { IStrapiHomePage } from "@/types.d";
-import { PAGE_CONTENTS } from "@/constants/page-contents";
+import { PAGE_CONTENTS } from "@/config/constants/page-contents";
 
 interface IHomeContainerProps {
   content: IStrapiHomePage;
