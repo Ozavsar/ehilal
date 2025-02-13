@@ -79,6 +79,7 @@ export interface IStrapiBasePage {
 export interface IStrapiHomePage extends IStrapiBasePage {
   greeting: string;
   introduction: string;
+  hero_image: IImage;
 }
 
 export interface IStrapiContactPage extends IStrapiBasePage {

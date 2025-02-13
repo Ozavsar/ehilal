@@ -15,7 +15,6 @@ export const getAllCourses = async () => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      timeout: 200000,
     });
 
     const page = await browser.newPage();
@@ -26,7 +25,6 @@ export const getAllCourses = async () => {
 
     await page.goto(UDEMY_USER_URL, {
       waitUntil: "networkidle2",
-      timeout: 200000,
     });
     await autoScroll(page);
 
