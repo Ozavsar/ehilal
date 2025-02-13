@@ -1,0 +1,38 @@
+import { ITEMS_PER_PAGE } from "@/config/constants";
+import ConferencesContainer from "@/containers/conferences";
+import { fetchConferences } from "@/lib/services/conferences";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Conferences",
+};
+
+export default async function Conferences({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const start = ITEMS_PER_PAGE * (Number(params.slug) - 1);
+  const end = start + ITEMS_PER_PAGE;
+  const response = await fetchConferences(start, end);
+  const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
+  return (
+    <ConferencesContainer
+      conferences={response.data}
+      pageNumber={params.slug}
+      totalPages={totalPages}
+    />
+  );
+}
+
+export async function generateStaticParams() {
+  const response = await fetchConferences();
+
+  if (!response || !response.data.length) return [];
+  const totalConferences = response.meta.pagination.total;
+  const totalPages = Math.ceil(totalConferences / ITEMS_PER_PAGE);
+
+  return Array.from({ length: totalPages }, (_, i) => ({
+    page: (i + 1).toString(),
+  }));
+}
