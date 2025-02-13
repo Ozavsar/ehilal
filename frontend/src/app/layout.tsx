@@ -3,10 +3,13 @@ import { GeistMono } from "geist/font/mono";
 import Providers from "@/context/providers";
 import type { Metadata } from "next";
 import Header from "@/components/header";
+import hextohsl from "hex-to-hsl";
 import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";
 import RocketCursor from "@/components/rocket-cursor";
+import { fetchTheme } from "@/lib/services";
+import React from "react";
 
 export const metadata: Metadata = {
   title: {
@@ -70,13 +73,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { primaryDark, primaryLight } = await fetchTheme();
+  const hslDark = hextohsl(primaryDark);
+  const hslLight = hextohsl(primaryLight);
   return (
-    <html lang="en" className="dark">
+    <html
+      lang="en"
+      className="dark"
+      style={
+        {
+          "--primary-dark": `${hslDark[0]}, ${hslDark[1]}%, ${hslDark[2]}%`,
+          "--primary-light": `${hslLight[0]}, ${hslLight[1]}%, ${hslLight[2]}%`,
+        } as React.CSSProperties
+      }
+    >
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all selection:bg-muted selection:text-primary max-sm:py-20`}
         suppressHydrationWarning

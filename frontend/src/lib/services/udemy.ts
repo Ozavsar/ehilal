@@ -7,7 +7,7 @@ import type { ICourse } from "@/types.d";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
-export const getAllCourses = async (): Promise<ICourse[]> => {
+export const getAllCourses = async () => {
   // Instead of scraping, return dummy data
   if (process.env.NODE_ENV === "development") {
     return courseDummyData;
@@ -15,6 +15,7 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      timeout: 200000,
     });
 
     const page = await browser.newPage();
@@ -23,7 +24,10 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     );
 
-    await page.goto(UDEMY_USER_URL, { waitUntil: "networkidle2" });
+    await page.goto(UDEMY_USER_URL, {
+      waitUntil: "networkidle2",
+      timeout: 200000,
+    });
     await autoScroll(page);
 
     const courses = await page.evaluate(() => {

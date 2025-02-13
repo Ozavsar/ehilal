@@ -7,7 +7,7 @@ import type { IBlog } from "@/types.d";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
-export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
+export const getAllArticlePreviews = async () => {
   if (process.env.NODE_ENV === "development") {
     // Instead of scraping, return dummy data
     return blogDummyData;
@@ -15,6 +15,7 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      timeout: 200000,
     });
 
     const page = await browser.newPage();
@@ -23,7 +24,10 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     );
 
-    await page.goto(MEDIUM_USER_URL, { waitUntil: "networkidle2", timeout: 0 });
+    await page.goto(MEDIUM_USER_URL, {
+      waitUntil: "networkidle2",
+      timeout: 200000,
+    });
     await autoScroll(page);
 
     const articles = await page.evaluate(() => {
@@ -68,9 +72,7 @@ export const getAllArticlePreviews = async (): Promise<IBlog[]> => {
   }
 };
 
-export const getSingleArticle = async (
-  url: string,
-): Promise<{ content: string; rawText: string }> => {
+export const getSingleArticle = async (url: string) => {
   if (process.env.NODE_ENV === "development") {
     // Instead of scraping, return dummy data
     const content = `<p>Dummy content for ${url}</p>`;

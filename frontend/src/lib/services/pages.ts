@@ -8,7 +8,7 @@ import type {
 /**
  * Get home page content
  */
-export async function getHomePageContent(): Promise<IStrapiHomePage> {
+export async function getHomePageContent() {
   const response = await fetchAPI<IStrapiResponse<IStrapiHomePage>>(
     "/home-page",
     {},
@@ -20,7 +20,7 @@ export async function getHomePageContent(): Promise<IStrapiHomePage> {
 /**
  * Get contact page content
  */
-export async function getContactPageContent(): Promise<IStrapiContactPage> {
+export async function getContactPageContent() {
   const response = await fetchAPI<IStrapiResponse<IStrapiContactPage>>(
     "/contact-page",
     {},

@@ -1,13 +1,10 @@
-import { IStrapiBasePage, IStrapiConference, IStrapiResponse } from "@/types";
 import { fetchAPI } from "../api/fetchAPI";
+import type { IStrapiConference, IStrapiResponse } from "@/types.d";
 
 /**
  * Fetch all conferences with optional pagination.
  */
-export async function fetchConferences(
-  start?: number,
-  limit?: number,
-): Promise<IStrapiResponse<IStrapiConference[]>> {
+export async function fetchConferences(start?: number, limit?: number) {
   const baseQuery = {
     sort: { date: "desc" },
     populate: "images",

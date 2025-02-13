@@ -56,7 +56,7 @@ export default async function Blog({ params }: { params: { slug: string } }) {
             {blogTitle}
           </h1>
           <div className="mb-4 flex items-center">
-            <div className="text-sm text-secondary-blog-text-color">
+            <div className="text-sm">
               <p className="leading-none text-primary">{authorName}</p>
               <p className="text-gray-600">
                 {publishDate} • {readTime}

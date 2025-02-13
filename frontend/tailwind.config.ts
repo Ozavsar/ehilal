@@ -1,25 +1,25 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: '1rem',
+      padding: "1rem",
       screens: {
-        xs: '100%',
-        sm: '540px',
-        md: '720px',
-        lg: '960px',
-        xl: '1140px',
-        '2xl': '1320px',
+        xs: "100%",
+        sm: "540px",
+        md: "720px",
+        lg: "960px",
+        xl: "1140px",
+        "2xl": "1320px",
       },
     },
     extend: {
@@ -33,14 +33,9 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         "blog-text-color": "hsl(var(--blog-text-color))",
-        "secondary-blog-text-color": "hsl(var(--secondary-blog-text-color))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -82,7 +77,10 @@ const config = {
           to: { opacity: "1", transform: "translateX(0)" },
         },
         "fade-in-elif": {
-          from: { opacity: "0", transform: "rotate(-10deg) translateX(-100px)" },
+          from: {
+            opacity: "0",
+            transform: "rotate(-10deg) translateX(-100px)",
+          },
           to: { opacity: "1", transform: "rotate(0deg) translateX(0px)" },
         },
       },
@@ -95,6 +93,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

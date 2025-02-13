@@ -68,13 +68,6 @@ export interface ICourse {
   thumbnailURL: string | null;
 }
 
-export interface IConference {
-  title: string;
-  location: string;
-  timestamp: number;
-  images: StaticImageData[];
-}
-
 export interface IStrapiBasePage {
   id: number;
   documentId: string;
@@ -100,6 +93,11 @@ export interface IStrapiConference extends IStrapiBasePage {
   location: string;
   date: string;
   images: IImage[];
+}
+
+export interface IStrapiTheme extends IStrapiBasePage {
+  primaryDark: string;
+  primaryLight: string;
 }
 
 export interface IStrapiResponse<T> {
