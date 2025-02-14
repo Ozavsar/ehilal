@@ -1,1 +1,0 @@
-export {default as UdemyIcon} from './udemy-icon';

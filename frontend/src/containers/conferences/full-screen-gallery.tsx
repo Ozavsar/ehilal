@@ -1,8 +1,8 @@
-import Image, { StaticImageData } from "next/image";
-import { XIcon } from "lucide-react";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import { IImage } from "@/types";
+import type { IImage } from "@/types.d";
+import { LuX } from "react-icons/lu";
 
 interface FullScreenImageProps {
   images: IImage[];
@@ -22,7 +22,7 @@ export default function FullScreenImage({
         className="absolute right-4 top-4 z-50 text-primary hover:text-foreground"
         aria-label="Close full screen image"
       >
-        <XIcon size={24} />
+        <LuX size={24} />
       </button>
       <Swiper
         modules={[Navigation]}

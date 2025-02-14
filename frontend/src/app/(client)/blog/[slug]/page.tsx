@@ -1,7 +1,8 @@
-import { ITEMS_PER_PAGE, MEDIUM_USER_URL } from "@/config/constants";
-import BlogContainer from "@/containers/blog";
-import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
 import { Metadata } from "next";
+import BlogContainer from "@/containers/blog";
+import { ITEMS_PER_PAGE, MEDIUM_USER_URL } from "@/config/constants";
+import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
+import { getPageTitle } from "@/lib/services/pages";
 
 export const revalidate = 60 * 60 * 24;
 export const dynamicParams = false; // show 404 if the page is not found
@@ -11,9 +12,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Blog({ params }: { params: { slug: string } }) {
+  const pageContent = await getPageTitle("blog-page");
   if (!Number.isNaN(params.slug)) {
     const articles = await getAllArticlePreviews();
-    return <BlogContainer articles={articles} pageNumber={params.slug} />;
+    return (
+      <BlogContainer
+        articles={articles}
+        pageNumber={params.slug}
+        content={pageContent}
+      />
+    );
   } else {
     const { content, rawText } = await getSingleArticle(
       `${MEDIUM_USER_URL}/${encodeURIComponent(params.slug)}`,

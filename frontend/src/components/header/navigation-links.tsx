@@ -4,47 +4,47 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  ContactIcon,
-  HomeIcon,
-  NotebookPenIcon,
-  PresentationIcon,
-  VideoIcon,
-} from "lucide-react";
-import UdemyIcon from "@/assets/icons/udemy-icon";
+import { SiUdemy } from "react-icons/si";
 import { Button } from "../ui/button";
+import {
+  LuContact,
+  LuHouse,
+  LuNotebookPen,
+  LuPresentation,
+  LuVideo,
+} from "react-icons/lu";
 import appRoutes from "@/config/constants/app-routes";
 
 const navLinks = [
   {
     title: "Home",
     url: appRoutes.INTERNAL.Home,
-    icon: <HomeIcon />,
+    icon: <LuHouse size={24} />,
   },
   {
     title: "Conferences",
     url: appRoutes.INTERNAL.Conferences,
-    icon: <PresentationIcon />,
+    icon: <LuPresentation size={24} />,
   },
   {
     title: "Blog",
     url: appRoutes.INTERNAL.Blog,
-    icon: <NotebookPenIcon />,
+    icon: <LuNotebookPen size={24} />,
   },
   {
     title: "Videos",
     url: appRoutes.INTERNAL.Videos,
-    icon: <VideoIcon />,
+    icon: <LuVideo size={24} />,
   },
   {
     title: "My Courses",
     url: appRoutes.INTERNAL.Udemy,
-    icon: <UdemyIcon width={24} height={24} />,
+    icon: <SiUdemy size={24} />,
   },
   {
     title: "Contact",
     url: "/contact",
-    icon: <ContactIcon />,
+    icon: <LuContact size={24} />,
   },
 ];
 

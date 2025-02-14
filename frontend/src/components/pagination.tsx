@@ -3,8 +3,8 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { generatePagination } from "@/lib/utils";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 interface IPaginationProps {
   totalPages: number;
@@ -86,7 +86,7 @@ function PaginationNumber({
   return isActive || position === "middle" ? (
     <div className={className}>{page}</div>
   ) : (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} scroll={false}>
       {page}
     </Link>
   );
@@ -113,9 +113,9 @@ function PaginationArrow({
 
   const icon =
     direction === "left" ? (
-      <ArrowLeftIcon className="w-4" />
+      <LuArrowLeft className="w-4" />
     ) : (
-      <ArrowRightIcon className="w-4" />
+      <LuArrowRight className="w-4" />
     );
 
   return isDisabled ? (

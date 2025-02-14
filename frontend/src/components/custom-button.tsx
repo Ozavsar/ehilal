@@ -1,11 +1,12 @@
+import { LuArrowRight } from "react-icons/lu";
+import type { IconType } from "react-icons/lib";
 import { Button } from "@/components/ui/button";
-import { LucideIcon, ArrowRight } from "lucide-react";
 
 interface CustomButtonProps {
   text: string;
   className?: string;
   onClick?: () => void;
-  icon?: LucideIcon;
+  icon?: IconType;
   [key: string]: any;
 }
 
@@ -13,7 +14,7 @@ export default function CustomButton({
   text,
   className = "",
   onClick,
-  icon: Icon = ArrowRight,
+  icon: Icon = LuArrowRight,
   ...props
 }: CustomButtonProps) {
   return (
@@ -24,7 +25,7 @@ export default function CustomButton({
     >
       {text}
       <span className="relative flex size-14 items-center justify-center rounded-full bg-primary">
-        <Icon className="text-white" />{" "}
+        <Icon size={24} className="text-white" />{" "}
       </span>
       <span className="absolute right-0 -z-10 h-14 w-0 rounded-full bg-primary transition-all duration-700 ease-out group-hover:w-96 group-active:w-0 group-active:duration-150" />
     </Button>

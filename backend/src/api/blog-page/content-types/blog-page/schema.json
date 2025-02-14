@@ -1,0 +1,22 @@
+{
+  "kind": "singleType",
+  "collectionName": "blog_pages",
+  "info": {
+    "singularName": "blog-page",
+    "pluralName": "blog-pages",
+    "displayName": "Blog Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "page_title": {
+      "type": "string",
+      "required": true
+    },
+    "page_title_background": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

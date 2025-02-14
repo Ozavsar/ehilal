@@ -1,13 +1,13 @@
 import Image from "next/image";
-import { IVideoPreview } from "@/types";
 import {
   Card,
   CardHeader,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { truncateDescription } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { truncateDescription } from "@/lib/utils";
+import type { IVideoPreview } from "@/types.d";
 
 export default function VideoCard({
   id,

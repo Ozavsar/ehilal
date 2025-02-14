@@ -67,6 +67,11 @@ export interface ICourse {
   rating: string | null;
   thumbnailURL: string | null;
 }
+export interface IStrapiSocialLinks extends IStrapiBasePage {
+  email: string;
+  linkedin: string;
+  twitter_x: string;
+}
 
 export interface IStrapiBasePage {
   id: number;
@@ -76,17 +81,20 @@ export interface IStrapiBasePage {
   publishedAt: string;
 }
 
+export interface IPageTitle {
+  page_title: string;
+  page_title_background: string;
+}
+
 export interface IStrapiHomePage extends IStrapiBasePage {
   greeting: string;
   introduction: string;
   hero_image: IImage;
 }
 
-export interface IStrapiContactPage extends IStrapiBasePage {
+export interface IStrapiContactPage extends IStrapiBasePage, IPageTitle {
   title: string;
   description: string;
-  page_title: string;
-  page_title_background: string;
 }
 
 export interface IStrapiConference extends IStrapiBasePage {

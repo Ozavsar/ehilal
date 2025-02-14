@@ -1,0 +1,22 @@
+{
+  "kind": "singleType",
+  "collectionName": "conferences_pages",
+  "info": {
+    "singularName": "conferences-page",
+    "pluralName": "conferences-pages",
+    "displayName": "Conferences Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "page_title": {
+      "type": "string",
+      "required": true
+    },
+    "page_title_background": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

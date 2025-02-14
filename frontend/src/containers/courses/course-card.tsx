@@ -1,13 +1,13 @@
 import Image from "next/image";
+import { LuStar, LuUsers } from "react-icons/lu";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import type { ICourse } from "@/types.d";
 import { Button } from "@/components/ui/button";
-import { Star, Users } from "lucide-react";
+import type { ICourse } from "@/types.d";
 
 export default function CourseCard({
   thumbnailURL,
@@ -53,7 +53,7 @@ export default function CourseCard({
               <div className="relative">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-muted-foreground" />
+                    <LuStar key={i} className="h-4 w-4 text-muted-foreground" />
                   ))}
                 </div>
                 <div
@@ -62,7 +62,7 @@ export default function CourseCard({
                 >
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star
+                      <LuStar
                         key={i}
                         className="h-4 w-4 fill-yellow-400 text-yellow-400"
                       />
@@ -74,7 +74,7 @@ export default function CourseCard({
             </>
           )}
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Users className="h-4 w-4" />
+            <LuUsers className="h-4 w-4" />
             <span>{numReviews}</span>
           </div>
         </div>

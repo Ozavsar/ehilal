@@ -1,7 +1,8 @@
-import { ITEMS_PER_PAGE } from "@/config/constants";
-import ConferencesContainer from "@/containers/conferences";
-import { fetchConferences } from "@/lib/services/conferences";
 import { Metadata } from "next";
+import ConferencesContainer from "@/containers/conferences";
+import { ITEMS_PER_PAGE } from "@/config/constants";
+import { fetchConferences } from "@/lib/services/conferences";
+import { getPageTitle } from "@/lib/services/pages";
 
 export const metadata: Metadata = {
   title: "Conferences",
@@ -12,6 +13,7 @@ export default async function Conferences({
 }: {
   params: { slug: string };
 }) {
+  const pageContent = await getPageTitle("conferences-page");
   const start = ITEMS_PER_PAGE * (Number(params.slug) - 1);
   const end = start + ITEMS_PER_PAGE;
   const response = await fetchConferences(start, end);
@@ -20,6 +22,7 @@ export default async function Conferences({
     <ConferencesContainer
       conferences={response.data}
       pageNumber={params.slug}
+      content={pageContent}
       totalPages={totalPages}
     />
   );

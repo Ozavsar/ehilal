@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "social_media_links",
+  "info": {
+    "singularName": "social-media-link",
+    "pluralName": "social-media-links",
+    "displayName": "Social Media Links"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "twitter_x": {
+      "type": "string",
+      "required": true
+    },
+    "linkedin": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

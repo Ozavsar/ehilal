@@ -369,6 +369,35 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBlogPageBlogPage extends Struct.SingleTypeSchema {
+  collectionName: 'blog_pages';
+  info: {
+    displayName: 'Blog Page';
+    pluralName: 'blog-pages';
+    singularName: 'blog-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::blog-page.blog-page'
+    > &
+      Schema.Attribute.Private;
+    page_title: Schema.Attribute.String & Schema.Attribute.Required;
+    page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
   collectionName: 'conferences';
   info: {
@@ -402,6 +431,36 @@ export interface ApiConferenceConference extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiConferencesPageConferencesPage
+  extends Struct.SingleTypeSchema {
+  collectionName: 'conferences_pages';
+  info: {
+    displayName: 'Conferences Page';
+    pluralName: 'conferences-pages';
+    singularName: 'conferences-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::conferences-page.conferences-page'
+    > &
+      Schema.Attribute.Private;
+    page_title: Schema.Attribute.String & Schema.Attribute.Required;
+    page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
   collectionName: 'contact_pages';
   info: {
@@ -424,10 +483,39 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
       'api::contact-page.contact-page'
     > &
       Schema.Attribute.Private;
-    page_title: Schema.Attribute.String;
-    page_title_background: Schema.Attribute.String;
+    page_title: Schema.Attribute.String & Schema.Attribute.Required;
+    page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCoursesPageCoursesPage extends Struct.SingleTypeSchema {
+  collectionName: 'courses_pages';
+  info: {
+    displayName: 'Courses Page';
+    pluralName: 'courses-pages';
+    singularName: 'courses-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::courses-page.courses-page'
+    > &
+      Schema.Attribute.Private;
+    page_title: Schema.Attribute.String & Schema.Attribute.Required;
+    page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -466,6 +554,37 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiSocialMediaLinkSocialMediaLink
+  extends Struct.SingleTypeSchema {
+  collectionName: 'social_media_links';
+  info: {
+    displayName: 'Social Media Links';
+    pluralName: 'social-media-links';
+    singularName: 'social-media-link';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.String & Schema.Attribute.Required;
+    linkedin: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::social-media-link.social-media-link'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    twitter_x: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiThemeTheme extends Struct.SingleTypeSchema {
   collectionName: 'themes';
   info: {
@@ -487,6 +606,35 @@ export interface ApiThemeTheme extends Struct.SingleTypeSchema {
       Schema.Attribute.CustomField<'plugin::color-picker.color'>;
     primaryLight: Schema.Attribute.String &
       Schema.Attribute.CustomField<'plugin::color-picker.color'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiVideosPageVideosPage extends Struct.SingleTypeSchema {
+  collectionName: 'videos_pages';
+  info: {
+    displayName: 'Videos Page';
+    pluralName: 'videos-pages';
+    singularName: 'videos-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::videos-page.videos-page'
+    > &
+      Schema.Attribute.Private;
+    page_title: Schema.Attribute.String & Schema.Attribute.Required;
+    page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1003,10 +1151,15 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::blog-page.blog-page': ApiBlogPageBlogPage;
       'api::conference.conference': ApiConferenceConference;
+      'api::conferences-page.conferences-page': ApiConferencesPageConferencesPage;
       'api::contact-page.contact-page': ApiContactPageContactPage;
+      'api::courses-page.courses-page': ApiCoursesPageCoursesPage;
       'api::home-page.home-page': ApiHomePageHomePage;
+      'api::social-media-link.social-media-link': ApiSocialMediaLinkSocialMediaLink;
       'api::theme.theme': ApiThemeTheme;
+      'api::videos-page.videos-page': ApiVideosPageVideosPage;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
