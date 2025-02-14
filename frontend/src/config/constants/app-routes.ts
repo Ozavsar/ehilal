@@ -8,7 +8,7 @@ const appRoutes = {
     Contact: "/contact",
   },
   EXTERNAL: {
-    Mail: "mailto:elif@ehilal.net",
+    Mail: "elif@ehilal.net",
   },
 } as const;
 
