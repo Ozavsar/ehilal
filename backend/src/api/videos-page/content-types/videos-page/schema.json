@@ -1,0 +1,22 @@
+{
+  "kind": "singleType",
+  "collectionName": "videos_pages",
+  "info": {
+    "singularName": "videos-page",
+    "pluralName": "videos-pages",
+    "displayName": "Videos Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "page_title": {
+      "type": "string",
+      "required": true
+    },
+    "page_title_background": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

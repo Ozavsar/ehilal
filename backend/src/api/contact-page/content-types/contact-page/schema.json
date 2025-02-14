@@ -20,10 +20,12 @@
       "required": true
     },
     "page_title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "page_title_background": {
-      "type": "string"
+      "type": "string",
+      "required": true
     }
   }
 }

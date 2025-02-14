@@ -1,20 +1,20 @@
-import { LinkedinIcon } from "lucide-react";
-import XIcon from "@/assets/icons/x-icon";
+import { BsTwitterX } from "react-icons/bs";
 import { Button } from "./ui/button";
-import appRoutes from "@/config/constants/app-routes";
+import { getSocialMediaLinks } from "@/lib/services";
+import { LuLinkedin } from "react-icons/lu";
 
-const socialLinkContents = [
-  {
-    href: appRoutes.SOCIAL.X,
-    icon: XIcon,
-  },
-  {
-    href: appRoutes.SOCIAL.LINKEDIN,
-    icon: LinkedinIcon,
-  },
-];
-
-export default function SocialLinks() {
+export default async function SocialLinks() {
+  const socialLinks = await getSocialMediaLinks();
+  const socialLinkContents = [
+    {
+      href: socialLinks.twitter_x,
+      icon: BsTwitterX,
+    },
+    {
+      href: socialLinks.linkedin,
+      icon: LuLinkedin,
+    },
+  ];
   return (
     <div className="flex gap-2 sm:gap-4">
       {socialLinkContents.map(({ href, icon: Icon }) => (
@@ -25,7 +25,7 @@ export default function SocialLinks() {
             className="size-14 border border-primary text-primary hover:text-foreground"
             variant="circle"
           >
-            <Icon className="size-14" />
+            <Icon size={24} />
           </Button>
         </a>
       ))}

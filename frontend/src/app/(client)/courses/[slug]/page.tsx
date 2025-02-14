@@ -1,7 +1,8 @@
-import { ITEMS_PER_PAGE } from "@/config/constants";
-import CourseContainer from "@/containers/courses";
-import { getAllCourses } from "@/lib/services/udemy";
 import { Metadata } from "next";
+import CourseContainer from "@/containers/courses";
+import { ITEMS_PER_PAGE } from "@/config/constants";
+import { getAllCourses } from "@/lib/services/udemy";
+import { getPageTitle } from "@/lib/services/pages";
 
 export const revalidate = 60 * 60 * 24;
 export const dynamicParams = false; // show 404 if the page is not found
@@ -15,9 +16,11 @@ export default async function Courses({
 }: {
   params: { slug: string };
 }) {
+  const pageContent = await getPageTitle("courses-page");
+  console.log(pageContent);
   if (!Number.isNaN(params.slug ? params.slug : "1")) {
     const courses = await getAllCourses();
-    return <CourseContainer courses={courses} />;
+    return <CourseContainer courses={courses} content={pageContent} />;
   } else {
     return null;
   }

@@ -10,10 +10,6 @@ const appRoutes = {
   EXTERNAL: {
     Mail: "mailto:elif@ehilal.net",
   },
-  SOCIAL: {
-    LINKEDIN: "https://www.linkedin.com/in/elif-hilal-umucu/",
-    X: "https://x.com/elifhilalumucu",
-  },
 } as const;
 
 export default appRoutes;
