@@ -17,7 +17,6 @@ export default async function Courses({
   params: { slug: string };
 }) {
   const pageContent = await getPageTitle("courses-page");
-  console.log(pageContent);
   if (!Number.isNaN(params.slug ? params.slug : "1")) {
     const courses = await getAllCourses();
     return <CourseContainer courses={courses} content={pageContent} />;

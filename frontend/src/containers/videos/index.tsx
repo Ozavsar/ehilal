@@ -20,7 +20,6 @@ export default async function VideosContainer({
   const allVideos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
   const totalPages = Math.ceil(allVideos.length / ITEMS_PER_PAGE);
   const pageContent = await getPageTitle("videos-page");
-  console.log("Video page content", pageContent);
 
   videos = videos
     ? videos.slice(
