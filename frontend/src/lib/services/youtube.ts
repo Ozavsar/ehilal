@@ -36,7 +36,7 @@ export async function getUploadedVideos(
         id: item.snippet?.resourceId?.videoId,
         title: item.snippet?.title || "",
         description: item.snippet?.description || "",
-        thumbnailURL: item.snippet?.thumbnails?.high?.url || "",
+        thumbnailURL: item.snippet?.thumbnails?.standard?.url || "",
         publishedAt: item.snippet?.publishedAt
           ? new Date(item.snippet.publishedAt).toLocaleDateString()
           : "",
@@ -132,5 +132,31 @@ export async function getVideoCaptions(videoId: string): Promise<any[]> {
     }));
 
     return captions || [];
+  }
+}
+
+export async function getYoutubeVideoDetails(
+  id: string,
+): Promise<{ thumbnailURL: string; publishedAt: string } | null> {
+  try {
+    const response = await youtube.videos.list({
+      part: ["snippet", "statistics"],
+      id: [id],
+    });
+
+    const video = response.data.items?.[0];
+    if (!video) return null;
+
+    const thumbnailURL = video.snippet?.thumbnails?.standard?.url || "";
+
+    return {
+      thumbnailURL,
+      publishedAt: video.snippet?.publishedAt
+        ? new Date(video.snippet.publishedAt).toLocaleDateString()
+        : "unknown",
+    };
+  } catch (err) {
+    console.error("YouTube API error:", err);
+    return null;
   }
 }

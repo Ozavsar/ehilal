@@ -5,10 +5,10 @@ import VideoCard from "./video-card";
 import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos } from "@/lib/services/youtube";
 import { getPageTitle } from "@/lib/services/pages";
-import type { IVideoPreview } from "@/types.d";
+import type { IUnifiedVideo } from "@/types.d";
 
 interface IVideosContainerProps {
-  videos: IVideoPreview[];
+  videos: IUnifiedVideo[];
   pageNumber: string;
 }
 

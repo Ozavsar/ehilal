@@ -7,16 +7,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { truncateDescription } from "@/lib/utils";
-import type { IVideoPreview } from "@/types.d";
+import type { IUnifiedVideo } from "@/types.d";
 
 export default function VideoCard({
-  id,
+  url,
   thumbnailURL,
   title,
   description,
   publishedAt,
-}: IVideoPreview) {
-  const videoUrl = `https://www.youtube.com/watch?v=${id}`;
+  source,
+}: IUnifiedVideo) {
+  const videoUrl = url || "#";
 
   return (
     <Card className="row-span-3 grid grid-rows-subgrid gap-0 overflow-hidden rounded-[5px] border border-muted bg-muted">
@@ -40,11 +41,20 @@ export default function VideoCard({
         </p>
       </CardContent>
       <CardFooter className="row-span-1 flex justify-between p-4 pt-1">
-        <a href={videoUrl} target="_blank" rel="noopener noreferrer">
-          <Button variant={"link"} className="h-fit p-0 text-foreground">
-            Watch on <span className="text-[#ff0033]">&nbsp;YouTube</span>
-          </Button>
-        </a>
+        {source === "youtube" ? (
+          <a href={videoUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant={"link"} className="h-fit p-0 text-foreground">
+              Watch on <span className="text-[#ff0033]">&nbsp;YouTube</span>
+            </Button>
+          </a>
+        ) : (
+          <a href={videoUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant={"link"} className="h-fit p-0 text-foreground">
+              Watch the <span className="text-primary">&nbsp;video</span>
+            </Button>
+          </a>
+        )}
+
         <p className="text-sm">{publishedAt}</p>
       </CardFooter>
     </Card>

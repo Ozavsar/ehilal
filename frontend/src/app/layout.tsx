@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";
 import RocketCursor from "@/components/rocket-cursor";
-import { fetchTheme } from "@/lib/services";
+import { getTheme } from "@/lib/services";
 import React from "react";
 
 export const metadata: Metadata = {
@@ -78,7 +78,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { primaryDark, primaryLight } = await fetchTheme();
+  const { primaryDark, primaryLight } = await getTheme();
   const hslDark = hextohsl(primaryDark);
   const hslLight = hextohsl(primaryLight);
   return (

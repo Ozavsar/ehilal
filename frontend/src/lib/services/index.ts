@@ -2,10 +2,10 @@ import { IStrapiResponse, IStrapiSocialLinks, IStrapiTheme } from "@/types";
 import { fetchAPI } from "../api/fetchAPI";
 
 /**
- * Fetches the theme data from the Strapi API.
+ * get the theme data from the Strapi API.
  */
 
-export async function fetchTheme() {
+export async function getTheme() {
   const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>(
     "/theme",
     {},
