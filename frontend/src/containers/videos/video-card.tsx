@@ -55,7 +55,13 @@ export default function VideoCard({
           </a>
         )}
 
-        <p className="text-sm">{new Date(publish_date).getTime()}</p>
+        <p className="text-sm">
+          {new Date(publish_date).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </p>
       </CardFooter>
     </Card>
   );

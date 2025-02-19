@@ -9,7 +9,7 @@ export async function getTheme() {
   const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>(
     "/theme",
     {},
-    { tags: ["pages"] },
+    { tags: ["theme"] },
   );
 
   return response.data;
@@ -22,7 +22,7 @@ export async function getSocialMediaLinks() {
   const response = await fetchAPI<IStrapiResponse<IStrapiSocialLinks>>(
     "/social-media-link",
     {},
-    { tags: ["pages"] },
+    { tags: ["social-media-links"] },
   );
 
   return response.data;

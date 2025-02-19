@@ -18,7 +18,7 @@ export async function getAllConferences(start?: number, limit?: number) {
   const response = await fetchAPI<IStrapiResponse<IStrapiConference[]>>(
     "/conferences",
     query,
-    { tags: ["pages"] },
+    { tags: ["conferences"] },
   );
 
   return response;
