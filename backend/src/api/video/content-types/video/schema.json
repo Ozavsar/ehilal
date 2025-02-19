@@ -24,12 +24,17 @@
       "unique": true
     },
     "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
+    },
+    "publish_date": {
+      "type": "date",
+      "required": true
     }
   }
 }

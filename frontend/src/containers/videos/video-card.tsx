@@ -14,7 +14,7 @@ export default function VideoCard({
   thumbnailURL,
   title,
   description,
-  publishedAt,
+  publish_date,
   source,
 }: IUnifiedVideo) {
   const videoUrl = url || "#";
@@ -50,12 +50,12 @@ export default function VideoCard({
         ) : (
           <a href={videoUrl} target="_blank" rel="noopener noreferrer">
             <Button variant={"link"} className="h-fit p-0 text-foreground">
-              Watch the <span className="text-primary">&nbsp;video</span>
+              Watch the <span className="text-primary">&nbsp;Video</span>
             </Button>
           </a>
         )}
 
-        <p className="text-sm">{publishedAt}</p>
+        <p className="text-sm">{new Date(publish_date).getTime()}</p>
       </CardFooter>
     </Card>
   );

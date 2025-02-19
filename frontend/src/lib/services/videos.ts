@@ -1,8 +1,8 @@
 import { fetchAPI } from "../api/fetchAPI";
-import type { IStrapiResponse, IStrapiVideo, IUnifiedVideo } from "@/types.d";
 import { getUploadedVideos } from "@/lib/services/youtube";
 import { getYoutubeVideoDetails } from "@/lib/services/youtube";
 import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
+import type { IStrapiResponse, IStrapiVideo, IUnifiedVideo } from "@/types.d";
 
 /**
  * get all videos from strapi with optional pagination.
@@ -20,7 +20,7 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>(
     "/videos",
     query,
-    // { tags: ["pages"] },
+    { tags: ["pages"] },
   );
 
   return response;
@@ -36,7 +36,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     description: video.description!,
     url: `https://www.youtube.com/watch?v=${video.id}`,
     thumbnailURL: video.thumbnailURL!,
-    publishedAt: video.publishedAt,
+    publish_date: video.publishedAt,
     source: "youtube" as const,
   }));
 
@@ -48,7 +48,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   const processedStrapiVideos = await Promise.all(
     strapiVideos.map(async (video) => {
       let thumbnailURL = video.thumbnail?.url || "";
-      let publishedAt = new Date().toISOString();
+      let publish_date = new Date(video.publish_date).toLocaleDateString();
       let source: "strapi" | "youtube" = "strapi";
 
       // If the video is a YouTube video, get the thumbnail and publishedAt date
@@ -57,8 +57,9 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
         if (youtubeId) {
           const youtubeDetails = await getYoutubeVideoDetails(youtubeId);
           if (youtubeDetails) {
-            thumbnailURL = youtubeDetails.thumbnailURL;
-            publishedAt = youtubeDetails.publishedAt;
+            thumbnailURL = !thumbnailURL
+              ? youtubeDetails.thumbnailURL
+              : thumbnailURL;
           }
           source = "youtube";
         }
@@ -70,7 +71,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
         description: video.description,
         url: video.url,
         thumbnailURL,
-        publishedAt,
+        publish_date,
         source: source,
       };
     }),
@@ -79,7 +80,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   // 4. Combine and sort all videos
   const allVideos = [...formattedYoutubeVideos, ...processedStrapiVideos].sort(
     (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+      new Date(b.publish_date).getTime() - new Date(a.publish_date).getTime(),
   );
 
   return allVideos;

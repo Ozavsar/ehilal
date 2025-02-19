@@ -107,6 +107,7 @@ export interface IStrapiConference extends IStrapiBasePage {
 export interface IStrapiVideo extends IStrapiBasePage {
   title: string;
   description: string;
+  publish_date: string;
   url: string;
   thumbnail: IImage;
 }
@@ -136,6 +137,6 @@ export interface IUnifiedVideo {
   description: string;
   url: string;
   thumbnailURL: string;
-  publishedAt: string;
+  publish_date: string;
   source: "youtube" | "strapi";
 }
