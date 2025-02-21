@@ -6,24 +6,18 @@ import type { IPageTitle, IStrapiConference } from "@/types.d";
 
 interface IConferencesContainerProps {
   conferences: IStrapiConference[];
-  content: IPageTitle;
   pageNumber: string;
   totalPages: number;
 }
 
 export default function ConferencesContainer({
   conferences,
-  content,
   pageNumber,
   totalPages,
 }: IConferencesContainerProps) {
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
-        <TitleSection
-          text={content.page_title}
-          backgroundText={content.page_title_background}
-        />
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {conferences.map((conference) => (
             <ConferenceCard key={conference.title} {...conference} />

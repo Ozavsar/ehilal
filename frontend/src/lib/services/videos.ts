@@ -20,7 +20,6 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>(
     "/videos",
     query,
-    { tags: ["videos"] },
   );
 
   return response;
@@ -82,7 +81,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     (a, b) =>
       new Date(b.publish_date).getTime() - new Date(a.publish_date).getTime(),
   );
-
+  console.log("all videos fetched");
   return allVideos;
 }
 

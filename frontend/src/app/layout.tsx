@@ -1,15 +1,15 @@
+import { unstable_cache } from "next/cache";
+import type { Metadata } from "next";
+import hextohsl from "hex-to-hsl";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import Providers from "@/context/providers";
-import type { Metadata } from "next";
+import RocketCursor from "@/components/rocket-cursor";
 import Header from "@/components/header";
-import hextohsl from "hex-to-hsl";
-import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";
-import RocketCursor from "@/components/rocket-cursor";
+import "swiper/css";
+import Providers from "@/context/providers";
 import { getTheme } from "@/lib/services";
-import React from "react";
 
 export const metadata: Metadata = {
   title: {
@@ -73,12 +73,16 @@ export const metadata: Metadata = {
   },
 };
 
+const getCachedTheme = unstable_cache(getTheme, ["get-website-theme"], {
+  tags: ["theme"],
+});
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { primaryDark, primaryLight } = await getTheme();
+  const { primaryDark, primaryLight } = await getCachedTheme();
   const hslDark = hextohsl(primaryDark);
   const hslLight = hextohsl(primaryLight);
   return (
