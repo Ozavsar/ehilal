@@ -1,15 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 import ConferencesContainer from "@/containers/conferences";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllConferences } from "@/lib/services/conferences";
 
 export const dynamicParams = true;
-
-export const metadata: Metadata = {
-  title: "Conferences",
-};
 
 const getCachedConferences = unstable_cache(
   async (start: number, limit: number) => {

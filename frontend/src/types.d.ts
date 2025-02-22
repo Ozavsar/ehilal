@@ -84,9 +84,11 @@ export interface IStrapiBasePage {
 export interface IPageTitle {
   page_title: string;
   page_title_background: string;
+  SEO_title: string;
+  SEO_description: string;
 }
 
-export interface IStrapiHomePage extends IStrapiBasePage {
+export interface IStrapiHomePage extends IStrapiBasePage, IPageTitle {
   greeting: string;
   introduction: string;
   hero_image: IImage;

@@ -1,6 +1,5 @@
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 import CourseContainer from "@/containers/courses";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllCourses } from "@/lib/services/udemy";
@@ -21,10 +20,6 @@ const getCachedCourses = unstable_cache(
     revalidate: 86400, // 24 hours
   },
 );
-
-export const metadata: Metadata = {
-  title: "Courses",
-};
 
 export default async function CoursesPage({
   params,

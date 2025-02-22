@@ -372,6 +372,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiBlogPageBlogPage extends Struct.SingleTypeSchema {
   collectionName: 'blog_pages';
   info: {
+    description: '';
     displayName: 'Blog Page';
     pluralName: 'blog-pages';
     singularName: 'blog-page';
@@ -392,6 +393,14 @@ export interface ApiBlogPageBlogPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -435,6 +444,7 @@ export interface ApiConferencesPageConferencesPage
   extends Struct.SingleTypeSchema {
   collectionName: 'conferences_pages';
   info: {
+    description: '';
     displayName: 'Conferences Page';
     pluralName: 'conferences-pages';
     singularName: 'conferences-page';
@@ -455,6 +465,14 @@ export interface ApiConferencesPageConferencesPage
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -486,6 +504,14 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -496,6 +522,7 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
 export interface ApiCoursesPageCoursesPage extends Struct.SingleTypeSchema {
   collectionName: 'courses_pages';
   info: {
+    description: '';
     displayName: 'Courses Page';
     pluralName: 'courses-pages';
     singularName: 'courses-page';
@@ -516,6 +543,14 @@ export interface ApiCoursesPageCoursesPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -548,6 +583,14 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -648,6 +691,7 @@ export interface ApiVideoVideo extends Struct.CollectionTypeSchema {
 export interface ApiVideosPageVideosPage extends Struct.SingleTypeSchema {
   collectionName: 'videos_pages';
   info: {
+    description: '';
     displayName: 'Videos Page';
     pluralName: 'videos-pages';
     singularName: 'videos-page';
@@ -668,6 +712,14 @@ export interface ApiVideosPageVideosPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

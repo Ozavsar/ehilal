@@ -18,13 +18,21 @@
       "type": "text"
     },
     "hero_image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": false,
-      "required": true
+      ]
+    },
+    "SEO_title": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "SEO_description": {
+      "type": "text",
+      "maxLength": 300
     }
   }
 }
