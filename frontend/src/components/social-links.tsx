@@ -1,10 +1,19 @@
+import { unstable_cache } from "next/cache";
+import { LuLinkedin } from "react-icons/lu";
 import { BsTwitterX } from "react-icons/bs";
 import { Button } from "./ui/button";
 import { getSocialMediaLinks } from "@/lib/services";
-import { LuLinkedin } from "react-icons/lu";
+
+export const getCachedSocialMediaLinks = unstable_cache(
+  getSocialMediaLinks,
+  ["social-media-links"],
+  {
+    tags: ["social-media-links"],
+  },
+);
 
 export default async function SocialLinks() {
-  const socialLinks = await getSocialMediaLinks();
+  const socialLinks = await getCachedSocialMediaLinks();
   const socialLinkContents = [
     {
       href: socialLinks.twitter_x,

@@ -10,46 +10,41 @@ const youtube = google.youtube({
 export async function getUploadedVideos(
   channelIds: string[],
 ): Promise<IVideoPreview[]> {
-  if (process.env.NODE_ENV === "development") {
-    // Return dummy data instead of fetching from YouTube API
-    return videoPreviewDummyData;
-  } else {
-    try {
-      const channelResponse = await youtube.channels.list({
-        part: ["contentDetails"],
-        id: channelIds,
-      });
+  try {
+    const channelResponse = await youtube.channels.list({
+      part: ["contentDetails"],
+      id: channelIds,
+    });
 
-      const uploadsPlaylistId =
-        channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists
-          ?.uploads;
+    const uploadsPlaylistId =
+      channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists
+        ?.uploads;
 
-      if (!uploadsPlaylistId) throw new Error("Uploads playlist ID not found");
+    if (!uploadsPlaylistId) throw new Error("Uploads playlist ID not found");
 
-      const videoResponse = await youtube.playlistItems.list({
-        part: ["snippet"],
-        playlistId: uploadsPlaylistId,
-        maxResults: 50, // Maksimum 50 video alabiliriz
-      });
+    const videoResponse = await youtube.playlistItems.list({
+      part: ["snippet"],
+      playlistId: uploadsPlaylistId,
+      maxResults: 50, // Maksimum 50 video alabiliriz
+    });
 
-      const videos = videoResponse.data.items?.map((item) => ({
-        id: item.snippet?.resourceId?.videoId,
-        title: item.snippet?.title || "",
-        description: item.snippet?.description || "",
-        thumbnailURL: item.snippet?.thumbnails?.high?.url || "",
-        publishedAt: item.snippet?.publishedAt
-          ? new Date(item.snippet.publishedAt).toLocaleDateString()
-          : "",
-      }));
+    const videos = videoResponse.data.items?.map((item) => ({
+      id: item.snippet?.resourceId?.videoId,
+      title: item.snippet?.title || "",
+      description: item.snippet?.description || "",
+      thumbnailURL: item.snippet?.thumbnails?.standard?.url || "",
+      publishedAt: item.snippet?.publishedAt
+        ? new Date(item.snippet.publishedAt).toLocaleDateString()
+        : "",
+    }));
 
-      // @todo: Remove limit before the final product
-      const limitedVideos = videos?.slice(0, 3);
+    // @todo: Remove limit before the final product
+    const limitedVideos = videos?.slice(0, 3);
 
-      return limitedVideos || [];
-    } catch (err) {
-      console.error("Error fetching videos:", err);
-      return [];
-    }
+    return limitedVideos || [];
+  } catch (err) {
+    console.error("Error fetching videos:", err);
+    return [];
   }
 }
 
@@ -132,5 +127,31 @@ export async function getVideoCaptions(videoId: string): Promise<any[]> {
     }));
 
     return captions || [];
+  }
+}
+
+export async function getYoutubeVideoDetails(
+  id: string,
+): Promise<{ thumbnailURL: string; publishedAt: string } | null> {
+  try {
+    const response = await youtube.videos.list({
+      part: ["snippet", "statistics"],
+      id: [id],
+    });
+
+    const video = response.data.items?.[0];
+    if (!video) return null;
+
+    const thumbnailURL = video.snippet?.thumbnails?.standard?.url || "";
+
+    return {
+      thumbnailURL,
+      publishedAt: video.snippet?.publishedAt
+        ? new Date(video.snippet.publishedAt).toLocaleDateString()
+        : "unknown",
+    };
+  } catch (err) {
+    console.error("YouTube API error:", err);
+    return null;
   }
 }

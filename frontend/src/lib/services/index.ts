@@ -2,16 +2,12 @@ import { IStrapiResponse, IStrapiSocialLinks, IStrapiTheme } from "@/types";
 import { fetchAPI } from "../api/fetchAPI";
 
 /**
- * Fetches the theme data from the Strapi API.
+ * get the theme data from the Strapi API.
  */
 
-export async function fetchTheme() {
-  const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>(
-    "/theme",
-    {},
-    { tags: ["pages"] },
-  );
-
+export async function getTheme() {
+  const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>("/theme");
+  console.log("theme fetched");
   return response.data;
 }
 
@@ -19,11 +15,9 @@ export async function fetchTheme() {
  * Get Social Media Links
  */
 export async function getSocialMediaLinks() {
-  const response = await fetchAPI<IStrapiResponse<IStrapiSocialLinks>>(
-    "/social-media-link",
-    {},
-    { tags: ["pages"] },
-  );
+  const response =
+    await fetchAPI<IStrapiResponse<IStrapiSocialLinks>>("/social-media-link");
+  console.log("social media links fetched");
 
   return response.data;
 }

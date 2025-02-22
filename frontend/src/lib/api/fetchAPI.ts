@@ -9,12 +9,11 @@ export function getStrapiURL(path = ""): string {
 export async function fetchAPI<T>(
   path: string,
   urlParamsObject = {},
-  options: { headers?: Record<string, string>; tags?: string[] } = {},
+  options: { headers?: Record<string, string> } = {},
 ): Promise<T> {
   try {
     const token = process.env.BEARER_TOKEN;
     const mergedOptions = {
-      next: options.tags ? { tags: options.tags } : undefined,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

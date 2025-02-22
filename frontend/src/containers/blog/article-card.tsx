@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import {
   Card,
@@ -15,7 +14,6 @@ export default function ArticleCard({
   mediumURL,
   description,
 }: IBlog) {
-  const localArticleUrl = `/blog/${mediumURL.split("/").pop()}`;
   return (
     <Card>
       <CardHeader>

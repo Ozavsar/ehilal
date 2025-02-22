@@ -104,6 +104,14 @@ export interface IStrapiConference extends IStrapiBasePage {
   images: IImage[];
 }
 
+export interface IStrapiVideo extends IStrapiBasePage {
+  title: string;
+  description: string;
+  publish_date: string;
+  url: string;
+  thumbnail: IImage;
+}
+
 export interface IStrapiTheme extends IStrapiBasePage {
   primaryDark: string;
   primaryLight: string;
@@ -121,4 +129,14 @@ export interface IStrapiResponse<T> {
       total: number;
     };
   };
+}
+
+export interface IUnifiedVideo {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  thumbnailURL: string;
+  publish_date: string;
+  source: "youtube" | "strapi";
 }
