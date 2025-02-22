@@ -38,7 +38,7 @@ const getCachedSocialMediaLinks = unstable_cache(
   },
   ["social-media-links"],
   {
-    tags: ["social-links"],
+    tags: ["social-media-links"],
   },
 );
 
