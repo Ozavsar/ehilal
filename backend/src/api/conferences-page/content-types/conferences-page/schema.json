@@ -4,7 +4,8 @@
   "info": {
     "singularName": "conferences-page",
     "pluralName": "conferences-pages",
-    "displayName": "Conferences Page"
+    "displayName": "Conferences Page",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -17,6 +18,14 @@
     "page_title_background": {
       "type": "string",
       "required": true
+    },
+    "SEO_title": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "SEO_description": {
+      "type": "text",
+      "maxLength": 300
     }
   }
 }

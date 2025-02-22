@@ -5,10 +5,6 @@ import ContactContainer from "@/containers/contact";
 import { getContactPageContent } from "@/lib/services/pages";
 import { getSocialMediaLinks } from "@/lib/services";
 
-export const metadata: Metadata = {
-  title: "Contact",
-};
-
 const getCachedContactPageContent = unstable_cache(
   async () => {
     try {
@@ -41,6 +37,16 @@ const getCachedSocialMediaLinks = unstable_cache(
     tags: ["social-media-links"],
   },
 );
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getCachedContactPageContent();
+  return {
+    title: content?.SEO_title || "Contact",
+    description:
+      content?.SEO_description ||
+      "Get in touch with Elif Hilal Umucu through email or social media.",
+  };
+}
 
 export default async function ContactPage() {
   try {

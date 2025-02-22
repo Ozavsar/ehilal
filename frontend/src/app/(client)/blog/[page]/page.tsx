@@ -1,6 +1,5 @@
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllArticlePreviews } from "@/lib/services/medium";
@@ -66,13 +65,4 @@ export async function generateStaticParams() {
     console.error("Error generating static params:", error);
     return [{ slug: "1" }];
   }
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  const articles = await getCachedArticles();
-
-  return {
-    title: "Blog",
-    description: `Read Elif Hilal's latest ${articles?.length || 0} articles and stay updated`,
-  };
 }

@@ -1,6 +1,5 @@
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 import VideosContainer from "@/containers/videos";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllVideos } from "@/lib/services/videos";
@@ -22,10 +21,6 @@ const getCachedVideos = unstable_cache(
     revalidate: 86400, // 24 hours
   },
 );
-
-export const metadata: Metadata = {
-  title: "Videos",
-};
 
 export default async function VideosPage({
   params,

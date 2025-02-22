@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import TitleSection from "@/components/title-section";
 import { getPageTitle } from "@/lib/services/pages";
+import { Metadata } from "next";
 
 interface CoursesLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,16 @@ const getCachedPageTitle = unstable_cache(
   ["get-courses-page-title"],
   { tags: ["courses-title"] },
 );
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getCachedPageTitle();
+  return {
+    title: content.SEO_title || "Courses",
+    description:
+      content.SEO_description ||
+      "Find the latest courses and events in the tech industry.",
+  };
+}
 
 export default async function CoursesLayout({ children }: CoursesLayoutProps) {
   const content = await getCachedPageTitle();
