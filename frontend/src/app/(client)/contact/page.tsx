@@ -40,11 +40,13 @@ const getCachedSocialMediaLinks = unstable_cache(
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getCachedContactPageContent();
+  const title = content?.SEO_title || "Contact";
+  const description =
+    content?.SEO_description ||
+    "Get in touch with Elif Hilal Umucu through email or social media.";
   return {
-    title: content?.SEO_title || "Contact",
-    description:
-      content?.SEO_description ||
-      "Get in touch with Elif Hilal Umucu through email or social media.",
+    title,
+    description,
   };
 }
 

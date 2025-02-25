@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
+import { Metadata } from "next";
 import TitleSection from "@/components/title-section";
 import { getPageTitle } from "@/lib/services/pages";
-import { Metadata } from "next";
 
 interface ConferencesLayoutProps {
   children: React.ReactNode;
@@ -17,11 +17,13 @@ const getCachedPageTitle = unstable_cache(
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getCachedPageTitle();
+  const title = content?.SEO_title ? content.SEO_title : "Conferences";
+  const description = content?.SEO_description
+    ? content.SEO_description
+    : "Find the latest conferences and events in the tech industry.";
   return {
-    title: content.SEO_title || "Conferences",
-    description:
-      content.SEO_description ||
-      "Find the latest conferences and events in the tech industry.",
+    title,
+    description,
   };
 }
 

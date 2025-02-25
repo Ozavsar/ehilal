@@ -21,12 +21,16 @@ const getCachedHomePageContent = unstable_cache(
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getCachedHomePageContent();
-  return {
-    title: content?.SEO_title || "Portfolio",
-    description:
-      content?.SEO_description ||
-      "Elif Hilal Umucu's portfolio. Find the latest projects and events in the tech industry.",
-  };
+
+  const title = content?.SEO_title
+    ? `${content.SEO_title} | Elif Hilal Umucu`
+    : "Portfolio | Elif Hilal Umucu";
+
+  const description = content?.SEO_description
+    ? content.SEO_description
+    : "Elif Hilal Umucu's portfolio. Find the latest projects and events in the tech industry.";
+
+  return { title, description };
 }
 
 export default async function Home() {
