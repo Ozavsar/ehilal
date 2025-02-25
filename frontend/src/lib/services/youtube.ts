@@ -39,7 +39,7 @@ export async function getUploadedVideos(
     }));
 
     // @todo: Remove limit before the final product
-    const limitedVideos = videos?.slice(0, 3);
+    const limitedVideos = videos;
 
     return limitedVideos || [];
   } catch (err) {
