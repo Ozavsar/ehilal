@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
+import { Metadata } from "next";
 import TitleSection from "@/components/title-section";
 import { getPageTitle } from "@/lib/services/pages";
-import { Metadata } from "next";
 
 interface BlogLayoutProps {
   children: React.ReactNode;
@@ -17,11 +17,13 @@ const getCachedPageTitle = unstable_cache(
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getCachedPageTitle();
+  const title = content?.SEO_title ? content.SEO_title : "Blog";
+  const description = content?.SEO_description
+    ? content.SEO_description
+    : "Read Elif Hilal's latest articles and stay updated with the latest news and trends in the tech industry.";
   return {
-    title: content.SEO_title || "Blogg",
-    description:
-      content.SEO_description ||
-      "Read Elif Hilal's latest articles and stay updated with the latest news and trends in the tech industry.",
+    title,
+    description,
   };
 }
 

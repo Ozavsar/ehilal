@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import Pagination from "@/components/pagination";
 import VideoCard from "./video-card";
-import { ITEMS_PER_PAGE, YOUTUBE_CHANNEL_ID } from "@/config/constants";
-import { getUploadedVideos } from "@/lib/services/youtube";
+import { ITEMS_PER_PAGE } from "@/config/constants";
 import type { IUnifiedVideo } from "@/types.d";
 
 interface IVideosContainerProps {
@@ -15,8 +14,7 @@ export default async function VideosContainer({
   pageNumber,
 }: IVideosContainerProps) {
   const currentPage = parseInt(pageNumber, 10);
-  const allVideos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
-  const totalPages = Math.ceil(allVideos.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
 
   videos = videos
     ? videos.slice(

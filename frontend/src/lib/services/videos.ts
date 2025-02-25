@@ -60,8 +60,8 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
               ? youtubeDetails.thumbnailURL
               : thumbnailURL;
           }
-          source = "youtube";
         }
+        source = "youtube";
       }
 
       return {
@@ -88,7 +88,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
 // Extract the YouTube video ID from a URL
 function extractYoutubeId(url: string): string | null {
   const regex =
-    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|live\/)|youtu\.be\/)([^"&?/\s]{11})/;
   const match = url.match(regex);
   return match ? match[1] : null;
 }
