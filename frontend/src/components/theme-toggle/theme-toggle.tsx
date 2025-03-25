@@ -28,7 +28,7 @@ export default function ThemeToggle() {
       id="switch"
       ref={switchRef}
       onClick={toggle}
-      className="fixed right-0 top-1 scale-75 sm:right-4 sm:top-8"
+      className="fixed -right-6 top-1 scale-50 sm:right-4 sm:scale-75 sm:top-8"
     >
       <div id="contentwrapper">
         <div id="circle"></div>

@@ -609,6 +609,7 @@ export interface ApiSocialMediaLinkSocialMediaLink
   extends Struct.SingleTypeSchema {
   collectionName: 'social_media_links';
   info: {
+    description: '';
     displayName: 'Social Media Links';
     pluralName: 'social-media-links';
     singularName: 'social-media-link';
@@ -633,6 +634,7 @@ export interface ApiSocialMediaLinkSocialMediaLink
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    youtube: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 

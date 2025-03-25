@@ -31,13 +31,13 @@ export default function ArticleCard({
         <a href={mediumURL} target="_blank">
           <h2 className="text-lg font-bold">{title}</h2>
         </a>
-        <p className="dark:text-gray-400">
+        <p className="dark:text-gray-400 max-sm:text-sm">
           {truncateDescription(description!)}
         </p>
       </CardContent>
       <CardFooter>
         <a href={mediumURL} target="_blank">
-          <span className="text-sm text-primary hover:underline">
+          <span className="max-sm:text-xs text-sm text-primary hover:underline">
             Read more...
           </span>
         </a>

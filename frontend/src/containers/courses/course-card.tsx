@@ -35,45 +35,50 @@ export default function CourseCard({
       </CardHeader>
       <CardContent>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
-          <h2 className="line-clamp-2 text-xl font-bold sm:text-3xl">
+          <h2 className="line-clamp-2 text-lg font-bold sm:text-3xl">
             {title}
           </h2>
         </a>
         <p className="line-clamp-2 text-sm text-muted-foreground">{headline}</p>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex mt-auto items-center gap-2 text-sm max-sm:my-1 max-sm:justify-around max-sm:text-xs">
           <span>{contentInfo}</span>
           <span>•</span>
           <span>{numLectures} lectures</span>
           <span>•</span>
           <span>{instructionalLevel}</span>
         </div>
-        <div className="flex items-center gap-2">
-          {rating && (
-            <>
-              <div className="relative">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <LuStar key={i} className="h-4 w-4 text-muted-foreground" />
-                  ))}
-                </div>
-                <div
-                  className="absolute left-0 top-0 flex overflow-hidden"
-                  style={{ width: `${(parseFloat(rating) / 5) * 100}%` }}
-                >
+        <div className="flex items-center gap-2 text-sm max-sm:my-1 max-sm:justify-between max-sm:text-xs">
+          <div className="flex items-center gap-1 text-muted-foreground">
+            {rating && (
+              <>
+                <div className="relative">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
                       <LuStar
                         key={i}
-                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                        className="size-4 text-muted-foreground"
                       />
                     ))}
                   </div>
+                  <div
+                    className="absolute left-0 top-0 flex overflow-hidden"
+                    style={{ width: `${(parseFloat(rating) / 5) * 100}%` }}
+                  >
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <LuStar
+                          key={i}
+                          className="size-4 fill-yellow-400 text-yellow-400"
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <span className="text-sm font-medium">{rating}</span>
-            </>
-          )}
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <span className="font-medium">{rating}</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
             <LuUsers className="h-4 w-4" />
             <span>{numReviews}</span>
           </div>

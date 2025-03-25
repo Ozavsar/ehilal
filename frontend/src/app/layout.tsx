@@ -10,6 +10,7 @@ import "./globals.css";
 import "swiper/css";
 import Providers from "@/context/providers";
 import { getTheme } from "@/lib/services";
+import MobileNav from "@/components/header/mobile-nav";
 
 export const metadata: Metadata = {
   title: {
@@ -103,9 +104,7 @@ export default async function RootLayout({
         <Providers>
           <Header />
           {children}
-
-          <RocketCursor />
-          {/* <LightDarkModeEffects /> */}
+          {/* <RocketCursor /> */}
         </Providers>
       </body>
     </html>

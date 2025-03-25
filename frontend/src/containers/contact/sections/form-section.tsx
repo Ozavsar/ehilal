@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z, ZodErrorMap } from "zod";
-import { Resend } from "resend";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import appRoutes from "@/config/constants/app-routes";
 import { submitAction } from "@/lib/services/resend";
 import axios from "axios";
 
@@ -150,7 +148,9 @@ export default function FormSection({
               />
             ))}
           </div>
-          <CustomButton type="submit" text="Send Message" />
+          <div className="flex w-full max-sm:justify-center">
+            <CustomButton type="submit" text="Send Message" />
+          </div>
           <ToastContainer />
         </form>
       </Form>

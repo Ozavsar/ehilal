@@ -9,91 +9,92 @@ process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
 export const getAllCourses = async () => {
   // Instead of scraping, return dummy data
-  if (process.env.NODE_ENV === "development") {
-    return courseDummyData;
-  } else {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
 
-    const page = await browser.newPage();
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  const page = await browser.newPage();
+
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  );
+
+  await page.goto(UDEMY_USER_URL, {
+    waitUntil: "networkidle2",
+  });
+  await autoScroll(page);
+
+  const courses = await page.evaluate(() => {
+    const courseElements = document.querySelectorAll(
+      "section[class*='vertical-card-module--card--']",
     );
+    const courseList: ICourse[] = [];
 
-    await page.goto(UDEMY_USER_URL, {
-      waitUntil: "networkidle2",
-    });
-    await autoScroll(page);
-
-    const courses = await page.evaluate(() => {
-      const courseElements = document.querySelectorAll(
-        "div[data-purpose='course-card-container']",
+    courseElements.forEach((courseElement) => {
+      const titleElement = courseElement.querySelector(
+        "h3[class*='card-title-module--title--'] a",
       );
-      const courseList: ICourse[] = [];
+      const headlineElement = courseElement.querySelector(
+        "span[data-purpose='safely-set-inner-html:course-card:course-headline']",
+      );
+      const ratingElement = courseElement.querySelector(
+        "span[data-testid='seo-rating']",
+      );
+      const contentInfoElement = courseElement.querySelector(
+        "span[data-testid='seo-content-info']",
+      );
+      const numReviews = courseElement.querySelector(
+        "span[data-testid='seo-num-reviews']",
+      );
+      const numLecturesElement = courseElement.querySelector(
+        "span[data-testid='seo-num-lectures']",
+      );
+      const instructionalLevelElement = courseElement.querySelector(
+        "span[data-testid='seo-instructional-level']",
+      );
+      const thumbnailElement = courseElement.querySelector("img");
 
-      courseElements.forEach((courseElement) => {
-        const titleElement = courseElement.querySelector(
-          "h3[data-purpose='course-title-url'] a",
-        );
-        const headlineElement = courseElement.querySelector(
-          "span[data-testid='seo-headline']",
-        );
-        const ratingElement = courseElement.querySelector(
-          "span[data-testid='seo-rating']",
-        );
-        const contentInfoElement = courseElement.querySelector(
-          "span[data-testid='seo-content-info']",
-        );
-        const numReviews = courseElement.querySelector(
-          "span[data-testid='seo-num-reviews']",
-        );
-        const numLecturesElement = courseElement.querySelector(
-          "span[data-testid='seo-num-lectures']",
-        );
-        const instructionalLevelElement = courseElement.querySelector(
-          "span[data-testid='seo-instructional-level']",
-        );
-        const thumbnailElement = courseElement.querySelector("img");
+      const thumbnailElementBig = thumbnailElement
+        ? thumbnailElement
+            .getAttribute("srcset")
+            ?.split(", ")
+            .map((src) => {
+              const [url, size] = src.split(" ");
+              return { url, width: parseInt(size) };
+            })
+            .sort((a, b) => b.width - a.width)[0]?.url
+        : null;
 
-        const thumbnailElementBig = thumbnailElement
-          ?.getAttribute("srcset")
-          ?.split(",")[1]
-          .trim()
-          .slice(0, -3)
-          .trim();
-
-        if (titleElement) {
-          courseList.push({
-            title:
-              (titleElement.firstChild as HTMLElement)?.textContent?.trim() ||
-              "No Title",
-            headline: headlineElement?.textContent?.trim() || "No Headline",
-            rating:
-              ratingElement?.textContent?.split(":")[1].split("/")[0].trim() ||
-              "No Rating",
-            contentInfo:
-              contentInfoElement?.textContent?.trim() || "No Content Info",
-            numLectures:
-              numLecturesElement?.textContent?.trim() || "No Lectures Info",
-            numReviews: numReviews?.textContent?.trim() || "No Reviews",
-            instructionalLevel:
-              instructionalLevelElement?.textContent?.trim() || "No Level Info",
-            udemyURL:
-              "https://www.udemy.com" + titleElement.getAttribute("href") ||
-              "No URL",
-            thumbnailURL: thumbnailElementBig || null,
-          });
-        }
-      });
-
-      return courseList;
+      if (titleElement) {
+        courseList.push({
+          title:
+            (titleElement.firstChild as HTMLElement)?.textContent?.trim() ||
+            "No Title",
+          headline: headlineElement?.textContent?.trim() || "No Headline",
+          rating:
+            ratingElement?.textContent?.split(":")[1].split("/")[0].trim() ||
+            "No Rating",
+          contentInfo:
+            contentInfoElement?.textContent?.trim() || "No Content Info",
+          numLectures:
+            numLecturesElement?.textContent?.trim() || "No Lectures Info",
+          numReviews: numReviews?.textContent?.trim() || "No Reviews",
+          instructionalLevel:
+            instructionalLevelElement?.textContent?.trim() || "No Level Info",
+          udemyURL:
+            "https://www.udemy.com" + titleElement.getAttribute("href") ||
+            "No URL",
+          thumbnailURL: thumbnailElementBig || null,
+        });
+      }
     });
 
-    console.log("courses fetched");
-    await browser.close();
-    return courses;
-  }
+    return courseList;
+  });
+
+  console.log("courses fetched");
+  await browser.close();
+  return courses;
 };

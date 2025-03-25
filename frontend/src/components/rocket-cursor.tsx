@@ -1,13 +1,29 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function RocketCursor() {
+  const [isDesktop, setIsDesktop] = useState(false);
   const rocketRef = useRef<HTMLDivElement>(null);
   const heartRef = useRef<HTMLDivElement>(null);
 
   const { theme } = useTheme();
+
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(
+        window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+      );
+    };
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
+
+  if (!isDesktop) return null;
 
   useEffect(() => {
     const mouseMargin = 5;

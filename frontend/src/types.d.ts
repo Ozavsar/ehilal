@@ -71,6 +71,7 @@ export interface IStrapiSocialLinks extends IStrapiBasePage {
   email: string;
   linkedin: string;
   twitter_x: string;
+  youtube: string;
 }
 
 export interface IStrapiBasePage {

@@ -36,11 +36,11 @@ export default function VideoCard({
         <a href={videoUrl} target="_blank" rel="noopener noreferrer">
           <h2 className="text-lg font-bold">{title}</h2>
         </a>
-        <p className="dark:text-gray-400">
+        <p className="text-sm dark:text-gray-400">
           {description ? truncateDescription(description) : ""}
         </p>
       </CardContent>
-      <CardFooter className="row-span-1 flex justify-between p-4 pt-1">
+      <CardFooter className="row-span-1 flex justify-between p-4 pt-1 text-sm max-sm:text-xs">
         {source === "youtube" ? (
           <a href={videoUrl} target="_blank" rel="noopener noreferrer">
             <Button variant={"link"} className="h-fit p-0 text-foreground">
