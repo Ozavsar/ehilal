@@ -12,9 +12,7 @@ export default function RocketCursor() {
 
   useEffect(() => {
     const checkDevice = () => {
-      setIsDesktop(
-        window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-      );
+      setIsDesktop(!("ontouchstart" in window) && window.innerWidth > 768);
     };
 
     checkDevice();
@@ -23,9 +21,9 @@ export default function RocketCursor() {
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
-  if (!isDesktop) return null;
-
   useEffect(() => {
+    if (!isDesktop) return;
+
     const mouseMargin = 5;
     const body = document.body;
     const rocket = rocketRef.current;
@@ -174,7 +172,9 @@ export default function RocketCursor() {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [isDesktop]);
+
+  if (!isDesktop) return null;
 
   return (
     <div className="rocket" ref={rocketRef}>

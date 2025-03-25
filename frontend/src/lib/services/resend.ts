@@ -1,7 +1,7 @@
 "use server";
 
 import { EmailTemplate } from "@/components/email-template";
-import appRoutes from "@/config/constants/app-routes";
+import { ROUTES } from "@/config/constants/app-routes";
 import { Resend } from "resend";
 
 export const submitAction = async (formData: FormData) => {
@@ -17,7 +17,7 @@ export const submitAction = async (formData: FormData) => {
 
   const { data, error } = await resend.emails.send({
     from: process.env.NEXT_PUBLIC_DOMAIN_MAIL!,
-    to: appRoutes.EXTERNAL.Mail,
+    to: ROUTES.EXTERNAL.Mail,
     subject: rawFormData.subject,
     react: EmailTemplate(rawFormData),
   });

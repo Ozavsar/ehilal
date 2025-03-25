@@ -29,7 +29,7 @@ const getCachedSocialMediaLinks = unstable_cache(
         "Error fetching social media links on contact page:",
         error,
       );
-      return { email: "", twitter_x: "", linkedin: "" };
+      return { email: "", twitter_x: "", linkedin: "" , youtube: ""};
     }
   },
   ["social-media-links"],
