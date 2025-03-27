@@ -17,7 +17,7 @@ export default function MobileNav() {
             "flex flex-col items-center border-b",
             pathname === href
               ? "border-primary text-primary"
-              : "border-transparent text-white/90",
+              : "border-transparent",
           )}
         >
           {ICONS[icon]}

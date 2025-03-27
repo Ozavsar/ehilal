@@ -23,7 +23,7 @@ export default function ArticleCard({
             alt={title}
             width={800}
             height={800}
-            className="aspect-video object-cover transition-transform duration-300 hover:scale-110"
+            className="aspect-video object-cover transition-transform duration-300 hover:scale-105"
           />
         </a>
       </CardHeader>

@@ -89,6 +89,12 @@ export interface IPageTitle {
   SEO_description: string;
 }
 
+export interface INotFoundPage
+  extends IStrapiBasePage,
+    Omit<IPageTitle, "page_title" | "page_title_background"> {
+  image: IImage;
+}
+
 export interface IStrapiHomePage extends IStrapiBasePage, IPageTitle {
   greeting: string;
   introduction: string;
@@ -113,6 +119,7 @@ export interface IStrapiVideo extends IStrapiBasePage {
   publish_date: string;
   url: string;
   thumbnail: IImage;
+  isFeatured: boolean;
 }
 
 export interface IStrapiTheme extends IStrapiBasePage {
@@ -141,5 +148,6 @@ export interface IUnifiedVideo {
   url: string;
   thumbnailURL: string;
   publish_date: string;
+  isFeatured?: boolean;
   source: "youtube" | "strapi";
 }

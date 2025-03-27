@@ -9,7 +9,7 @@ import type { IStrapiResponse, IStrapiVideo, IUnifiedVideo } from "@/types.d";
  */
 export async function getAllStrapiVideos(start?: number, limit?: number) {
   const baseQuery = {
-    populate: "thumbnail",
+    populate: ["thumbnail"],
   };
 
   const query =
@@ -25,6 +25,11 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   return response;
 }
 
+const parseDateToISO = (dateStr: string) => {
+  const [day, month, year] = dateStr.split(".").map(Number);
+  return new Date(year, month - 1, day).toISOString();
+};
+
 export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   // 1. Get YouTube videos from the channel
   const youtubeVideos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
@@ -35,7 +40,8 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     description: video.description!,
     url: `https://www.youtube.com/watch?v=${video.id}`,
     thumbnailURL: video.thumbnailURL!,
-    publish_date: video.publishedAt,
+    publish_date: parseDateToISO(video.publishedAt!),
+    isFeatured: false,
     source: "youtube" as const,
   }));
 
@@ -47,19 +53,15 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   const processedStrapiVideos = await Promise.all(
     strapiVideos.map(async (video) => {
       let thumbnailURL = video.thumbnail?.url || "";
-      let publish_date = new Date(video.publish_date).toLocaleDateString();
+      let publish_date = new Date(video.publish_date).toISOString();
       let source: "strapi" | "youtube" = "strapi";
 
-      // If the video is a YouTube video, get the thumbnail and publishedAt date
-      if (video.url.includes("youtube.com") || video.url.includes("youtu.be")) {
-        const youtubeId = extractYoutubeId(video.url);
-        if (youtubeId) {
-          const youtubeDetails = await getYoutubeVideoDetails(youtubeId);
-          if (youtubeDetails) {
-            thumbnailURL = !thumbnailURL
-              ? youtubeDetails.thumbnailURL
-              : thumbnailURL;
-          }
+      // Check if the video is a YouTube video
+      let youtubeId = extractYoutubeId(video.url);
+      if (youtubeId) {
+        const youtubeDetails = await getYoutubeVideoDetails(youtubeId);
+        if (youtubeDetails) {
+          thumbnailURL = thumbnailURL || youtubeDetails.thumbnailURL;
         }
         source = "youtube";
       }
@@ -71,16 +73,32 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
         url: video.url,
         thumbnailURL,
         publish_date,
-        source: source,
+        source,
+        isFeatured: video.isFeatured || false,
       };
     }),
   );
 
-  // 4. Combine and sort all videos
-  const allVideos = [...formattedYoutubeVideos, ...processedStrapiVideos].sort(
-    (a, b) =>
-      new Date(b.publish_date).getTime() - new Date(a.publish_date).getTime(),
+  // 4. Strapi videoları YouTube videolarından çıkar
+  const strapiUrls = new Set(processedStrapiVideos.map((video) => video.url));
+  const filteredYoutubeVideos = formattedYoutubeVideos.filter(
+    (video) => !strapiUrls.has(video.url),
   );
+
+  // 5. Combine all videos and sort them
+  const allVideos = [...processedStrapiVideos, ...filteredYoutubeVideos].sort(
+    (a, b) => {
+      // Sort by featured first, then by publish date
+      if (a.isFeatured === b.isFeatured) {
+        return (
+          new Date(b.publish_date).getTime() -
+          new Date(a.publish_date).getTime()
+        );
+      }
+      return a.isFeatured ? -1 : 1;
+    },
+  );
+
   console.log("all videos fetched");
   return allVideos;
 }

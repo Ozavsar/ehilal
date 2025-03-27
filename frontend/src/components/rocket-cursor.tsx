@@ -1,14 +1,11 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 
 export default function RocketCursor() {
   const [isDesktop, setIsDesktop] = useState(false);
   const rocketRef = useRef<HTMLDivElement>(null);
   const heartRef = useRef<HTMLDivElement>(null);
-
-  const { theme } = useTheme();
 
   useEffect(() => {
     const checkDevice = () => {
@@ -177,7 +174,7 @@ export default function RocketCursor() {
   if (!isDesktop) return null;
 
   return (
-    <div className="rocket" ref={rocketRef}>
+    <div className="rocket select-none" ref={rocketRef}>
       <svg
         viewBox="0 0 32 44"
         xmlns="http://www.w3.org/2000/svg"

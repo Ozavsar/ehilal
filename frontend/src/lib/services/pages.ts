@@ -4,6 +4,7 @@ import type {
   IStrapiHomePage,
   IStrapiResponse,
   IPageTitle,
+  INotFoundPage,
 } from "@/types.d";
 
 /**
@@ -33,5 +34,16 @@ export async function getContactPageContent() {
 export async function getPageTitle(pageName: string) {
   const response = await fetchAPI<IStrapiResponse<IPageTitle>>(`/${pageName}`);
   console.log(pageName + " title fetched");
+  return response.data;
+}
+
+/**
+ * Get Not Found page content
+ */
+export async function getNotFoundPageContent() {
+  const response = await fetchAPI<IStrapiResponse<INotFoundPage>>(
+    "/not-found-page",
+    { populate: "image" },
+  );
   return response.data;
 }

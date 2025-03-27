@@ -605,6 +605,44 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiNotFoundPageNotFoundPage extends Struct.SingleTypeSchema {
+  collectionName: 'not_found_pages';
+  info: {
+    description: '';
+    displayName: 'Not Found Page';
+    pluralName: 'not-found-pages';
+    singularName: 'not-found-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images' | 'files'> &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::not-found-page.not-found-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    SEO_description: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    SEO_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSocialMediaLinkSocialMediaLink
   extends Struct.SingleTypeSchema {
   collectionName: 'social_media_links';
@@ -682,6 +720,7 @@ export interface ApiVideoVideo extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
+    isFeatured: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::video.video'> &
       Schema.Attribute.Private;
@@ -1255,6 +1294,7 @@ declare module '@strapi/strapi' {
       'api::contact-page.contact-page': ApiContactPageContactPage;
       'api::courses-page.courses-page': ApiCoursesPageCoursesPage;
       'api::home-page.home-page': ApiHomePageHomePage;
+      'api::not-found-page.not-found-page': ApiNotFoundPageNotFoundPage;
       'api::social-media-link.social-media-link': ApiSocialMediaLinkSocialMediaLink;
       'api::theme.theme': ApiThemeTheme;
       'api::video.video': ApiVideoVideo;
