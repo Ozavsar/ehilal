@@ -27,7 +27,7 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
 
 const parseDateToISO = (dateStr: string) => {
   const [day, month, year] = dateStr.split(".").map(Number);
-  return new Date(year, month - 1, day).toISOString();
+  return new Date(year, month, day).toISOString();
 };
 
 export async function getAllVideos(): Promise<IUnifiedVideo[]> {
