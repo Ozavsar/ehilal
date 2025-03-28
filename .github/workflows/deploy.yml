@@ -50,9 +50,9 @@ jobs:
             echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
             echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
 
-            npm install
-            npm run build
-            pm2 restart ehilal_strapi
+            /root/.nvm/versions/node/v20.18.0/bin/npm install
+            /root/.nvm/versions/node/v20.18.0/bin/npm run build
+            /root/.nvm/versions/node/v20.18.0/bin/pm2 restart ehilal_strapi
 
             #### FRONTEND BUILD ####
             cd ../frontend
@@ -61,7 +61,7 @@ jobs:
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
             echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
 
-            npm install
-            npm run build
-            pm2 restart ehilal_frontend
+            /root/.nvm/versions/node/v20.18.0/bin/npm install
+            /root/.nvm/versions/node/v20.18.0/bin/npm run build
+            /root/.nvm/versions/node/v20.18.0/bin/pm2 restart ehilal_frontend
           EOF
