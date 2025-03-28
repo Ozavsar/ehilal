@@ -21,13 +21,13 @@ export const metadata: Metadata = {
       {
         rel: "icon",
         type: "image/png",
-        url: "https://7cf5-2a09-bac5-58c3-d2d-00-150-b1.ngrok-free.app/api/og?theme=light&source=favicon",
+        url: "https://ehilal.net/api/og?theme=light&source=favicon",
         media: "(prefers-color-scheme: light)",
       },
       {
         rel: "icon",
         type: "image/png",
-        url: "https://7cf5-2a09-bac5-58c3-d2d-00-150-b1.ngrok-free.app/api/og?theme=dark&source=favicon",
+        url: "https://ehilal.net/api/og?theme=dark&source=favicon",
         media: "(prefers-color-scheme: dark)",
       },
     ],
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "https://7cf5-2a09-bac5-58c3-d2d-00-150-b1.ngrok-free.app/api/og",
+        url: "hhttps://ehilal.net/api/og",
         width: 1200,
         height: 630,
         alt: "Elif Hilal Logo",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     siteId: "@elifhilalumucu",
     images: [
       {
-        url: "https://7cf5-2a09-bac5-58c3-d2d-00-150-b1.ngrok-free.app/api/og",
+        url: "https://ehilal.net/api/og",
         width: 1200,
         height: 630,
         alt: "Elif Hilal Logo",
