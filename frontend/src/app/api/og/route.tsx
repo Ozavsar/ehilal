@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const theme =
     (new URL(request.url).searchParams.get("theme") as "light" | "dark") ||
     "dark";
-  const source = new URL(request.url).searchParams.get("source") || "favicon";
+  const source = new URL(request.url).searchParams.get("source") || "og";
 
   const themeResponse = await getTheme();
   const themeColor =

@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "hhttps://ehilal.net/api/og",
+        url: "https://ehilal.net/api/og",
         width: 1200,
         height: 630,
         alt: "Elif Hilal Logo",
