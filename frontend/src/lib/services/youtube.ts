@@ -34,7 +34,7 @@ export async function getUploadedVideos(
       description: item.snippet?.description || "",
       thumbnailURL: item.snippet?.thumbnails?.standard?.url || "",
       publishedAt: item.snippet?.publishedAt
-        ? new Date(item.snippet.publishedAt).toLocaleDateString()
+        ? new Date(item.snippet.publishedAt).toLocaleDateString("tr-TR")
         : "",
     }));
 
@@ -78,7 +78,7 @@ export async function getYoutubeVideoById(
       description: video.snippet?.description,
       thumbnailURL: video.snippet?.thumbnails?.high?.url,
       publishedAt: video.snippet?.publishedAt
-        ? new Date(video.snippet.publishedAt).toLocaleDateString()
+        ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
         : "unknown",
       views: video.statistics?.viewCount,
     };
@@ -147,7 +147,7 @@ export async function getYoutubeVideoDetails(
     return {
       thumbnailURL,
       publishedAt: video.snippet?.publishedAt
-        ? new Date(video.snippet.publishedAt).toLocaleDateString()
+        ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
         : "unknown",
     };
   } catch (err) {
