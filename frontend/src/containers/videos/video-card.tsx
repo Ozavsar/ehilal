@@ -27,8 +27,8 @@ export default function VideoCard({
       <CardHeader className="relative overflow-hidden border-b-8 border-primary bg-primary p-0">
         <div className="group relative aspect-video object-cover transition-transform duration-300">
           {isFeatured && (
-            <Badge className="absolute left-1 top-1 z-10 w-fit select-none bg-primary backdrop-blur-sm hover:bg-primary/50">
-              <LuFlame className="size-4" />
+            <Badge className="absolute left-4 top-2 z-10 w-fit select-none border-red-600 bg-muted text-red-600 backdrop-blur-sm hover:bg-primary/50 dark:border-red-300 dark:text-red-300">
+              <LuFlame className="mr-1 size-4" />
               Featured
             </Badge>
           )}
