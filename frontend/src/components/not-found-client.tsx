@@ -133,7 +133,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
   return (
     <main
       ref={containerRef}
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0A0E17] px-4 py-16 text-white max-sm:-my-20 md:py-24"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0A0E17] px-4 py-16 text-white max-sm:-my-20 md:py-4"
     >
       {/* Space background with stars */}
       <div className="absolute inset-0 overflow-hidden">
