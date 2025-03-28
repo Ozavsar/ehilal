@@ -23,8 +23,9 @@ jobs:
       - name: Deploy
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            cd /root/personal-portfolio-project
+            source ~/.config/fish/config.fish || true
 
+            cd /root/personal-portfolio-project
             git pull origin main
 
             #### BACKEND BUILD ####
