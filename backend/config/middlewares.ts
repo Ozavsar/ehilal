@@ -31,8 +31,17 @@ export default [
     },
   },
 
+  {
+    name: "strapi::cors",
+    config: {
+      origin: ["https://ehilal.com", "https://admin.ehilal.com"],
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      headers: "*",
+      credentials: true,
+    },
+  },
+
   "strapi::logger",
-  "strapi::cors",
   "strapi::poweredBy",
   "strapi::query",
   "strapi::body",
