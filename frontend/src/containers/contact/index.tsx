@@ -3,6 +3,7 @@ import { LuLinkedin, LuMail, LuYoutube } from "react-icons/lu";
 import { BsTwitterX } from "react-icons/bs";
 import TitleSection from "@/components/title-section";
 import FormSection from "./sections/form-section";
+import { COMPANY_LINKEDIN_URL } from "@/config/constants";
 import type { IStrapiContactPage } from "@/types.d";
 
 interface IContactContainerProps {
@@ -79,6 +80,19 @@ export default async function ContactContainer({
                 <h3 className="uppercase text-opacity-30">Subscribe</h3>
                 <p className="font-semibold">
                   {socialMediaLinks.youtube?.split("/")[3] || "@elifhilalumucu"}
+                </p>
+              </div>
+            </Link>
+            <Link
+              href={COMPANY_LINKEDIN_URL}
+              target="_blank"
+              className="flex items-center gap-4"
+            >
+              <LuLinkedin className="size-10 text-primary" />
+              <div className="flex flex-col">
+                <h3 className="uppercase text-opacity-30">Connect with Us</h3>
+                <p className="font-semibold capitalize">
+                  {COMPANY_LINKEDIN_URL.split("/")[4]}
                 </p>
               </div>
             </Link>

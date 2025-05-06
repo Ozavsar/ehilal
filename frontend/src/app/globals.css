@@ -90,7 +90,7 @@
 .glow {
   width: 0;
   height: 0;
-  box-shadow: 0 0 200px 40px #f6ae2d;
+  box-shadow: 0 0 100px 20px #f6ae2d;
   position: absolute;
   top: 0;
   left: 50%;
