@@ -99,7 +99,6 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     },
   );
 
-  console.log("all videos fetched");
   return allVideos;
 }
 

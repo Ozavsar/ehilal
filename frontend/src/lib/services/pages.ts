@@ -24,7 +24,6 @@ export async function getHomePageContent() {
 export async function getContactPageContent() {
   const response =
     await fetchAPI<IStrapiResponse<IStrapiContactPage>>("/contact-page");
-  console.log("contact page content fetched");
   return response.data;
 }
 
@@ -33,7 +32,6 @@ export async function getContactPageContent() {
  */
 export async function getPageTitle(pageName: string) {
   const response = await fetchAPI<IStrapiResponse<IPageTitle>>(`/${pageName}`);
-  console.log(pageName + " title fetched");
   return response.data;
 }
 

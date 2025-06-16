@@ -94,7 +94,6 @@ export const getAllCourses = async () => {
     return courseList;
   });
 
-  console.log("courses fetched");
   await browser.close();
   return courses;
 };
