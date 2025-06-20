@@ -7,19 +7,19 @@ import "./theme-toggle.css";
 export default function ThemeToggle() {
   const switchRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const { setTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
   const toggle = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!switchRef.current) return;
-    if (theme === "dark") switchRef.current.classList.add("off");
+    if (resolvedTheme === "dark") switchRef.current.classList.add("off");
     else switchRef.current.classList.remove("off");
-  }, [theme, mounted]);
+  }, [resolvedTheme, mounted]);
 
   if (!mounted) return null;
 
@@ -28,7 +28,7 @@ export default function ThemeToggle() {
       id="switch"
       ref={switchRef}
       onClick={toggle}
-      className="fixed -right-6 top-1 scale-50 sm:right-4 sm:scale-75 sm:top-8"
+      className="fixed -right-6 top-1 scale-50 cursor-pointer sm:right-4 sm:top-8 sm:scale-75"
     >
       <div id="contentwrapper">
         <div id="circle"></div>
