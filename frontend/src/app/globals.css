@@ -105,6 +105,9 @@
   opacity: 0;
   transition: opacity 0.5s;
 }
+main {
+  @apply max-sm:py-20;
+}
 
 @keyframes fadeout {
   to {

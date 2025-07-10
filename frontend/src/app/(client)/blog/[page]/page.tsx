@@ -1,5 +1,5 @@
-import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllArticlePreviews } from "@/lib/services/medium";

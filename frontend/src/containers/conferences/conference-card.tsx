@@ -22,9 +22,9 @@ export default function ConferenceCard({
       <CardContent className="row-span-1 flex flex-col gap-2 p-4 pb-2">
         <h2 className="text-lg font-bold">{title}</h2>
       </CardContent>
-      <CardFooter className="row-span-1 flex items-center justify-between p-4 pt-1">
+      <CardFooter className="row-span-1 flex items-center justify-between gap-4 p-4 pt-1">
         <Badge variant="outline">{location}</Badge>
-        <p className="text-sm dark:text-gray-400 max-sm:text-xs">
+        <p className="text-xs dark:text-gray-400 shrink-0 max-sm:text-xs">
           {new Date(date).toLocaleDateString("en-US", {
             day: "numeric",
             month: "long",

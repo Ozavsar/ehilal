@@ -13,7 +13,7 @@ interface IHomeContainerProps {
 
 export default function HomeContainer({ content }: IHomeContainerProps) {
   return (
-    <main className="container flex min-h-screen items-center justify-center max-sm:-my-20">
+    <main className="container flex min-h-screen items-center justify-center max-sm:py-0 max-sm:pb-4">
       <Image
         src={content.hero_image.url}
         className="fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 animate-fade-in-elif rounded-3xl object-cover opacity-0 shadow-md shadow-slate-900 xl:block"
@@ -23,7 +23,7 @@ export default function HomeContainer({ content }: IHomeContainerProps) {
       />
       <div className="fixed -left-[83%] -top-1/2 -z-10 hidden h-[200%] w-full -rotate-[15deg] bg-primary lg:block" />
 
-      <div className="flex max-w-md flex-col gap-12 max-sm:gap-6 md:max-w-[600px] md:gap-24 lg:ml-[10%] xl:ml-[35%]">
+      <div className="flex max-w-md flex-col gap-8 max-sm:gap-4 md:max-w-[600px] md:gap-12 lg:ml-[10%] xl:ml-[35%]">
         <Avatar className="size-52 self-center border-4 border-primary xl:hidden">
           <AvatarImage
             src={content.hero_image.url}
@@ -35,7 +35,7 @@ export default function HomeContainer({ content }: IHomeContainerProps) {
         <div className="flex w-full flex-col items-start sm:gap-6 md:items-center md:gap-10">
           <div className="flex gap-4 md:justify-center">
             <span className="mt-4 h-1 w-6 rounded-md bg-primary sm:mt-6 sm:w-10" />
-            <h1 className="text-3xl font-bold text-primary sm:text-4xl md:text-5xl">
+            <h1 className="text-2xl font-bold text-primary sm:text-4xl md:text-5xl">
               {content.greeting}
             </h1>
           </div>

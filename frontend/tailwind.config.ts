@@ -25,6 +25,10 @@ const config = {
     extend: {
       screens: {
         "custom-lg": "1135px",
+        md: "720px",
+        lg: "960px",
+        xl: "1140px",
+        "2xl": "1320px",
       },
       colors: {
         border: "hsl(var(--border))",
