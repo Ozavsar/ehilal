@@ -17,7 +17,7 @@ const getCachedArticles = unstable_cache(
   },
   ["articles-list"],
   {
-    revalidate: 86400, // 24 hours
+    revalidate: 3600, // 1 hour
   },
 );
 
@@ -48,7 +48,6 @@ export default async function BlogPage({
       <BlogContainer articles={articles} pageNumber={pageNum.toString()} />
     );
   } catch (error) {
-    console.error("Error in Blog page:", error);
     return notFound();
   }
 }

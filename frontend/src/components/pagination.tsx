@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
-import { generatePagination } from "@/lib/utils";
+import { generatePagination } from "@/lib/pagination";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 interface IPaginationProps {

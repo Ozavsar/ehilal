@@ -1,4 +1,3 @@
-import { videoPreviewDummyData } from "@/config/constants/dummy-data";
 import type { IVideoPreview } from "@/types.d";
 import { google } from "googleapis";
 
@@ -51,19 +50,7 @@ export async function getUploadedVideos(
 export async function getYoutubeVideoById(
   id: string,
 ): Promise<IVideoPreview | null> {
-  if (process.env.NODE_ENV === "development") {
-    try {
-      // Find the dummy video by ID
-      const video = videoPreviewDummyData.find((video) => video.id === id);
-
-      if (!video) return null;
-
-      return video;
-    } catch (err) {
-      console.error("Error fetching video by ID:", err);
-      return null;
-    }
-  } else {
+   
     const response = await youtube.videos.list({
       part: ["snippet", "statistics"],
       id: [id],
@@ -83,7 +70,6 @@ export async function getYoutubeVideoById(
       views: video.statistics?.viewCount,
     };
   }
-}
 
 export async function getVideoCaptions(videoId: string): Promise<any[]> {
   if (process.env.NODE_ENV === "development") {

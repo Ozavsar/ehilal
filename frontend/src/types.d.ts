@@ -52,8 +52,9 @@ export interface IVideoPreview {
 export interface IBlog {
   title: string;
   mediumURL: string;
-  description?: string;
-  thumbnailURL?: string;
+  description: string;
+  thumbnailURL: string;
+  pubDate: string;
 }
 
 export interface ICourse {

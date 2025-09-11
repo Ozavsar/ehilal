@@ -37,6 +37,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "cdn-images-1.medium.com",
+        port: "",
+      },
+      {
+        protocol: "https",
         hostname:
           "ehilal-strapi-aws-s3-images-bucket.s3.eu-central-1.amazonaws.com",
         pathname: "/**",

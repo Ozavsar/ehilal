@@ -13,6 +13,7 @@ export default function ArticleCard({
   title,
   mediumURL,
   description,
+  pubDate,
 }: IBlog) {
   return (
     <Card>
@@ -35,12 +36,13 @@ export default function ArticleCard({
           {truncateDescription(description!)}
         </p>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex justify-between">
         <a href={mediumURL} target="_blank">
-          <span className="max-sm:text-xs text-sm text-primary hover:underline">
+          <span className="text-xs text-primary hover:underline">
             Read more...
           </span>
         </a>
+        <span className="text-xs text-gray-500">{pubDate}</span>
       </CardFooter>
     </Card>
   );

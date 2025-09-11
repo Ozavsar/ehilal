@@ -1,103 +1,76 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { blogDummyData } from "@/config/constants/dummy-data";
 import { MEDIUM_USER_URL } from "@/config/constants";
 import { autoScroll } from "../utils";
-import type { IBlog } from "@/types.d";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
 export const getAllArticlePreviews = async () => {
-  if (process.env.NODE_ENV === "development") {
-    // Instead of scraping, return dummy data
-    return blogDummyData;
-  } else {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
 
-    const page = await browser.newPage();
+  const page = await browser.newPage();
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    );
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  );
 
-    await page.goto(MEDIUM_USER_URL, {
-      waitUntil: "networkidle2",
-    });
-    await autoScroll(page);
+  await page.goto(MEDIUM_USER_URL, {
+    waitUntil: "networkidle2",
+  });
+  await autoScroll(page);
 
-    const articles = await page.evaluate(() => {
-      const articleElements = document.querySelectorAll("article");
-      const articleList: IBlog[] = [];
+  const articles = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll("article")).map((article) => {
+      const title = article.querySelector("h2")?.innerText || "No Title";
+      const description =
+        article.querySelector("h3")?.innerText || "No Description";
+      const imgs = article.querySelectorAll("img");
+      let img = "";
 
-      articleElements.forEach((article) => {
-        const titleElement = article.querySelector("h2");
-        const linkElements = article.querySelectorAll("a");
-        const imageElement = article.querySelectorAll("img")[1];
-        const descriptionElement = article.querySelector("h3");
-        let validUrl = null;
+      if (imgs.length === 1) {
+        img = imgs[0].src;
+      } else if (imgs.length >= 2) {
+        img = imgs[1].src;
+      }
+      const link =
+        Array.from(article.querySelectorAll("a"))
+          .map((a) => a.href)
+          .find((href) => href.includes("//medium.com/")) || "";
 
-        linkElements.forEach((link) => {
-          // do not replace below url with MEDIM_USER_URL, it will not work
-          if (link.href.startsWith("https://medium.com/@Elifhilalumucu/")) {
-            validUrl = link.href;
+      let pubDate = "No Date";
+      const spanElements = Array.from(article.querySelectorAll("span"));
+
+      for (const span of spanElements) {
+        const text = span.textContent || "";
+
+        const match = text.match(/\b\w+ \d{1,2}(?:, \d{4})?\b/);
+        if (match) {
+          const dateStr = text;
+          if (!/\d{4}/.test(dateStr)) {
+            const currentYear = new Date().getFullYear();
+            pubDate = `${dateStr}, ${currentYear}`;
+          } else {
+            const match = dateStr.match(/^[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
+            pubDate = match ? match[0] : dateStr;
           }
-        });
-
-        if (titleElement && validUrl) {
-          articleList.push({
-            title: titleElement.innerText,
-            mediumURL: validUrl,
-            thumbnailURL: imageElement?.src.replace(
-              /\/resize:fill:\d+:\d+\//,
-              "/",
-            ),
-            description: descriptionElement?.innerText,
-          });
+          break;
         }
-      });
+      }
 
-      return articleList;
+      return {
+        title,
+        mediumURL: link,
+        thumbnailURL: img.replace(/\/resize:fill:\d+:\d+\//, "/"),
+        description,
+        pubDate,
+      };
     });
+  });
 
-    // @todo: Remove limit before the final product
-    const limitedArticles = articles.slice(0, 3);
+  await browser.close();
 
-    await browser.close();
-    return limitedArticles;
-  }
-};
-
-export const getSingleArticle = async (url: string) => {
-  if (process.env.NODE_ENV === "development") {
-    // Instead of scraping, return dummy data
-    const content = `<p>Dummy content for ${url}</p>`;
-    const rawText = `Dummy raw text for ${url}`;
-
-    return { content, rawText };
-  } else {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    );
-
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
-
-    const { content, rawText } = await page.evaluate(() => {
-      const article = document.querySelector("article");
-      const content = article?.innerHTML || "No Content";
-      const rawText = article?.innerText || "No Raw Text";
-      return { content, rawText };
-    });
-
-    await browser.close();
-    return { content, rawText };
-  }
+  return articles;
 };
