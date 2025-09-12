@@ -31,6 +31,7 @@ jobs:
             nvm use --lts
 
             cd /root/personal-portfolio-project
+            git reset --hard HEAD
             git pull origin main
 
             #### BACKEND BUILD ####
