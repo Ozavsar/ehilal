@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Page } from "puppeteer";
+import { getPlaiceholder } from "plaiceholder";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,7 +40,7 @@ export async function autoScroll(page: Page): Promise<void> {
           clearInterval(timer);
           resolve();
         }
-      }, 175);
+      }, 350);
     });
   });
 }

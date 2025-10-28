@@ -1,3 +1,4 @@
+import withPlaiceholder from "@plaiceholder/next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
@@ -51,4 +52,4 @@ const nextConfig = {
   staticPageGenerationTimeout: 300,
 };
 
-export default nextConfig;
+export default withPlaiceholder(nextConfig);

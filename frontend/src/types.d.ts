@@ -38,6 +38,7 @@ interface IImage {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  blurDataURL?: string;
 }
 
 export interface IVideoPreview {
@@ -54,6 +55,7 @@ export interface IBlog {
   mediumURL: string;
   description: string;
   thumbnailURL: string;
+  blurDataURL?: string | undefined;
   pubDate: string;
 }
 
@@ -67,6 +69,7 @@ export interface ICourse {
   udemyURL: string;
   rating: string | null;
   thumbnailURL: string | null;
+  blurDataURL?: string;
 }
 export interface IStrapiSocialLinks extends IStrapiBasePage {
   email: string;
@@ -151,4 +154,5 @@ export interface IUnifiedVideo {
   publish_date: string;
   isFeatured?: boolean;
   source: "youtube" | "strapi";
+  blurDataURL?: string;
 }

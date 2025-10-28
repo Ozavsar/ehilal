@@ -1,5 +1,6 @@
-import type { IVideoPreview } from "@/types.d";
 import { google } from "googleapis";
+import { getImage } from "../getImage";
+import type { IVideoPreview } from "@/types.d";
 
 const youtube = google.youtube({
   version: "v3",
@@ -24,7 +25,7 @@ export async function getUploadedVideos(
     const videoResponse = await youtube.playlistItems.list({
       part: ["snippet"],
       playlistId: uploadsPlaylistId,
-      maxResults: 50, // Maksimum 50 video alabiliriz
+      maxResults: 50,
     });
 
     const videos = videoResponse.data.items?.map((item) => ({
@@ -50,26 +51,25 @@ export async function getUploadedVideos(
 export async function getYoutubeVideoById(
   id: string,
 ): Promise<IVideoPreview | null> {
-   
-    const response = await youtube.videos.list({
-      part: ["snippet", "statistics"],
-      id: [id],
-    });
+  const response = await youtube.videos.list({
+    part: ["snippet", "statistics"],
+    id: [id],
+  });
 
-    const video = response.data.items?.[0];
-    if (!video) return null;
+  const video = response.data.items?.[0];
+  if (!video) return null;
 
-    return {
-      id: video.id,
-      title: video.snippet?.title,
-      description: video.snippet?.description,
-      thumbnailURL: video.snippet?.thumbnails?.high?.url,
-      publishedAt: video.snippet?.publishedAt
-        ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
-        : "unknown",
-      views: video.statistics?.viewCount,
-    };
-  }
+  return {
+    id: video.id,
+    title: video.snippet?.title,
+    description: video.snippet?.description,
+    thumbnailURL: video.snippet?.thumbnails?.high?.url,
+    publishedAt: video.snippet?.publishedAt
+      ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
+      : "unknown",
+    views: video.statistics?.viewCount,
+  };
+}
 
 export async function getVideoCaptions(videoId: string): Promise<any[]> {
   if (process.env.NODE_ENV === "development") {
@@ -116,9 +116,11 @@ export async function getVideoCaptions(videoId: string): Promise<any[]> {
   }
 }
 
-export async function getYoutubeVideoDetails(
-  id: string,
-): Promise<{ thumbnailURL: string; publishedAt: string } | null> {
+export async function getYoutubeVideoDetails(id: string): Promise<{
+  thumbnailURL: string;
+  blurDataURL: string;
+  publishedAt: string;
+} | null> {
   try {
     const response = await youtube.videos.list({
       part: ["snippet", "statistics"],
@@ -129,9 +131,11 @@ export async function getYoutubeVideoDetails(
     if (!video) return null;
 
     const thumbnailURL = video.snippet?.thumbnails?.standard?.url || "";
+    const placeholder = await getImage(thumbnailURL);
 
     return {
       thumbnailURL,
+      blurDataURL: placeholder.base64,
       publishedAt: video.snippet?.publishedAt
         ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
         : "unknown",

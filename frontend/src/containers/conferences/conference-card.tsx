@@ -24,7 +24,7 @@ export default function ConferenceCard({
       </CardContent>
       <CardFooter className="row-span-1 flex items-center justify-between gap-4 p-4 pt-1">
         <Badge variant="outline">{location}</Badge>
-        <p className="text-xs dark:text-gray-400 shrink-0 max-sm:text-xs">
+        <p className="shrink-0 text-xs dark:text-gray-400 max-sm:text-xs">
           {new Date(date).toLocaleDateString("en-US", {
             day: "numeric",
             month: "long",

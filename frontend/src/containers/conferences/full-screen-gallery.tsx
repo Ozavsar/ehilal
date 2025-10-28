@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import type { IImage } from "@/types.d";
 import { LuX } from "react-icons/lu";
+import type { IImage } from "@/types.d";
 
 interface FullScreenImageProps {
   images: IImage[];
@@ -36,6 +36,8 @@ export default function FullScreenImage({
               alt={`${title} - Image ${index + 1}`}
               width={1920}
               height={1920}
+              blurDataURL={image.blurDataURL ? image.blurDataURL : ""}
+              placeholder={image.blurDataURL ? "blur" : "empty"}
               className="h-full w-full object-contain object-center"
             />
           </SwiperSlide>

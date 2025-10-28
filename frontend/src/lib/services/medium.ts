@@ -2,6 +2,7 @@ import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { MEDIUM_USER_URL } from "@/config/constants";
 import { autoScroll } from "../utils";
+import { getImage } from "../getImage";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 
@@ -71,6 +72,14 @@ export const getAllArticlePreviews = async () => {
   });
 
   await browser.close();
+  const articlesWithPlaceholders = await Promise.all(
+    articles.map(async (article) => ({
+      ...article,
+      blurDataURL: article.thumbnailURL
+        ? (await getImage(article.thumbnailURL)).base64
+        : undefined,
+    })),
+  );
 
-  return articles;
+  return articlesWithPlaceholders;
 };

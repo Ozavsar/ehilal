@@ -9,6 +9,7 @@ import { truncateDescription } from "@/lib/utils";
 import type { IBlog } from "@/types.d";
 
 export default function ArticleCard({
+  blurDataURL,
   thumbnailURL,
   title,
   mediumURL,
@@ -24,6 +25,8 @@ export default function ArticleCard({
             alt={title}
             width={800}
             height={800}
+            blurDataURL={blurDataURL ? blurDataURL : undefined}
+            placeholder={blurDataURL ? "blur" : "empty"}
             className="aspect-video object-cover transition-transform duration-300 hover:scale-105"
           />
         </a>

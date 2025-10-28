@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import type { ICourse } from "@/types.d";
 
 export default function CourseCard({
+  blurDataURL,
   thumbnailURL,
   title,
   udemyURL,
@@ -25,11 +26,13 @@ export default function CourseCard({
       <CardHeader>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <Image
-            src={thumbnailURL || "/images/blog/default-blog.jpg"}
+            src={thumbnailURL || "/images/courses/default-course.jpg"}
             alt={title || ""}
             width={800}
             height={800}
-            className="aspect-video object-cover transition-transform duration-300 hover:scale-105"
+            blurDataURL={blurDataURL ? blurDataURL : undefined}
+            placeholder={blurDataURL ? "blur" : "empty"}
+            className="aspect-video object-cover transition-transform duration-500 hover:scale-105"
           />
         </a>
       </CardHeader>
@@ -40,7 +43,7 @@ export default function CourseCard({
           </h2>
         </a>
         <p className="line-clamp-2 text-sm text-muted-foreground">{headline}</p>
-        <div className="flex mt-auto items-center gap-2 text-sm max-sm:my-1 max-sm:justify-around max-sm:text-xs">
+        <div className="mt-auto flex items-center gap-2 text-sm max-sm:my-1 max-sm:justify-around max-sm:text-xs">
           <span>{contentInfo}</span>
           <span>•</span>
           <span>{numLectures} lectures</span>
@@ -91,8 +94,11 @@ export default function CourseCard({
           rel="noopener noreferrer"
           className="w-full"
         >
-          <Button className="w-full hover:bg-yellow-600">
-            View on <span className="text-[#a435f0]">&nbsp;Udemy</span>
+          <Button className="w-full hover:bg-primary/80">
+            View on{" "}
+            <span className="text-[#a435f0] mix-blend-difference">
+              &nbsp;Udemy
+            </span>
           </Button>
         </a>
       </CardFooter>

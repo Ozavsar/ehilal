@@ -1,11 +1,11 @@
 "use client";
 
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { useState } from "react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import FullScreenGallery from "./full-screen-gallery";
-import { IImage } from "@/types";
+import type { IImage } from "@/types";
 
 interface Props {
   images: IImage[];
@@ -36,6 +36,8 @@ export default function Gallery({ images, title }: Props) {
               alt={title || ""}
               width={800}
               height={800}
+              blurDataURL={image.blurDataURL ? image.blurDataURL : undefined}
+              placeholder={image.blurDataURL ? "blur" : "empty"}
               onClick={() => openFullScreen(image.formats.large.url)}
               className="aspect-video cursor-pointer object-cover object-center"
             />

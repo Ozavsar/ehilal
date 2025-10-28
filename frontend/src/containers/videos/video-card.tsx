@@ -12,6 +12,7 @@ import { truncateDescription } from "@/lib/utils";
 import type { IUnifiedVideo } from "@/types.d";
 
 export default function VideoCard({
+  blurDataURL,
   url,
   thumbnailURL,
   title,
@@ -41,6 +42,8 @@ export default function VideoCard({
             <Image
               src={thumbnailURL || "/images/blog/default-blog.jpg"}
               alt={title || ""}
+              blurDataURL={blurDataURL ? blurDataURL : undefined}
+              placeholder={blurDataURL ? "blur" : "empty"}
               className="object-cover transition-transform group-hover:scale-105"
               fill
             />

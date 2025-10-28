@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import HomeContainer from "@/containers/home";
 import { getHomePageContent } from "@/lib/services/pages";
 import { Metadata } from "next";
+import { getImage } from "@/lib/getImage";
 
 const getCachedHomePageContent = unstable_cache(
   async () => {
@@ -38,5 +39,11 @@ export default async function Home() {
   if (!content) {
     return notFound();
   }
-  return <HomeContainer content={content} />;
+  const placeholder = await getImage(content!.hero_image.url);
+  const contentWithPlaceholder = {
+    ...content,
+    hero_image: { ...content!.hero_image, blurDataURL: placeholder.base64 },
+  };
+
+  return <HomeContainer content={contentWithPlaceholder} />;
 }

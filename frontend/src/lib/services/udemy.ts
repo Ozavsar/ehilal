@@ -2,6 +2,7 @@ import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { UDEMY_USER_URL } from "@/config/constants";
 import { autoScroll } from "../utils";
+import { getImage } from "../getImage";
 import type { ICourse } from "@/types.d";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
@@ -94,5 +95,13 @@ export const getAllCourses = async () => {
   });
 
   await browser.close();
-  return courses;
+  const coursesWithPlaceholders = await Promise.all(
+    courses.map(async (course) => ({
+      ...course,
+      blurDataURL: course.thumbnailURL
+        ? (await getImage(course.thumbnailURL)).base64
+        : undefined,
+    })),
+  );
+  return coursesWithPlaceholders;
 };

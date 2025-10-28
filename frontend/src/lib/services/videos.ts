@@ -2,6 +2,7 @@ import { fetchAPI } from "../api/fetchAPI";
 import { getUploadedVideos } from "@/lib/services/youtube";
 import { getYoutubeVideoDetails } from "@/lib/services/youtube";
 import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
+import { getImage } from "../getImage";
 import type { IStrapiResponse, IStrapiVideo, IUnifiedVideo } from "@/types.d";
 
 /**
@@ -79,7 +80,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     }),
   );
 
-  // 4. Strapi videoları YouTube videolarından çıkar
+  // 4. Filter out YouTube videos from Strapi that are already in the YouTube list
   const strapiUrls = new Set(processedStrapiVideos.map((video) => video.url));
   const filteredYoutubeVideos = formattedYoutubeVideos.filter(
     (video) => !strapiUrls.has(video.url),
@@ -98,8 +99,16 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
       return a.isFeatured ? -1 : 1;
     },
   );
+  const allVideosWithPlaceholders = await Promise.all(
+    allVideos.map(async (video) => ({
+      ...video,
+      blurDataURL: video.thumbnailURL
+        ? (await getImage(video.thumbnailURL)).base64
+        : undefined,
+    })),
+  );
 
-  return allVideos;
+  return allVideosWithPlaceholders;
 }
 
 // Extract the YouTube video ID from a URL
