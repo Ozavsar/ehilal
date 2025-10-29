@@ -30,24 +30,29 @@ jobs:
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             nvm use --lts
 
-            # Ensure repo exists
-            if [ ! -d "$HOME/Github/${{ github.event.repository.name }}" ]; then
+            REPO_DIR="$HOME/Github/${{ github.event.repository.name }}"
+            REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
+            # ensure repo exists
+            if [ ! -d "$REPO_DIR" ]; then
               echo "Repository not found. Cloning fresh..."
               mkdir -p $HOME/Github
               cd $HOME/Github
-              git clone https://github.com/${{ github.repository }}.git
+              git clone "$REPO_URL"
             else
               echo "Repository already exists. Pulling latest changes..."
-              cd $HOME/Github/${{ github.event.repository.name }}
+              cd "$REPO_DIR"
+              # ensure correct remote URL with token authentication
+              git remote set-url origin "$REPO_URL"
               git fetch origin
+              git reset --hard HEAD
+              git pull origin main
             fi
 
-            cd $HOME/Github/${{ github.event.repository.name }}
-            git reset --hard HEAD
-            git pull origin main
-
             #### BACKEND BUILD ####
-            cd backend
+            cd "$REPO_DIR/backend"
+
+            echo "Creating .env from GitHub secrets..."
             echo "HOST=${{ secrets.HOST }}" > .env
             echo "PORT=${{ secrets.PORT }}" >> .env
             echo "APP_KEYS=${{ secrets.APP_KEYS }}" >> .env
@@ -70,10 +75,17 @@ jobs:
 
             npm install
             npm run build
-            pm2 restart ehilal_strapi
+
+            # PM2 for backend
+            if pm2 describe ehilal_strapi > /dev/null; then
+              pm2 restart ehilal_strapi
+            else
+              pm2 start npm --name ehilal_strapi -- run start
+            fi
 
             #### FRONTEND BUILD ####
-            cd ../frontend
+            cd "$REPO_DIR/frontend"
+
             echo "YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}" > .env.local
             echo "REVALIDATE_KEY=${{ secrets.REVALIDATE_KEY }}" >> .env.local
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
@@ -81,5 +93,13 @@ jobs:
 
             npm install
             npm run build
-            pm2 restart ehilal_frontend
+
+            # PM2 for frontend
+            if pm2 describe ehilal_frontend > /dev/null; then
+              pm2 restart ehilal_frontend
+            else
+              PORT=${{ secrets.FRONTEND_PORT }} pm2 start npm --name ehilal_frontend -- run start
+            fi
+
+            echo "✅ Deployment completed successfully!"
           EOF
