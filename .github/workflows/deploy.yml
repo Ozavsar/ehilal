@@ -30,7 +30,19 @@ jobs:
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             nvm use --lts
 
-            cd ./Github/${{ github.event.repository.name }}
+            # Ensure repo exists
+            if [ ! -d "$HOME/Github/${{ github.event.repository.name }}" ]; then
+              echo "Repository not found. Cloning fresh..."
+              mkdir -p $HOME/Github
+              cd $HOME/Github
+              git clone https://github.com/${{ github.repository }}.git
+            else
+              echo "Repository already exists. Pulling latest changes..."
+              cd $HOME/Github/${{ github.event.repository.name }}
+              git fetch origin
+            fi
+
+            cd $HOME/Github/${{ github.event.repository.name }}
             git reset --hard HEAD
             git pull origin main
 
