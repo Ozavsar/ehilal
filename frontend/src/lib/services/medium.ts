@@ -1,85 +1,225 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { MEDIUM_USER_URL } from "@/config/constants";
-import { autoScroll } from "../utils";
+import { MEDIUM_USER_ID } from "@/config/constants";
 import { getImage } from "../getImage";
+import { IBlogPreview, IBlog } from "@/types";
 
-process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
+export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
+  const allPreviews: IBlogPreview[] = [];
+  let from: string | null = null;
+  const limit = 10;
 
-export const getAllArticlePreviews = async () => {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  const page = await browser.newPage();
-
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-  );
-
-  await page.goto(MEDIUM_USER_URL, {
-    waitUntil: "networkidle2",
-  });
-  await autoScroll(page);
-
-  const articles = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll("article")).map((article) => {
-      const title = article.querySelector("h2")?.innerText || "No Title";
-      const description =
-        article.querySelector("h3")?.innerText || "No Description";
-      const imgs = article.querySelectorAll("img");
-      let img = "";
-
-      if (imgs.length === 1) {
-        img = imgs[0].src;
-      } else if (imgs.length >= 2) {
-        img = imgs[1].src;
-      }
-      const link =
-        Array.from(article.querySelectorAll("a"))
-          .map((a) => a.href)
-          .find((href) => href.includes("//medium.com/")) || "";
-
-      let pubDate = "No Date";
-      const spanElements = Array.from(article.querySelectorAll("span"));
-
-      for (const span of spanElements) {
-        const text = span.textContent || "";
-
-        const match = text.match(/\b\w+ \d{1,2}(?:, \d{4})?\b/);
-        if (match) {
-          const dateStr = text;
-          if (!/\d{4}/.test(dateStr)) {
-            const currentYear = new Date().getFullYear();
-            pubDate = `${dateStr}, ${currentYear}`;
-          } else {
-            const match = dateStr.match(/^[A-Za-z]+\s+\d{1,2},\s+\d{4}/);
-            pubDate = match ? match[0] : dateStr;
+  const query = `
+    query UserProfileQuery(
+      $id: ID
+      $username: ID
+      $limit: PaginationLimit = 10
+      $from: String = null
+    ) {
+    userResult(id: $id, username: $username) {
+      ... on User {
+        id
+        name
+        username
+        bio
+        imageId
+        socialStats {
+          followerCount
+          followingCount
+        }
+        homepagePostsConnection(
+          paging: { limit: $limit, from: $from }
+          includeDistributedResponses: true
+        ) {
+          posts {
+            id
+            title
+            uniqueSlug
+            mediumUrl
+            previewImage {
+              id
+              alt
+            }
+            extendedPreviewContent {
+                subtitle
+            }
+            firstPublishedAt
+            readingTime
           }
-          break;
+          pagingInfo {
+            next {
+              from
+              limit
+            }
+          }
         }
       }
+    }
+  }
+  `;
+
+  while (true) {
+    const res = await fetch("https://medium.com/_/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        variables: { id: MEDIUM_USER_ID, limit, from },
+      }),
+    });
+
+    const json = await res.json();
+    const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
+    const next =
+      json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
+
+    const currentYear = new Date().getFullYear();
+
+    const formatted: IBlogPreview[] = posts.map((post: any) => {
+      const date = new Date(post.firstPublishedAt);
+      const isCurrentYear = date.getFullYear() === currentYear;
+
+      const formattedDate = date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        ...(isCurrentYear ? {} : { year: "numeric" }),
+      });
 
       return {
-        title,
-        mediumURL: link,
-        thumbnailURL: img.replace(/\/resize:fill:\d+:\d+\//, "/"),
-        description,
-        pubDate,
+        title: post.title,
+        mediumURL: post.mediumUrl,
+        description: post.extendedPreviewContent?.subtitle || "",
+        thumbnailURL: post.previewImage
+          ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
+          : "",
+        pubDate: formattedDate,
       };
     });
-  });
 
-  await browser.close();
+    console.log(formatted);
+
+    allPreviews.push(...formatted);
+
+    if (!next?.from) break;
+    from = next.from;
+
+    // avoid Medium throttling
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
   const articlesWithPlaceholders = await Promise.all(
-    articles.map(async (article) => ({
+    allPreviews.map(async (article) => ({
       ...article,
-      blurDataURL: article.thumbnailURL
-        ? (await getImage(article.thumbnailURL)).base64
-        : undefined,
+      /*       blurDataURL: (article as any).thumbnailURL
+        ? (await getImage((article as any).thumbnailURL)).base64
+        : undefined, */
     })),
   );
 
   return articlesWithPlaceholders;
-};
+}
+
+export async function getSingleArticle(postId: string): Promise<IBlog | null> {
+  const query = `
+query PostPageQuery(
+  $postId: ID!,
+  $postMeteringOptions: PostMeteringOptions,
+  $includeShouldFollowPost: Boolean = false
+) {
+  postResult(id: $postId) {
+    ... on Post {
+      id
+      title
+      uniqueSlug
+      mediumUrl
+      firstPublishedAt
+      latestPublishedAt
+      readingTime
+      isLocked
+      content(postMeteringOptions: $postMeteringOptions) {
+        isLockedPreviewOnly
+        bodyModel {
+          paragraphs {
+            name
+            text
+            type
+            markups {
+              type
+              href
+            }
+            mixtapeMetadata {
+              href
+            }
+            metadata {
+                id
+            }
+            iframe {
+                mediaResource {
+                    iframeSrc
+                    title
+                }
+            }
+          }
+        }
+      }
+      previewImage {
+        id
+        alt
+        originalHeight
+        originalWidth
+        focusPercentX
+        focusPercentY
+      }
+      previewContent {
+        subtitle
+      }
+      tags {
+        displayTitle
+        normalizedTagSlug
+      }
+      creator {
+        id
+        name
+        username
+        imageId
+        bio
+        socialStats {
+          followerCount
+        }
+      }
+      collection {
+        id
+        name
+        slug
+        domain
+        description
+      }
+      viewerEdge @include(if: $includeShouldFollowPost) {
+        shouldFollowPostForExternalSearch
+      }
+    }
+  }
+}
+  `;
+
+  const res = await fetch("https://medium.com/_/graphql", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      query,
+      variables: { postId, includeShouldFollowPost: false },
+    }),
+  });
+
+  const json = await res.json();
+
+  if (!json.data?.postResult) {
+    return null;
+  }
+
+  return {
+    ...json.data.postResult,
+    paragraphs: json.data.postResult.content.bodyModel.paragraphs || [],
+  };
+}

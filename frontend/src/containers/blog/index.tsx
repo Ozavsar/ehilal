@@ -2,10 +2,10 @@ import { Suspense } from "react";
 import Pagination from "@/components/pagination";
 import ArticleCard from "./article-card";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import type { IBlog } from "@/types.d";
+import type { IBlogPreview } from "@/types.d";
 
 interface IBlogContainerProps {
-  articles: IBlog[];
+  articles: IBlogPreview[];
   pageNumber: string;
 }
 

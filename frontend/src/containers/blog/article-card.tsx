@@ -6,7 +6,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { truncateDescription } from "@/lib/utils";
-import type { IBlog } from "@/types.d";
+import type { IBlogPreview } from "@/types.d";
+import Link from "next/link";
 
 export default function ArticleCard({
   blurDataURL,
@@ -15,11 +16,12 @@ export default function ArticleCard({
   mediumURL,
   description,
   pubDate,
-}: IBlog) {
+}: IBlogPreview) {
+  const id = mediumURL.split("-").pop();
   return (
     <Card>
       <CardHeader>
-        <a href={mediumURL} target="_blank">
+        <Link href={`/blog/${id}`}>
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title}
@@ -29,22 +31,22 @@ export default function ArticleCard({
             placeholder={blurDataURL ? "blur" : "empty"}
             className="aspect-video object-cover transition-transform duration-300 hover:scale-105"
           />
-        </a>
+        </Link>
       </CardHeader>
       <CardContent>
-        <a href={mediumURL} target="_blank">
+        <Link href={`/blog/${id}`}>
           <h2 className="text-lg font-bold">{title}</h2>
-        </a>
+        </Link>
         <p className="dark:text-gray-400 max-sm:text-sm">
           {truncateDescription(description!)}
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <a href={mediumURL} target="_blank">
+        <Link href={`/blog/${id}`}>
           <span className="text-xs text-primary hover:underline">
             Read more...
           </span>
-        </a>
+        </Link>
         <span className="text-xs text-gray-500">{pubDate}</span>
       </CardFooter>
     </Card>
