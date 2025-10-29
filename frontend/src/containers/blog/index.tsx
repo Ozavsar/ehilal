@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ArticleCard from "./article-card";
 import { ITEMS_PER_PAGE } from "@/config/constants";
@@ -27,11 +28,11 @@ export default async function BlogContainer({
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
       <div className="flex flex-col">
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <MotionGrid>
           {articles.map((article) => (
             <ArticleCard key={article.mediumURL} {...article} />
           ))}
-        </div>
+        </MotionGrid>
       </div>
       <Suspense fallback={null}>
         <Pagination totalPages={totalPages} currentPage={currentPage} />

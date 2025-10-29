@@ -22,7 +22,7 @@ export default function CourseCard({
   numReviews,
 }: ICourse) {
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <Image
@@ -36,9 +36,9 @@ export default function CourseCard({
           />
         </a>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1">
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
-          <h2 className="line-clamp-2 text-lg font-bold sm:text-3xl">
+          <h2 className="line-clamp-2 text-lg font-bold text-foreground sm:text-2xl">
             {title}
           </h2>
         </a>
@@ -87,7 +87,7 @@ export default function CourseCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="mt-2">
         <a
           href={udemyURL}
           target="_blank"
@@ -96,7 +96,7 @@ export default function CourseCard({
         >
           <Button className="w-full hover:bg-primary/80">
             View on{" "}
-            <span className="text-[#a435f0] mix-blend-difference">
+            <span className="text-[#a435f0] font-bold mix-blend-difference">
               &nbsp;Udemy
             </span>
           </Button>

@@ -18,13 +18,13 @@ export default function TitleSection({
   return (
     <section>
       {/* Desktop */}
-      <div className="relative flex flex-col items-center justify-center overflow-hidden py-[70px] max-sm:hidden">
+      <div className="relative flex flex-col items-center justify-center overflow-visible py-[70px] max-sm:hidden">
         {/* Background text animation */}
         <motion.span
           initial={{ opacity: 0, scale: 1.2, y: 40 }}
-          animate={{ opacity: 0.08, scale: 1, y: 0 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute -z-10 -translate-y-[50%] text-[110px] font-extrabold uppercase tracking-[5px] text-muted"
+          animate={{ opacity: 0.25, scale: 1, y: 0 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute -z-10 -translate-y-[50%] text-[110px] font-extrabold uppercase tracking-[5px] text-muted-foreground/25 dark:text-card"
         >
           {backgroundText}
         </motion.span>

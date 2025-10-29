@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { truncateDescription } from "@/lib/utils";
 import type { IBlog } from "@/types.d";
+import LinkButton from "@/components/link-button";
 
 export default function ArticleCard({
   blurDataURL,
@@ -17,8 +18,8 @@ export default function ArticleCard({
   pubDate,
 }: IBlog) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex h-full flex-col">
+      <CardHeader className="h-fit">
         <a href={mediumURL} target="_blank">
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
@@ -33,19 +34,22 @@ export default function ArticleCard({
       </CardHeader>
       <CardContent>
         <a href={mediumURL} target="_blank">
-          <h2 className="text-lg font-bold">{title}</h2>
+          <h2 className="line-clamp-2 text-lg font-bold text-foreground">
+            {title}
+          </h2>
         </a>
-        <p className="dark:text-gray-400 max-sm:text-sm">
-          {truncateDescription(description!)}
+        <p className="line-clamp-2 text-sm text-muted-foreground">
+          {description}
         </p>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <a href={mediumURL} target="_blank">
-          <span className="text-xs text-primary hover:underline">
-            Read more...
+      <CardFooter className="mt-auto flex justify-between">
+        <LinkButton href={mediumURL} target="_blank" rel="noopener noreferrer">
+          Read on{" "}
+          <span className="font-bold text-[#242424] dark:text-foreground">
+            Medium
           </span>
-        </a>
-        <span className="text-xs text-gray-500">{pubDate}</span>
+        </LinkButton>
+        <span className="text-xs text-muted-foreground">{pubDate}</span>
       </CardFooter>
     </Card>
   );

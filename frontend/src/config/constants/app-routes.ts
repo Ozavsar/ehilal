@@ -1,3 +1,12 @@
+import {
+  LuContact,
+  LuHouse,
+  LuNotebookPen,
+  LuPresentation,
+  LuVideo,
+} from "react-icons/lu";
+import { SiUdemy } from "react-icons/si";
+
 export const ROUTES = {
   INTERNAL: {
     HOME: "/",
@@ -18,37 +27,37 @@ export const MENUS = {
       key: "HOME",
       label: "Home",
       href: ROUTES.INTERNAL.HOME,
-      icon: "home",
+      icon: LuHouse,
     },
     {
       key: "CONFERENCES",
       label: "Conferences",
       href: ROUTES.INTERNAL.CONFERENCES,
-      icon: "conference",
+      icon: LuPresentation,
     },
     {
       key: "BLOG",
       label: "Blog",
       href: ROUTES.INTERNAL.BLOG,
-      icon: "blog",
+      icon: LuNotebookPen,
     },
     {
       key: "VIDEOS",
       label: "Videos",
       href: ROUTES.INTERNAL.VIDEOS,
-      icon: "video",
+      icon: LuVideo,
     },
     {
       key: "COURSES",
       label: "Courses",
       href: ROUTES.INTERNAL.COURSES,
-      icon: "course",
+      icon: SiUdemy,
     },
     {
       key: "CONTACT",
       label: "Contact",
       href: ROUTES.INTERNAL.CONTACT,
-      icon: "contact",
+      icon: LuContact,
     },
   ],
 };

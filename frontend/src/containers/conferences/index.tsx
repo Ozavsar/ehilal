@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ConferenceCard from "./conference-card";
 import type { IStrapiConference } from "@/types.d";
@@ -17,11 +18,11 @@ export default function ConferencesContainer({
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
       <div className="flex flex-col">
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <MotionGrid>
           {conferences.map((conference) => (
             <ConferenceCard key={conference.title} {...conference} />
           ))}
-        </div>
+        </MotionGrid>
       </div>
       <Suspense fallback={null}>
         <Pagination totalPages={totalPages} currentPage={+pageNumber} />
