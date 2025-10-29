@@ -21,11 +21,12 @@ const getCachedCourses = unstable_cache(
   },
 );
 
-export default async function CoursesPage({
-  params,
-}: {
-  params: { page: string };
-}) {
+export default async function CoursesPage(
+  props: {
+    params: Promise<{ page: string }>;
+  }
+) {
+  const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
   if (isNaN(pageNum) || pageNum < 1) {

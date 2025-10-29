@@ -22,11 +22,12 @@ const getCachedArticlePreviews = unstable_cache(
   },
 );
 
-export default async function BlogPage({
-  params,
-}: {
-  params: { page: string };
-}) {
+export default async function BlogPage(
+  props: {
+    params: Promise<{ page: string }>;
+  }
+) {
+  const params = await props.params;
   if (isNaN(Number(params.page))) {
     const articleId = params.page.split("-").pop() || "";
 

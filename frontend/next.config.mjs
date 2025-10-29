@@ -1,18 +1,7 @@
 import withPlaiceholder from "@plaiceholder/next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Keep puppeteer out of the server bundle
-      config.externals = [
-        ...config.externals,
-        "puppeteer",
-        "puppeteer-extra",
-        "puppeteer-extra-plugin-stealth",
-      ];
-    }
-    return config;
-  },
+  turbopack: {},
   images: {
     remotePatterns: [
       // @todo: remove picsum pattern before production build

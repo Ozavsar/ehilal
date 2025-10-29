@@ -19,7 +19,7 @@ export const submitAction = async (formData: FormData) => {
     from: process.env.NEXT_PUBLIC_DOMAIN_MAIL!,
     to: ROUTES.EXTERNAL.Mail,
     subject: rawFormData.subject,
-    react: EmailTemplate(rawFormData),
+    react: await EmailTemplate(rawFormData),
   });
 
   console.log(data);

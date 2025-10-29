@@ -22,11 +22,12 @@ const getCachedVideos = unstable_cache(
   },
 );
 
-export default async function VideosPage({
-  params,
-}: {
-  params: { page: string };
-}) {
+export default async function VideosPage(
+  props: {
+    params: Promise<{ page: string }>;
+  }
+) {
+  const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
   if (isNaN(pageNum) || pageNum < 1) {

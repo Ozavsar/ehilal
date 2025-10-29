@@ -21,11 +21,12 @@ const getCachedConferences = unstable_cache(
   },
 );
 
-export default async function ConferencesPage({
-  params,
-}: {
-  params: { page: string };
-}) {
+export default async function ConferencesPage(
+  props: {
+    params: Promise<{ page: string }>;
+  }
+) {
+  const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
   if (isNaN(pageNum) || pageNum <= 0) {

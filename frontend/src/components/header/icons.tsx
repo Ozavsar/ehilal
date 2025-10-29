@@ -7,7 +7,7 @@ import {
 } from "react-icons/lu";
 import { SiUdemy } from "react-icons/si";
 
-export const ICONS: Record<string, JSX.Element> = {
+export const ICONS: Record<string, React.JSX.Element> = {
   conference: <LuPresentation className="size-5 sm:size-6" />,
   blog: <LuNotebookPen className="size-5 sm:size-6" />,
   contact: <LuContact className="size-5 sm:size-6" />,
