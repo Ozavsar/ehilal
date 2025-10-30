@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import CourseContainer from "@/containers/courses";
 import { ITEMS_PER_PAGE } from "@/config/constants";
@@ -6,26 +5,9 @@ import { getAllCourses } from "@/lib/services/udemy";
 
 export const dynamicParams = true;
 
-const getCachedCourses = unstable_cache(
-  async () => {
-    try {
-      return await getAllCourses();
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      return [];
-    }
-  },
-  ["courses-list"],
-  {
-    revalidate: 86400, // 24 hours
-  },
-);
-
-export default async function CoursesPage(
-  props: {
-    params: Promise<{ page: string }>;
-  }
-) {
+export default async function CoursesPage(props: {
+  params: Promise<{ page: string }>;
+}) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -33,7 +15,7 @@ export default async function CoursesPage(
     return notFound();
   }
 
-  const courses = await getCachedCourses();
+  const courses = await getAllCourses();
   if (!courses || courses.length === 0) {
     return notFound();
   }
@@ -42,7 +24,7 @@ export default async function CoursesPage(
 }
 
 export async function generateStaticParams() {
-  const courses = await getCachedCourses();
+  const courses = await getAllCourses();
   const pageCount = Math.ceil((courses?.length || 0) / ITEMS_PER_PAGE);
 
   return Array.from({ length: pageCount || 1 }, (_, i) => ({

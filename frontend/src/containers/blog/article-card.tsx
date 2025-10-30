@@ -17,11 +17,11 @@ export default function ArticleCard({
   description,
   pubDate,
 }: IBlogPreview) {
-  const id = mediumURL.split("-").pop();
+  const slug = mediumURL.split("/").pop();
   return (
     <Card>
       <CardHeader>
-        <Link href={`/blog/${id}`}>
+        <Link href={`/blog/${slug}`}>
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title}
@@ -34,7 +34,7 @@ export default function ArticleCard({
         </Link>
       </CardHeader>
       <CardContent>
-        <Link href={`/blog/${id}`}>
+        <Link href={`/blog/${slug}`}>
           <h2 className="text-lg font-bold">{title}</h2>
         </Link>
         <p className="dark:text-gray-400 max-sm:text-sm">
@@ -42,7 +42,7 @@ export default function ArticleCard({
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Link href={`/blog/${id}`}>
+        <Link href={`/blog/${slug}`}>
           <span className="text-xs text-primary hover:underline">
             Read more...
           </span>

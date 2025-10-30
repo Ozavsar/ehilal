@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
 import BlogContainer from "@/containers/blog";
 import ArticleContainer from "@/containers/article";
 import { ITEMS_PER_PAGE } from "@/config/constants";
@@ -7,49 +6,16 @@ import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
 
 export const dynamicParams = true;
 
-const getCachedArticlePreviews = unstable_cache(
-  async () => {
-    try {
-      return await getAllArticlePreviews();
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-      return [];
-    }
-  },
-  ["articles-list"],
-  {
-    revalidate: 3600, // 1 hour
-  },
-);
-
-export default async function BlogPage(
-  props: {
-    params: Promise<{ page: string }>;
-  }
-) {
+export default async function BlogPage(props: {
+  params: Promise<{ page: string }>;
+}) {
   const params = await props.params;
   if (isNaN(Number(params.page))) {
     const articleId = params.page.split("-").pop() || "";
 
-    const getCachedArticle = unstable_cache(
-      async () => {
-        try {
-          return await getSingleArticle(articleId);
-        } catch (error) {
-          console.error("Error fetching articles:", error);
-          return null;
-        }
-      },
-      ["article-" + articleId],
-      {
-        revalidate: 3600, // 1 hour
-        tags: ["articles"],
-      },
-    );
-
     try {
       console.log("Fetching article for slug:", params.page, articleId);
-      const article = await getCachedArticle();
+      const article = await getSingleArticle(articleId);
 
       if (!article) {
         return notFound();
@@ -57,7 +23,7 @@ export default async function BlogPage(
 
       return <ArticleContainer article={article} />;
     } catch (error) {
-      console.error("Error fetching article:", error);
+      console.error("Error fetching article:", params.page, error);
       return notFound();
     }
   } else {
@@ -68,7 +34,7 @@ export default async function BlogPage(
     }
 
     try {
-      const articles = await getCachedArticlePreviews();
+      const articles = await getAllArticlePreviews();
 
       if (!articles || articles.length === 0) {
         return notFound();
@@ -90,21 +56,21 @@ export default async function BlogPage(
 
 export async function generateStaticParams() {
   try {
-    const articles = await getCachedArticlePreviews();
+    const articles = await getAllArticlePreviews();
     const pageCount = Math.ceil((articles?.length || 0) / ITEMS_PER_PAGE);
 
     const pageNumbers = Array.from({ length: pageCount || 1 }, (_, i) => ({
-      slug: (i + 1).toString(),
+      page: (i + 1).toString(),
     }));
 
     const blogSlugs = articles.map((article) => {
       const slug = article.mediumURL.split("/").pop();
-      return { slug };
+      return { page: slug };
     });
 
     return [...pageNumbers, ...blogSlugs];
   } catch (error) {
     console.error("Error generating static params:", error);
-    return [{ slug: "1" }];
+    return [{ page: "1" }];
   }
 }

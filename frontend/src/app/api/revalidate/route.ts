@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag, updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 // @todo: Add body type control after docs added to the project
 export async function POST(req: NextRequest) {
@@ -13,15 +13,15 @@ export async function POST(req: NextRequest) {
     console.log("revalidating model: ", model);
 
     if (model === "video") {
-      updateTag("videos");
+      revalidateTag("videos", "max");
     } else if (model === "conference") {
-      updateTag("conferences");
+      revalidateTag("conferences", "max");
     } else if (model === "social-media-link") {
-      updateTag("social-media-links");
+      revalidateTag("social-media-links", "max");
     } else if (model === "theme") {
-      updateTag("theme");
+      revalidateTag("theme", "max");
     } else if (model.includes("-page")) {
-      updateTag(`${model.split("-")[0]}-title`);
+      revalidateTag(`${model.split("-")[0]}-title`, "max");
     } else {
       return NextResponse.json({ message: "Invalid model" }, { status: 400 });
     }

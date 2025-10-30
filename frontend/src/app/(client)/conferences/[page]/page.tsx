@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import ConferencesContainer from "@/containers/conferences";
 import { ITEMS_PER_PAGE } from "@/config/constants";
@@ -6,26 +5,9 @@ import { getAllConferences } from "@/lib/services/conferences";
 
 export const dynamicParams = true;
 
-const getCachedConferences = unstable_cache(
-  async (start: number, limit: number) => {
-    try {
-      return await getAllConferences(start, limit);
-    } catch (error) {
-      console.error("Error fetching conferences:", error);
-      return { data: [], meta: { pagination: { total: 0 } } };
-    }
-  },
-  ["conferences-list"],
-  {
-    tags: ["conferences"],
-  },
-);
-
-export default async function ConferencesPage(
-  props: {
-    params: Promise<{ page: string }>;
-  }
-) {
+export default async function ConferencesPage(props: {
+  params: Promise<{ page: string }>;
+}) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -36,7 +18,7 @@ export default async function ConferencesPage(
   const start = ITEMS_PER_PAGE * (pageNum - 1);
 
   try {
-    const response = await getCachedConferences(start, ITEMS_PER_PAGE);
+    const response = await getAllConferences(start, ITEMS_PER_PAGE);
 
     if (!response || !response.data) {
       return notFound();
@@ -65,7 +47,7 @@ export default async function ConferencesPage(
 
 export async function generateStaticParams() {
   try {
-    const response = await getCachedConferences(0, 1);
+    const response = await getAllConferences(0, 1);
 
     if (!response || !response.data.length) {
       return [{ page: "1" }];

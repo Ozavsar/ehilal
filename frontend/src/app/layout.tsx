@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import hextohsl from "hex-to-hsl";
 import { GeistSans } from "geist/font/sans";
@@ -73,16 +72,12 @@ export const metadata: Metadata = {
   },
 };
 
-const getCachedTheme = unstable_cache(getTheme, ["get-website-theme"], {
-  tags: ["theme"],
-});
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { primaryDark, primaryLight } = await getCachedTheme();
+  const { primaryDark, primaryLight } = await getTheme();
   const hslDark = hextohsl(primaryDark);
   const hslLight = hextohsl(primaryLight);
   return (

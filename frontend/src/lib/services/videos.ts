@@ -21,6 +21,7 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>(
     "/videos",
     query,
+    { tags: ["videos"] },
   );
 
   return response;

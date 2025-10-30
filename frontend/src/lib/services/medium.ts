@@ -67,6 +67,10 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
         query,
         variables: { id: MEDIUM_USER_ID, limit, from },
       }),
+      cache: "force-cache",
+      next: {
+        tags: ["articles"],
+      },
     });
 
     const json = await res.json();
@@ -210,6 +214,10 @@ query PostPageQuery(
       query,
       variables: { postId, includeShouldFollowPost: false },
     }),
+    cache: "force-cache",
+    next: {
+      tags: ["articles", `article-${postId}`],
+    },
   });
 
   const json = await res.json();

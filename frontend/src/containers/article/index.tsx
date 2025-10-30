@@ -10,9 +10,7 @@ export default async function ArticleContainer({
 }: IArticleContainerProps) {
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
-      <div className="flex flex-col">
-        <MediumRenderer paragraphs={article.paragraphs} />
-      </div>
+      <div className="flex flex-col">{article.title}</div>
     </main>
   );
 }
