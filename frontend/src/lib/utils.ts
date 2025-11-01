@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { slugifyWithCounter } from "@sindresorhus/slugify";
+import slugify, { slugifyWithCounter } from "@sindresorhus/slugify";
 import { type ClassValue, clsx } from "clsx";
 import type { Page } from "puppeteer";
 
@@ -45,8 +45,8 @@ export async function autoScroll(page: Page): Promise<void> {
   });
 }
 
-export function getCleanSlug(input: string) {
-  const slugify = slugifyWithCounter();
+export function getCleanSlug(input: string, useCounter = false): string {
+  const slugifyCounter = slugifyWithCounter();
   let decoded = input;
   try {
     decoded = decodeURIComponent(input);
@@ -55,5 +55,9 @@ export function getCleanSlug(input: string) {
   }
   decoded = decoded.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
 
-  return slugify(decoded, { lowercase: true, locale: "tr" });
+  if (!useCounter) {
+    return slugify(decoded, { lowercase: true, locale: "tr" });
+  }
+
+  return slugifyCounter(decoded, { lowercase: true, locale: "tr" });
 }

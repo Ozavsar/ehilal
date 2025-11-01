@@ -28,7 +28,7 @@ export default function MediumRenderer({ paragraphs }: { paragraphs: any[] }) {
         {paragraphs.map((p) => {
           const id =
             /^H[1-6]$/.test(p.type) && p.name
-              ? `${getCleanSlug(p.text)}`
+              ? `${getCleanSlug(p.text, true)}`
               : undefined;
 
           switch (p.type) {
