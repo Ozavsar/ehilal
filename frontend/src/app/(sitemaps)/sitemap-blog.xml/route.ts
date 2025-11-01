@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAllArticlePreviews } from "@/lib/services/medium";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { getCleanSlug } from "@/lib/utils";
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -20,7 +21,7 @@ export async function GET() {
 
   const articlesXml = articles
     .map((article) => {
-      const slug = article.mediumURL.split("/").pop();
+      const slug = getCleanSlug(article.mediumURL.split("/").pop()!);
       if (!slug) return "";
       const date = article.pubDate
         ? new Date(article.pubDate).toISOString()
