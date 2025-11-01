@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     const { model } = await req.json();
 
-    console.log("revalidating model: ", model);
+    // console.log("revalidating model: ", model);
 
     if (model === "video") {
       revalidateTag("videos", "max");

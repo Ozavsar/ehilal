@@ -1,54 +1,62 @@
-export const ROUTES = {
-  INTERNAL: {
-    HOME: "/",
-    CONFERENCES: "/conferences/1",
-    BLOG: "/blog/1",
-    VIDEOS: "/videos/1",
-    COURSES: "/courses/1",
-    CONTACT: "/contact",
+// routes.ts
+export const INTERNAL_ROUTES = {
+  HOME: { path: "/", label: "Home", icon: "home" },
+
+  CONFERENCES: {
+    path: "/conferences",
+    label: "Conferences",
+    icon: "conference",
+    href: (page: number | string = 1) => `/conferences/${page}`,
   },
-  EXTERNAL: {
-    Mail: "elif@ehilal.net",
+
+  BLOG: {
+    path: "/blog",
+    label: "Blog",
+    icon: "blog",
+    href: (param?: string | number) =>
+      typeof param === "undefined"
+        ? "/blog/1" // default
+        : `/blog/${param}`, // page veya slug
   },
+
+  VIDEOS: {
+    path: "/videos",
+    label: "Videos",
+    icon: "video",
+    href: (page: number | string = 1) => `/videos/${page}`,
+  },
+
+  COURSES: {
+    path: "/courses",
+    label: "Courses",
+    icon: "course",
+    href: (page: number | string = 1) => `/courses/${page}`,
+  },
+
+  CONTACT: { path: "/contact", label: "Contact", icon: "contact" },
 } as const;
 
+export const EXTERNAL_ROUTES = {
+  MAIL: "elif@ehilal.net",
+} as const;
+
+// 🔹 Nav menüleri otomatik üretelim
 export const MENUS = {
-  NAV: [
-    {
-      key: "HOME",
-      label: "Home",
-      href: ROUTES.INTERNAL.HOME,
-      icon: "home",
-    },
-    {
-      key: "CONFERENCES",
-      label: "Conferences",
-      href: ROUTES.INTERNAL.CONFERENCES,
-      icon: "conference",
-    },
-    {
-      key: "BLOG",
-      label: "Blog",
-      href: ROUTES.INTERNAL.BLOG,
-      icon: "blog",
-    },
-    {
-      key: "VIDEOS",
-      label: "Videos",
-      href: ROUTES.INTERNAL.VIDEOS,
-      icon: "video",
-    },
-    {
-      key: "COURSES",
-      label: "Courses",
-      href: ROUTES.INTERNAL.COURSES,
-      icon: "course",
-    },
-    {
-      key: "CONTACT",
-      label: "Contact",
-      href: ROUTES.INTERNAL.CONTACT,
-      icon: "contact",
-    },
-  ],
+  NAV: Object.entries(INTERNAL_ROUTES).map(([key, route]) => ({
+    key,
+    label: route.label,
+    href:
+      "href" in route
+        ? (route as any).href(1) // menüde ilk sayfa gösterimi için
+        : route.path,
+    icon: route.icon,
+  })),
 };
+
+// 🔹 ROUTES: sadece string path'lere hızlı erişim (isteğe bağlı)
+export const ROUTES = {
+  INTERNAL: Object.fromEntries(
+    Object.entries(INTERNAL_ROUTES).map(([key, route]) => [key, route.path]),
+  ),
+  EXTERNAL: EXTERNAL_ROUTES,
+} as const;

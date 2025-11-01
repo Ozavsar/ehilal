@@ -17,7 +17,7 @@ export const submitAction = async (formData: FormData) => {
 
   const { data, error } = await resend.emails.send({
     from: process.env.NEXT_PUBLIC_DOMAIN_MAIL!,
-    to: ROUTES.EXTERNAL.Mail,
+    to: ROUTES.EXTERNAL.MAIL,
     subject: rawFormData.subject,
     react: await EmailTemplate(rawFormData),
   });

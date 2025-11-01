@@ -90,6 +90,7 @@ export default async function RootLayout({
           "--primary-light": `${hslLight[0]}, ${hslLight[1]}%, ${hslLight[2]}%`,
         } as React.CSSProperties
       }
+      suppressHydrationWarning
     >
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all selection:bg-muted selection:text-primary`}

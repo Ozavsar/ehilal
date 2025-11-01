@@ -1,5 +1,5 @@
-import { IBlog } from "@/types";
 import MediumRenderer from "./medium-renderer";
+import type { IBlog } from "@/types";
 
 interface IArticleContainerProps {
   article: IBlog;
@@ -10,7 +10,7 @@ export default async function ArticleContainer({
 }: IArticleContainerProps) {
   return (
     <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
-      <div className="flex flex-col">{article.title}</div>
+      <MediumRenderer paragraphs={article.paragraphs} />
     </main>
   );
 }

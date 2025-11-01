@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { truncateDescription } from "@/lib/utils";
+import { getCleanSlug, truncateDescription } from "@/lib/utils";
 import type { IBlogPreview } from "@/types.d";
 import Link from "next/link";
 
@@ -17,7 +17,8 @@ export default function ArticleCard({
   description,
   pubDate,
 }: IBlogPreview) {
-  const slug = mediumURL.split("/").pop();
+  const rawSlug = mediumURL.split("/").pop() || "";
+  const slug = getCleanSlug(rawSlug);
   return (
     <Card>
       <CardHeader>

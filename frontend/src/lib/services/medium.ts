@@ -1,6 +1,5 @@
 import { MEDIUM_USER_ID } from "@/config/constants";
-import { getImage } from "../getImage";
-import { IBlogPreview, IBlog } from "@/types";
+import type { IBlogPreview, IBlog } from "@/types";
 
 export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
   const allPreviews: IBlogPreview[] = [];
@@ -101,7 +100,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       };
     });
 
-    console.log(formatted);
+    // console.log(formatted);
 
     allPreviews.push(...formatted);
 

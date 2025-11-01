@@ -20,7 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BlogLayout({ children }: BlogLayoutProps) {
   const content = await getPageTitle("blog-page", ["blog-title"]);
-  console.log("title: ", content.page_title);
   return (
     <>
       <TitleSection

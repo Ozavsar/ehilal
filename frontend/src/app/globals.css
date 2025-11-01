@@ -1,7 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@plugin @tailwindcss/typography;
+@plugin 'tailwind-scrollbar' {
+  preferredstrategy: "pseudoelements";
+}
 @layer base {
   :root {
     --background: 0, 0%, 96%;
@@ -106,4 +109,22 @@ main {
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
 }
