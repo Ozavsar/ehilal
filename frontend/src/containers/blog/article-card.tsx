@@ -5,9 +5,10 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { getCleanSlug } from "@/lib/utils";
 import type { IBlogPreview } from "@/types.d";
+import LinkButton from "@/components/link-button";
 import Link from "next/link";
+import { getCleanSlug } from "@/lib/utils";
 
 export default function ArticleCard({
   blurDataURL,
@@ -20,8 +21,8 @@ export default function ArticleCard({
   const rawSlug = mediumURL.split("/").pop() || "";
   const slug = getCleanSlug(rawSlug);
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex h-full flex-col">
+      <CardHeader className="h-fit">
         <Link href={`/blog/${slug}`}>
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
@@ -36,19 +37,22 @@ export default function ArticleCard({
       </CardHeader>
       <CardContent>
         <Link href={`/blog/${slug}`}>
-          <h2 className="text-lg font-bold">{title}</h2>
+          <h2 className="line-clamp-2 text-lg font-bold text-foreground">
+            {title}
+          </h2>
         </Link>
-        <p className="line-clamp-3 dark:text-gray-400 max-sm:text-sm">
+        <p className="line-clamp-2 text-sm text-muted-foreground">
           {description}
         </p>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Link href={`/blog/${slug}`}>
-          <span className="text-xs text-primary hover:underline">
-            Read more...
+      <CardFooter className="mt-auto flex justify-between">
+        <LinkButton href={mediumURL} rel="noopener noreferrer">
+          Read on{" "}
+          <span className="font-bold text-[#242424] dark:text-foreground">
+            Medium
           </span>
-        </Link>
-        <span className="text-xs text-gray-500">{pubDate}</span>
+        </LinkButton>
+        <span className="text-xs text-muted-foreground">{pubDate}</span>
       </CardFooter>
     </Card>
   );
