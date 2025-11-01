@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { submitAction } from "@/lib/services/resend";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const customErrorMap: ZodErrorMap = (issue, ctx) => {
   if (issue.code === "invalid_type" && issue.received === "undefined") {
@@ -91,7 +92,12 @@ export default function FormSection({
   };
 
   return (
-    <section className={`${className}`}>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`${className}`}
+    >
       <Form {...form}>
         <form
           action={submitAction}
@@ -111,7 +117,7 @@ export default function FormSection({
                       <Input
                         placeholder={field.placeholder}
                         {...formField}
-                        className="rounded-3xl bg-muted px-4 py-2 text-lg focus-visible:ring-1 focus-visible:ring-primary"
+                        className="rounded-3xl px-4 py-2 focus-visible:ring-1 focus-visible:ring-primary"
                       />
                     </FormControl>
                     <FormMessage>
@@ -137,7 +143,7 @@ export default function FormSection({
                         placeholder={field.placeholder}
                         {...formField}
                         rows={5}
-                        className="rounded-3xl bg-muted px-4 py-2 text-lg focus-visible:ring-1 focus-visible:ring-primary"
+                        className="rounded-3xl px-4 py-2 focus-visible:ring-1 focus-visible:ring-primary"
                       />
                     </FormControl>
                     <FormMessage>
@@ -154,6 +160,6 @@ export default function FormSection({
           <ToastContainer />
         </form>
       </Form>
-    </section>
+    </motion.section>
   );
 }

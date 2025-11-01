@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { getCleanSlug, truncateDescription } from "@/lib/utils";
+import { getCleanSlug } from "@/lib/utils";
 import type { IBlogPreview } from "@/types.d";
 import Link from "next/link";
 
@@ -38,8 +38,8 @@ export default function ArticleCard({
         <Link href={`/blog/${slug}`}>
           <h2 className="text-lg font-bold">{title}</h2>
         </Link>
-        <p className="dark:text-gray-400 max-sm:text-sm">
-          {truncateDescription(description!)}
+        <p className="line-clamp-3 dark:text-gray-400 max-sm:text-sm">
+          {description}
         </p>
       </CardContent>
       <CardFooter className="flex justify-between">

@@ -27,7 +27,7 @@ export default function Gallery({ images, title }: Props) {
       <Swiper
         modules={[Navigation]}
         navigation
-        className="h-full w-full text-primary"
+        className="h-full w-full text-primary p-0"
       >
         {images.map((image, index) => (
           <SwiperSlide key={index}>

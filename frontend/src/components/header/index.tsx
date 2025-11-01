@@ -1,6 +1,6 @@
-import ThemeToggle from "../theme-toggle/theme-toggle";
 import MobileNav from "./mobile-nav";
 import NavigationLinks from "./navigation-links";
+import ThemeToggle from "./theme-toggle";
 
 export default function Header() {
   return (
