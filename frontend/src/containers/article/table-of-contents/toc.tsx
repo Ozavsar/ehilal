@@ -1,6 +1,6 @@
 "use client";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function TOC({
   tree,
@@ -12,24 +12,13 @@ export default function TOC({
   tree: any[];
   activeId: string | null;
   containerRef?: React.RefObject<HTMLDivElement | null>;
-  onLinkClick?: () => void;
+  onLinkClick?: (id: string) => void;
   className?: string;
 }) {
-  const isMobile = useMediaQuery("(max-width: 1320px)");
-  const headerOffset = isMobile ? 96 : 32;
-
+  const router = useRouter();
   const handleScrollTo = (id: string) => {
-    const target = document.getElementById(id);
-    if (!target) return;
-    const elementTop = target.getBoundingClientRect().top + window.scrollY;
-    const scrollTarget = elementTop - headerOffset;
-
-    window.scrollTo({
-      top: scrollTarget,
-      behavior: "smooth",
-    });
-
-    if (onLinkClick) onLinkClick();
+    router.push(`#${id}`);
+    if (onLinkClick) onLinkClick(id);
   };
 
   return (
