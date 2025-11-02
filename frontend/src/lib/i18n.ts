@@ -1,17 +1,10 @@
 import "server-only";
-import type { Locale } from "@/i18n-config";
+import type { Locale } from "@/config/constants/i18n";
+import * as deepl from "deepl-node";
 
-// We enumerate all dictionaries here for better linting and typescript support
-// We also get the default import for cleaner types
-const dictionaries = {
-  en: () => import("../dictionaries/en.json").then((module) => module.default),
-  tr: () => import("../dictionaries/tr.json").then((module) => module.default),
-};
+const deeplClient = new deepl.DeepLClient(process.env.DEEPL_API_KEY!);
 
-export const getDictionary = async (locale: Locale) =>
-  dictionaries[locale]?.() ?? dictionaries.en();
-
-export async function translate<T extends Object>(
+/* export async function translate<T extends Object>(
   content: T,
   keys: string[],
   locale: Locale,
@@ -25,8 +18,29 @@ export async function translate<T extends Object>(
 
   const translated: T = { ...content };
   for (const key in toBeTranslated) {
-    translated[key] =
-      dictionary[pagePath][toBeTranslated[key]] || toBeTranslated[key];
+    translated[key] = dictionary[pagePath][key] || toBeTranslated[key];
+  }
+  return translated;
+} */
+
+export async function translateDeepl<T extends Object>(
+  content: T,
+  keys: string[],
+  locale: Locale,
+) {
+  const toBeTranslated: Partial<T> = {};
+  keys.forEach((key) => {
+    toBeTranslated[key] = content[key] || "";
+  });
+  const translatedTextArray = await deeplClient.translateText(
+    Object.values(toBeTranslated),
+    "en",
+    locale as deepl.TargetLanguageCode,
+  );
+
+  const translated: T = { ...content };
+  for (const [index, key] of Object.entries(toBeTranslated)) {
+    translated[key] = translatedTextArray[index] || toBeTranslated[key];
   }
   return translated;
 }

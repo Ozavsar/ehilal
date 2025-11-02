@@ -9,7 +9,7 @@ import "./globals.css";
 import "swiper/css";
 import Providers from "@/context/providers";
 import { getTheme } from "@/lib/services";
-import { i18n, Locale } from "@/i18n-config";
+import { i18n } from "@/config/constants/i18n";
 
 export const metadata: Metadata = {
   title: {
@@ -82,7 +82,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
   console.log("Current Language:", lang);

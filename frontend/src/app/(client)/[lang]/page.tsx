@@ -3,8 +3,8 @@ import HomeContainer from "@/containers/home";
 import { getHomePageContent } from "@/lib/services/pages";
 import { Metadata } from "next";
 import { getImage } from "@/lib/getImage";
-import { Locale } from "@/i18n-config";
-import { translate } from "@/lib/i18n";
+import { Locale } from "@/config/constants/i18n";
+import { translateDeepl } from "@/lib/i18n";
 import { IStrapiHomePage } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,11 +28,10 @@ export default async function Home({
 }) {
   const { lang } = await params;
   const content = await getHomePageContent();
-  const translatedContent = await translate<IStrapiHomePage>(
+  const translatedContent = await translateDeepl<IStrapiHomePage>(
     content,
     ["greeting", "introduction"],
     lang,
-    "/",
   );
   console.log("Translated Content:", translatedContent);
   if (!content) {
