@@ -3,6 +3,9 @@ import HomeContainer from "@/containers/home";
 import { getHomePageContent } from "@/lib/services/pages";
 import { Metadata } from "next";
 import { getImage } from "@/lib/getImage";
+import { Locale } from "@/i18n-config";
+import { translate } from "@/lib/i18n";
+import { IStrapiHomePage } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getHomePageContent();
@@ -18,14 +21,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title, description };
 }
 
-export default async function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const { lang } = await params;
   const content = await getHomePageContent();
+  const translatedContent = await translate<IStrapiHomePage>(
+    content,
+    ["greeting", "introduction"],
+    lang,
+    "/",
+  );
+  console.log("Translated Content:", translatedContent);
   if (!content) {
     return notFound();
   }
-  const placeholder = await getImage(content!.hero_image.url);
+  const placeholder = await getImage(translatedContent!.hero_image.url);
   const contentWithPlaceholder = {
-    ...content,
+    ...translatedContent,
     hero_image: { ...content!.hero_image, blurDataURL: placeholder.base64 },
   };
 

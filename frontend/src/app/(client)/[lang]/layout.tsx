@@ -9,6 +9,7 @@ import "./globals.css";
 import "swiper/css";
 import Providers from "@/context/providers";
 import { getTheme } from "@/lib/services";
+import { i18n, Locale } from "@/i18n-config";
 
 export const metadata: Metadata = {
   title: {
@@ -72,17 +73,25 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ lang: locale }));
+}
+
 export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
 }>) {
+  const { lang } = await params;
+  console.log("Current Language:", lang);
   const { primaryDark, primaryLight } = await getTheme();
   const hslDark = hextohsl(primaryDark);
   const hslLight = hextohsl(primaryLight);
   return (
     <html
-      lang="en"
+      lang={lang}
       className="dark"
       style={
         {

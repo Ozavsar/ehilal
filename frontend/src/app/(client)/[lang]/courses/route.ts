@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export async function GET() {
-  redirect("/blog/1");
+  redirect("/en/courses/1");
 }
