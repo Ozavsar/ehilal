@@ -32,8 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     return buildMeta({
       title: "Contact",
-      description:
-        "Get in touch with Elif Hilal Kara — reach out for collaborations, speaking invitations, or professional inquiries.",
+      description: `Get in touch with ${SITE_NAME} — reach out for collaborations, speaking invitations, or professional inquiries.`,
       path: "/contact",
       type: "website",
       image: {
@@ -45,8 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     console.error("Error generating metadata for Contact page:", error);
     return buildMeta({
       title: "Contact",
-      description:
-        "Connect with Elif Hilal Kara — for collaborations, inquiries, or networking.",
+      description: `Connect with ${SITE_NAME} — for collaborations, inquiries, or networking.`,
       path: "/contact",
       type: "website",
       image: {

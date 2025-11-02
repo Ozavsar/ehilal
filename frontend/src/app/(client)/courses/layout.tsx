@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import TitleSection from "@/components/title-section";
 import { getPageTitle } from "@/lib/services/pages";
 
