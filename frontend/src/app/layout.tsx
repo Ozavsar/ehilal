@@ -17,6 +17,8 @@ const TWITTER_HANDLE =
 const TWITTER_USER_ID =
   process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
 
+  // updated 
+
 export const metadata: Metadata = {
   title: {
     template: `%s | ${SITE_NAME}`,
