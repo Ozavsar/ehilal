@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   deploy:
@@ -12,6 +13,12 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Determine secret dynamically
+        id: set-secret
+        run: |
+          BRANCH_UPPER=$(echo ${{github.ref_name}} | tr '[:lower:]' '[:upper:]')
+          echo "branch_upper=$BRANCH_UPPER" >> $GITHUB_OUTPUT
 
       - name: Setup SSH
         run: |
@@ -29,8 +36,10 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             nvm use --lts
-
-            REPO_DIR="$HOME/Github/${{ github.event.repository.name }}"
+            BRANCH_NAME="${{ github.ref_name }}"
+            echo "Using branch with variable: $BRANCH_NAME"
+            echo "Using branch: ${{ github.ref_name }}"
+            REPO_DIR="$HOME/Github/${{ github.event.repository.name }}_${{ github.ref_name }}"
             REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
 
             # ensure repo exists
@@ -38,15 +47,16 @@ jobs:
               echo "Repository not found. Cloning fresh..."
               mkdir -p $HOME/Github
               cd $HOME/Github
-              git clone "$REPO_URL"
+              git clone -b ${{ github.ref_name }} "$REPO_URL" "$REPO_DIR"
             else
-              echo "Repository already exists. Pulling latest changes..."
+           echo "Repository already exists. Pulling latest changes..."
               cd "$REPO_DIR"
               # ensure correct remote URL with token authentication
               git remote set-url origin "$REPO_URL"
-              git fetch origin
+              git fetch origin ${{ github.ref_name }}
               git reset --hard HEAD
-              git pull origin main
+              git checkout ${{ github.ref_name }}
+              git pull origin ${{ github.ref_name }}
             fi
 
             #### BACKEND BUILD ####
@@ -77,10 +87,10 @@ jobs:
             npm run build
 
             # PM2 for backend
-            if pm2 describe ehilal_strapi > /dev/null; then
-              pm2 restart ehilal_strapi
+            if pm2 describe ehilal_${{ github.ref_name }}_strapi > /dev/null; then
+              pm2 restart ehilal_${{ github.ref_name }}_strapi
             else
-              pm2 start npm --name ehilal_strapi -- run start
+              pm2 start npm --name ehilal_${{ github.ref_name }}_strapi -- run start
             fi
 
             #### FRONTEND BUILD ####
@@ -95,11 +105,12 @@ jobs:
             npm run build
 
             # PM2 for frontend
-            if pm2 describe ehilal_frontend > /dev/null; then
-              pm2 restart ehilal_frontend
+            if pm2 describe ehilal_${{ github.ref_name }}_frontend > /dev/null; then
+              pm2 restart ehilal_${{ github.ref_name }}_frontend
             else
-              PORT=${{ secrets.FRONTEND_PORT }} pm2 start npm --name ehilal_frontend -- run start
+              GALATA_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["FRONTEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
+              PORT=$GALATA_PORT pm2 start npm --name ehilal_${{ github.ref_name }}_frontend -- run start
             fi
 
-            echo "✅ Deployment completed successfully!"
+            echo "(￣y▽￣)╭ Ohohoho..... Deployment completed successfully!"
           EOF
