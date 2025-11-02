@@ -101,15 +101,15 @@ jobs:
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
             echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
 
-            npm install
-            npm run build
+            yarn
+            yarn build
 
             # PM2 for frontend
             if pm2 describe ehilal_${{ github.ref_name }}_frontend > /dev/null; then
               pm2 restart ehilal_${{ github.ref_name }}_frontend
             else
               GALATA_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["FRONTEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$GALATA_PORT pm2 start npm --name ehilal_${{ github.ref_name }}_frontend -- run start
+              PORT=$GALATA_PORT pm2 start yarn --name ehilal_${{ github.ref_name }}_frontend -- start
             fi
 
             echo "(￣y▽￣)╭ Ohohoho..... Deployment completed successfully!"
