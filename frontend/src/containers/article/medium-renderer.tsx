@@ -6,17 +6,18 @@ import {
   useHeadingTree,
   useScrollSpy,
 } from "./table-of-contents";
-import { getCleanSlug } from "@/lib/utils";
+import { getCleanSlug, createSlugCounter } from "@/lib/utils";
 
 export default function MediumRenderer({ paragraphs }: { paragraphs: any[] }) {
   const headingTree = useHeadingTree(paragraphs);
   const activeId = useScrollSpy();
   const tocRef = useRef<HTMLDivElement | null>(null);
+  const slugCounter = createSlugCounter();
   return (
     <div className="relative mx-auto flex max-w-4xl justify-center">
       <aside
         ref={tocRef}
-        className="scrollbar-thin scrollbar-thumb-primary fixed left-[calc(50%-42rem)] top-32 hidden h-[80vh] w-80 overflow-y-auto 2xl:block"
+        className="fixed left-[calc(50%-42rem)] top-32 hidden h-[80vh] w-80 overflow-y-auto scrollbar-thin scrollbar-thumb-primary 2xl:block"
       >
         <h4 className="mb-2 font-semibold uppercase tracking-wide text-muted-foreground">
           Table of Contents
@@ -24,11 +25,11 @@ export default function MediumRenderer({ paragraphs }: { paragraphs: any[] }) {
         <TOC tree={headingTree} activeId={activeId} containerRef={tocRef} />
       </aside>
 
-      <article className="prose-sm dark:prose-invert sm:prose md:prose-lg max-w-xs flex-1 snap-y snap-mandatory scroll-smooth [&>*]:snap-start [&>*]:scroll-mt-24 [&>*]:2xl:scroll-mt-8">
+      <article className="prose-sm max-w-xs flex-1 snap-y snap-mandatory scroll-smooth dark:prose-invert sm:prose md:prose-lg [&>*]:snap-start [&>*]:scroll-mt-24 [&>*]:2xl:scroll-mt-8">
         {paragraphs.map((p) => {
           const id =
             /^H[1-6]$/.test(p.type) && p.name
-              ? `${getCleanSlug(p.text, true)}`
+              ? getCleanSlug(p.text, slugCounter)
               : undefined;
 
           switch (p.type) {

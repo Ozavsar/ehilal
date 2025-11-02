@@ -1,10 +1,12 @@
-import { getCleanSlug } from "@/lib/utils";
+import { createSlugCounter, getCleanSlug } from "@/lib/utils";
 
 export function useHeadingTree(paragraphs: any[]) {
+  const slugCounter = createSlugCounter();
+
   const headings = paragraphs
     .filter((p) => /^H[1-6]$/.test(p.type))
     .map((p) => ({
-      id: `${getCleanSlug(p.text)}`,
+      id: getCleanSlug(p.text, slugCounter),
       text: p.text,
       level: Number(p.type.replace("H", "")),
       children: [] as any[],

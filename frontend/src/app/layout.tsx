@@ -10,63 +10,73 @@ import "swiper/css";
 import Providers from "@/context/providers";
 import { getTheme } from "@/lib/services";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
+const TWITTER_HANDLE =
+  process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
+const TWITTER_USER_ID =
+  process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
+
 export const metadata: Metadata = {
   title: {
-    template: "%s | Elif Hilal Umucu",
-    default: "Portfolio | Elif Hilal",
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME} | Legal Engineer`,
   },
+
   icons: {
     icon: [
       {
         rel: "icon",
         type: "image/png",
-        url: "https://ehilal.net/api/og?theme=light&source=favicon",
+        url: `${SITE_URL}/api/og?theme=light&source=favicon`,
         media: "(prefers-color-scheme: light)",
       },
       {
         rel: "icon",
         type: "image/png",
-        url: "https://ehilal.net/api/og?theme=dark&source=favicon",
+        url: `${SITE_URL}/api/og?theme=dark&source=favicon`,
         media: "(prefers-color-scheme: dark)",
       },
     ],
   },
 
   description:
-    "Welcome to my portfolio! You can learn about my conferences, talks and blog here.",
+    "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
   robots: "index, follow",
   openGraph: {
-    title: "Elif Hilal - Portfolio",
+    title: `${SITE_NAME} | Legal Engineer`,
     description:
-      "Welcome to my portfolio! You can learn about my conferences, talks and blog here.",
+      "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
     type: "website",
-    url: "https://ehilal.net",
-    siteName: "ehilal.net",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_US",
+    alternateLocale: ["tr_TR"],
     images: [
       {
-        url: "https://ehilal.net/api/og",
+        url: `${SITE_URL}/api/og`,
         width: 1200,
         height: 630,
-        alt: "Elif Hilal Logo",
+        alt: `${SITE_NAME} Open Graph Image`,
       },
     ],
   },
+
   twitter: {
-    title: "Elif Hilal - Portfolio",
+    title: `${SITE_NAME} | Legal Engineer`,
     description:
-      "Welcome to my portfolio! You can learn about my conferences, talks and blog here.",
+      "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
     card: "summary_large_image",
-    creator: "@elifhilalumucu",
-    creatorId: "elifhilalumucu",
-    site: "@elifhilalumucu",
-    siteId: "@elifhilalumucu",
+    creator: `${TWITTER_HANDLE}`,
+    creatorId: `${TWITTER_USER_ID}`,
+    site: `${TWITTER_HANDLE}`,
+    siteId: `${TWITTER_USER_ID}`,
     images: [
       {
-        url: "https://ehilal.net/api/og",
+        url: `${SITE_URL}/api/og`,
         width: 1200,
         height: 630,
-        alt: "Elif Hilal Logo",
+        alt: `${SITE_NAME} Twitter Card Image`,
       },
     ],
   },

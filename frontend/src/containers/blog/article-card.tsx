@@ -31,7 +31,7 @@ export default function ArticleCard({
             height={800}
             blurDataURL={blurDataURL ? blurDataURL : undefined}
             placeholder={blurDataURL ? "blur" : "empty"}
-            className="aspect-video object-cover transition-transform duration-300 hover:scale-105"
+            className="aspect-video object-cover transition-transform duration-500 hover:scale-105"
           />
         </Link>
       </CardHeader>

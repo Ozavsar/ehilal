@@ -45,19 +45,26 @@ export async function autoScroll(page: Page): Promise<void> {
   });
 }
 
-export function getCleanSlug(input: string, useCounter = false): string {
-  const slugifyCounter = slugifyWithCounter();
+export function createSlugCounter() {
+  return slugifyWithCounter();
+}
+
+export function getCleanSlug(
+  input: string,
+  useCounter?: ReturnType<typeof slugifyWithCounter>,
+): string {
   let decoded = input;
   try {
     decoded = decodeURIComponent(input);
   } catch {
     decoded = input;
   }
+
   decoded = decoded.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
 
   if (!useCounter) {
     return slugify(decoded, { lowercase: true, locale: "tr" });
   }
 
-  return slugifyCounter(decoded, { lowercase: true, locale: "tr" });
+  return useCounter(decoded, { lowercase: true, locale: "tr" });
 }

@@ -5,8 +5,11 @@ import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
 import { getCleanSlug } from "@/lib/utils";
+import { buildMeta } from "@/lib/metadata";
 
 export const dynamicParams = true;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
 export default async function BlogPage(props: {
   params: Promise<{ page: string }>;
@@ -16,7 +19,6 @@ export default async function BlogPage(props: {
     const articleId = params.page.split("-").pop() || "";
 
     try {
-      // console.log("Fetching article for slug:", params.page, articleId);
       const article = await getSingleArticle(articleId);
 
       if (!article) {
@@ -88,58 +90,60 @@ export async function generateMetadata({
     if (isNaN(Number(page))) {
       const articleId = page.split("-").pop() || "";
       const article = await getSingleArticle(articleId);
-
       if (!article) {
-        return {
-          title: "Article Not Found | Blog",
+        return buildMeta({
+          title: "Article Not Found",
           description: "The requested article could not be found.",
-        };
+          path: `/blog/${page}`,
+        });
       }
 
-      return {
-        title: `${article.title} | Blog`,
-        description: article.description || "Read this article on our blog.",
-        openGraph: {
-          title: article.title,
-          description: article.description,
-          type: "article",
-          url: article.mediumURL,
-          images: article.thumbnailURL ? [article.thumbnailURL] : undefined,
+      return buildMeta({
+        title: article.title,
+        description:
+          article.description ||
+          `
+          Read the article "${article.title}" by ${SITE_NAME}.`,
+        path: `/blog/${page}`,
+        type: "article",
+        image: {
+          url: article.thumbnailURL,
+          alt: article.title,
         },
-      };
+      });
     }
 
-    const pageNum = parseInt(page ?? "1", 10);
-    if (pageNum < 1) {
-      return {
-        title: "Page Not Found | Blog",
-        description: "Invalid blog page number.",
-      };
-    }
+    const pageNum = parseInt(page, 10);
+    if (pageNum < 1) throw new Error("Invalid page number");
 
     const articles = await getAllArticlePreviews();
     const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
-    if (pageNum > totalPages) {
-      return {
-        title: "Page Not Found | Blog",
-        description: "Requested page exceeds available content.",
-      };
-    }
+    if (pageNum > totalPages) throw new Error("Page exceeds total pages");
 
-    return {
-      title: `Blog – Page ${pageNum}`,
-      description: `Explore our latest articles on page ${pageNum}.`,
-      openGraph: {
-        title: `Blog – Page ${pageNum}`,
-        description: `Discover insightful articles and updates – Page ${pageNum}.`,
-        type: "website",
+    const title = pageNum > 1 ? `Blog – Page ${pageNum}` : "Blog";
+    const description = `Explore ${SITE_NAME}'s latest articles and insights${
+      pageNum > 1 ? ` on page ${pageNum}` : ""
+    }.`;
+
+    return buildMeta({
+      title,
+      description,
+      path: `/blog${pageNum > 1 ? `/${pageNum}` : ""}`,
+      type: "website",
+      image: {
+        url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
+        alt: `Blog Articles by ${SITE_NAME}`,
       },
-    };
+    });
   } catch (error) {
-    console.error("Error generating metadata:", error);
-    return {
+    return buildMeta({
       title: "Blog",
-      description: "Read our latest articles and insights.",
-    };
+      description: `Read ${SITE_NAME}'s latest articles and insights.`,
+      path: "/blog",
+      image: {
+        url: `${SITE_URL}/api/og?title=blog`,
+        alt: `Blog Articles by ${SITE_NAME}`,
+      },
+    });
   }
 }
