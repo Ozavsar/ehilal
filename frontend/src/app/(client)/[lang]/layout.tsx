@@ -85,7 +85,6 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  console.log("Current Language:", lang);
   const { primaryDark, primaryLight } = await getTheme();
   const hslDark = hextohsl(primaryDark);
   const hslLight = hextohsl(primaryLight);

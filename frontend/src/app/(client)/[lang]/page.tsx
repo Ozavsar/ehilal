@@ -4,7 +4,7 @@ import { getHomePageContent } from "@/lib/services/pages";
 import { Metadata } from "next";
 import { getImage } from "@/lib/getImage";
 import { Locale } from "@/config/constants/i18n";
-import { translateDeepl } from "@/lib/i18n";
+import { translateDeepl, translateOpenAI } from "@/lib/i18n";
 import { IStrapiHomePage } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,11 +28,11 @@ export default async function Home({
 }) {
   const { lang } = await params;
   const content = await getHomePageContent();
-  const translatedContent = await translateDeepl<IStrapiHomePage>(
+  const translatedContent = await translateOpenAI<IStrapiHomePage>({
     content,
-    ["greeting", "introduction"],
-    lang,
-  );
+    keys: ["greeting", "introduction"],
+    locale: lang,
+  });
   console.log("Translated Content:", translatedContent);
   if (!content) {
     return notFound();

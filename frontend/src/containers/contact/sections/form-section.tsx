@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z, ZodErrorMap } from "zod";
+import { z } from "zod";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ import { submitAction } from "@/lib/services/resend";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const customErrorMap: ZodErrorMap = (issue, ctx) => {
+/* const customErrorMap = (issue, ctx) => {
   if (issue.code === "invalid_type" && issue.received === "undefined") {
     return { message: "This field is required. Please provide a value." };
   }
@@ -30,14 +30,14 @@ const customErrorMap: ZodErrorMap = (issue, ctx) => {
   return { message: ctx.defaultError };
 };
 
-z.setErrorMap(customErrorMap);
+z.config({customError: customErrorMap}); */
 
 const formSchema = z.object({
   name: z
     .string()
     .min(2, "Please enter a username with at least 2 characters.")
     .max(50, "Username should not exceed 50 characters."),
-  email: z.string().email("Please enter a valid email address."),
+  email: z.email("Please enter a valid email address."),
   subject: z
     .string()
     .min(5, "Subject is required. Please provide the subject.")
@@ -109,7 +109,7 @@ export default function FormSection({
               <FormField
                 key={field.name}
                 control={form.control}
-                name={field.name as keyof typeof formSchema._type}
+                name={field.name}
                 render={({ field: formField }) => (
                   <FormItem>
                     <FormLabel>{field.label}</FormLabel>
@@ -134,7 +134,7 @@ export default function FormSection({
               <FormField
                 key={field.name}
                 control={form.control}
-                name={field.name as keyof typeof formSchema._type}
+                name={field.name}
                 render={({ field: formField }) => (
                   <FormItem>
                     <FormLabel>{field.label}</FormLabel>
