@@ -64,7 +64,6 @@ jobs:
 
             echo "Creating .env from GitHub secrets..."
             echo "HOST=${{ secrets.HOST }}" > .env
-            echo "PORT=${{ secrets.PORT }}" >> .env
             echo "APP_KEYS=${{ secrets.APP_KEYS }}" >> .env
             echo "API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}" >> .env
             echo "ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}" >> .env
@@ -72,7 +71,8 @@ jobs:
             echo "DATABASE_CLIENT=${{ secrets.DATABASE_CLIENT }}" >> .env
             echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
             echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
-            echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+            DATABASE_NAME=$(echo '${{ toJson(secrets) }}' | jq -r '.["DATABASE_NAME_${{ steps.set-secret.outputs.branch_upper }}"]')
+            echo "DATABASE_NAME=$DATABASE_NAME" >> .env
             echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
             echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
             echo "DATABASE_SSL=${{ secrets.DATABASE_SSL }}" >> .env
@@ -90,7 +90,8 @@ jobs:
             if pm2 describe ehilal_${{ github.ref_name }}_strapi > /dev/null; then
               pm2 restart ehilal_${{ github.ref_name }}_strapi
             else
-              pm2 start npm --name ehilal_${{ github.ref_name }}_strapi -- run start
+              MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
+              PORT=$MAIDENS_PORT pm2 start npm --name ehilal_${{ github.ref_name }}_strapi -- run start
             fi
 
             #### FRONTEND BUILD ####
