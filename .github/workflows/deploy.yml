@@ -39,7 +39,7 @@ jobs:
             BRANCH_NAME="${{ github.ref_name }}"
             echo "Using branch with variable: $BRANCH_NAME"
             echo "Using branch: ${{ github.ref_name }}"
-            REPO_DIR="$HOME/Github/${{ github.event.repository.name }}_${{ github.ref_name }}"
+            REPO_DIR="$HOME/Github/${{ secrets.PROJECT_NAME }}/${{ github.repository }}_${{ github.ref_name }}"
             REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
 
             # ensure repo exists
@@ -87,11 +87,11 @@ jobs:
             npm run build
 
             # PM2 for backend
-            if pm2 describe ehilal_${{ github.ref_name }}_strapi > /dev/null; then
-              pm2 restart ehilal_${{ github.ref_name }}_strapi
+            if pm2 describe ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} > /dev/null; then
+              pm2 restart ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }}
             else
               MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$MAIDENS_PORT pm2 start npm --name ehilal_${{ github.ref_name }}_strapi -- run start
+              PORT=$MAIDENS_PORT pm2 start npm --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
             fi
 
             #### FRONTEND BUILD ####
@@ -106,11 +106,11 @@ jobs:
             yarn build
 
             # PM2 for frontend
-            if pm2 describe ehilal_${{ github.ref_name }}_frontend > /dev/null; then
-              pm2 restart ehilal_${{ github.ref_name }}_frontend
+            if pm2 describe ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}> /dev/null; then
+              pm2 restart ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}
             else
               GALATA_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["FRONTEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$GALATA_PORT pm2 start yarn --name ehilal_${{ github.ref_name }}_frontend -- start
+              PORT=$GALATA_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }} -- start
             fi
 
             echo "(￣y▽￣)╭ Ohohoho..... Deployment completed successfully!"
