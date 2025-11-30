@@ -3,10 +3,10 @@ import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ArticleCard from "./article-card";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import type { IBlog } from "@/types.d";
+import type { IBlogPreview } from "@/types.d";
 
 interface IBlogContainerProps {
-  articles: IBlog[];
+  articles: IBlogPreview[];
   pageNumber: string;
 }
 
@@ -30,7 +30,7 @@ export default async function BlogContainer({
       <div className="flex flex-col">
         <MotionGrid>
           {articles.map((article) => (
-            <ArticleCard key={article.mediumURL} {...article} />
+            <ArticleCard key={article.externalURL} {...article} />
           ))}
         </MotionGrid>
       </div>

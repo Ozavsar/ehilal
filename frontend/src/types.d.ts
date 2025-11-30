@@ -156,3 +156,13 @@ export interface IUnifiedVideo {
   source: "youtube" | "strapi";
   blurDataURL?: string;
 }
+export interface IBlogPreview {
+  title: string;
+  externalURL: string;
+  externalBlogSource: BlogSource;
+  description: string;
+  thumbnailURL: string;
+  blurDataURL?: string | undefined;
+  pubDate: string;
+  isReadable?: boolean;
+}

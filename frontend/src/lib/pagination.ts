@@ -8,7 +8,7 @@
 export function generatePagination(
   currentPage: number,
   totalPages: number,
-  maxVisible = 7,
+  maxVisible = 5,
 ): (number | "...")[] {
   // Input validation
   if (currentPage < 1 || totalPages < 1 || currentPage > totalPages) {
