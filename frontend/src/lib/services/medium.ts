@@ -61,6 +61,10 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "User-Agent": "Mozilla/5.0 ... Chrome/123",
+        Referer: "https://medium.com/",
+        Origin: "https://medium.com",
+        "Accept-Language": "en-US,en;q=0.9",
       },
       body: JSON.stringify({
         query,
@@ -100,7 +104,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       };
     });
 
-    // console.log(formatted);
+    console.log(formatted);
 
     allPreviews.push(...formatted);
 
@@ -208,7 +212,14 @@ query PostPageQuery(
 
   const res = await fetch("https://medium.com/_/graphql", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "User-Agent": "Mozilla/5.0 ... Chrome/123",
+      Referer: "https://medium.com/",
+      Origin: "https://medium.com",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
     body: JSON.stringify({
       query,
       variables: { postId, includeShouldFollowPost: false },

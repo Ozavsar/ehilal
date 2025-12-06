@@ -24,7 +24,7 @@ export default function Pagination({
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <div className="z-[9] mx-auto mt-8 flex self-end">
+    <div className="z-[9] mx-auto mt-8 flex items-center self-end">
       <PaginationArrow
         direction="left"
         href={createPageURL(currentPage - 1)}
@@ -73,7 +73,7 @@ function PaginationNumber({
   isActive: boolean;
 }) {
   const className = clsx(
-    "flex h-10 w-10 items-center bg-background justify-center text-sm border border-muted",
+    "flex size-9 sm:size-10 items-center bg-background justify-center text-sm border border-muted",
     {
       "rounded-l-md": position === "first" || position === "single",
       "rounded-r-md": position === "last" || position === "single",
@@ -102,12 +102,12 @@ function PaginationArrow({
   isDisabled?: boolean;
 }) {
   const className = clsx(
-    "flex h-10 w-10 items-center justify-center rounded-md border border-muted",
+    "flex size-8 sm:size-10 items-center justify-center rounded-md border border-muted",
     {
       "pointer-events-none text-gray-500": isDisabled,
       "hover:bg-muted": !isDisabled,
-      "mr-2 md:mr-4": direction === "left",
-      "ml-2 md:ml-4": direction === "right",
+      "mr-1 md:mr-4": direction === "left",
+      "ml-1 md:ml-4": direction === "right",
     },
   );
 

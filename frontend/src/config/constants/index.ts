@@ -5,3 +5,7 @@ export const YOUTUBE_CHANNEL_ID = "UCwPEpxjzJvCrG2Lz3S-PHrw" as const;
 export const ITEMS_PER_PAGE = 9 as const;
 export const COMPANY_LINKEDIN_URL =
   "https://www.linkedin.com/company/karakodcenter/" as const;
+export enum BlogSource {
+  MEDIUM = "Medium",
+  SUBSTACK = "Substack",
+}

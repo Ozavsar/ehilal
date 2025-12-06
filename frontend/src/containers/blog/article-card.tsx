@@ -14,8 +14,8 @@ export default function ArticleCard({
   blurDataURL,
   thumbnailURL,
   title,
-  mediumURL,
   description,
+  mediumURL,
   pubDate,
 }: IBlogPreview) {
   const rawSlug = mediumURL.split("/").pop() || "";
