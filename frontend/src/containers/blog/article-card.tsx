@@ -15,10 +15,10 @@ export default function ArticleCard({
   thumbnailURL,
   title,
   description,
-  externalURL,
+  mediumURL,
   pubDate,
 }: IBlogPreview) {
-  const rawSlug = externalURL.split("/").pop() || "";
+  const rawSlug = mediumURL.split("/").pop() || "";
   const slug = getCleanSlug(rawSlug);
   return (
     <Card className="flex h-full flex-col">
@@ -46,7 +46,7 @@ export default function ArticleCard({
         </p>
       </CardContent>
       <CardFooter className="mt-auto flex justify-between">
-        <LinkButton href={externalURL} rel="noopener noreferrer">
+        <LinkButton href={mediumURL} rel="noopener noreferrer">
           Read on{" "}
           <span className="font-bold text-[#242424] dark:text-foreground">
             Medium
