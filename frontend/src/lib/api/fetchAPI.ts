@@ -9,7 +9,12 @@ export function getStrapiURL(path = ""): string {
 export async function fetchAPI<T>(
   path: string,
   urlParamsObject = {},
-  options: { headers?: Record<string, string> } = {},
+  options: {
+    headers?: Record<string, string>;
+    cache?: RequestCache;
+    tags?: string[];
+    revalidate?: number;
+  } = {},
 ): Promise<T> {
   try {
     const token = process.env.BEARER_TOKEN;
@@ -18,6 +23,11 @@ export async function fetchAPI<T>(
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         ...options?.headers,
+      },
+      cache: options.cache || ("default" as RequestCache),
+      next: {
+        tags: options.tags || [],
+        revalidate: options.revalidate || 3600 * 24, // 24 hours
       },
       ...options,
     };

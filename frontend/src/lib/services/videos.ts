@@ -1,8 +1,8 @@
 import { fetchAPI } from "../api/fetchAPI";
-import { getUploadedVideos } from "@/lib/services/youtube";
-import { getYoutubeVideoDetails } from "@/lib/services/youtube";
-import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getImage } from "../getImage";
+import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
+import { getYoutubeVideoDetails } from "@/lib/services/youtube";
+import { getUploadedVideos } from "@/lib/services/youtube";
 import type { IStrapiResponse, IStrapiVideo, IUnifiedVideo } from "@/types.d";
 
 /**
@@ -21,6 +21,7 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>(
     "/videos",
     query,
+    { tags: ["videos"] },
   );
 
   return response;

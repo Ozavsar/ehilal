@@ -6,7 +6,13 @@ import { fetchAPI } from "../api/fetchAPI";
  */
 
 export async function getTheme() {
-  const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>("/theme");
+  const response = await fetchAPI<IStrapiResponse<IStrapiTheme>>(
+    "/theme",
+    {},
+    {
+      tags: ["theme"],
+    },
+  );
   return response.data;
 }
 
@@ -14,8 +20,13 @@ export async function getTheme() {
  * Get Social Media Links
  */
 export async function getSocialMediaLinks() {
-  const response =
-    await fetchAPI<IStrapiResponse<IStrapiSocialLinks>>("/social-media-link");
+  const response = await fetchAPI<IStrapiResponse<IStrapiSocialLinks>>(
+    "/social-media-link",
+    {},
+    {
+      tags: ["social-media-links"],
+    },
+  );
 
   return response.data;
 }

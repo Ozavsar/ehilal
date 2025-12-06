@@ -1,60 +1,18 @@
-import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
 import ContactContainer from "@/containers/contact";
 import { getContactPageContent } from "@/lib/services/pages";
 import { getSocialMediaLinks } from "@/lib/services";
+import { Metadata } from "next";
+import { buildMeta } from "@/lib/metadata";
 
-const getCachedContactPageContent = unstable_cache(
-  async () => {
-    try {
-      return await getContactPageContent();
-    } catch (error) {
-      console.error("Error fetching contact page content:", error);
-      return null;
-    }
-  },
-  ["contact-page-content"],
-  {
-    tags: ["contact-title"],
-  },
-);
-
-const getCachedSocialMediaLinks = unstable_cache(
-  async () => {
-    try {
-      return await getSocialMediaLinks();
-    } catch (error) {
-      console.error(
-        "Error fetching social media links on contact page:",
-        error,
-      );
-      return { email: "", twitter_x: "", linkedin: "", youtube: "" };
-    }
-  },
-  ["social-media-links"],
-  {
-    tags: ["social-media-links"],
-  },
-);
-
-export async function generateMetadata(): Promise<Metadata> {
-  const content = await getCachedContactPageContent();
-  const title = content?.SEO_title || "Contact";
-  const description =
-    content?.SEO_description ||
-    "Get in touch with Elif Hilal Umucu through email or social media.";
-  return {
-    title,
-    description,
-  };
-}
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
 export default async function ContactPage() {
   try {
     const [content, socialMediaLinks] = await Promise.all([
-      getCachedContactPageContent(),
-      getCachedSocialMediaLinks(),
+      getContactPageContent(),
+      getSocialMediaLinks(),
     ]);
 
     if (!content) {
@@ -67,5 +25,32 @@ export default async function ContactPage() {
   } catch (error) {
     console.error("Error in Contact page:", error);
     return notFound();
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    return buildMeta({
+      title: "Contact",
+      description: `Get in touch with ${SITE_NAME} — reach out for collaborations, speaking invitations, or professional inquiries.`,
+      path: "/contact",
+      type: "website",
+      image: {
+        url: `${SITE_URL}/api/og?title=contact`,
+        alt: `Contact ${SITE_NAME}`,
+      },
+    });
+  } catch (error) {
+    console.error("Error generating metadata for Contact page:", error);
+    return buildMeta({
+      title: "Contact",
+      description: `Connect with ${SITE_NAME} — for collaborations, inquiries, or networking.`,
+      path: "/contact",
+      type: "website",
+      image: {
+        url: `${SITE_URL}/api/og?title=contact`,
+        alt: `Contact ${SITE_NAME}`,
+      },
+    });
   }
 }

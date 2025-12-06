@@ -1,8 +1,5 @@
-import { BlogSource, MEDIUM_USER_ID } from "@/config/constants";
-import { getImage } from "../getImage";
-import { type IBlogPreview, type IBlog } from "@/types";
-
-export const REVALIDATE = 3600; // 1 hour
+import { MEDIUM_USER_ID } from "@/config/constants";
+import type { IBlogPreview, IBlog } from "@/types";
 
 export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
   const allPreviews: IBlogPreview[] = [];
@@ -76,34 +73,19 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       cache: "force-cache",
       next: {
         tags: ["articles"],
-        revalidate: REVALIDATE,
       },
     });
 
-    const json: any = await res.json();
+    const json = await res.json();
     const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
     const next =
       json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
 
     const currentYear = new Date().getFullYear();
 
-    const formattedPromises = posts.map(async (post: any) => {
+    const formatted: IBlogPreview[] = posts.map((post: any) => {
       const date = new Date(post.firstPublishedAt);
       const isCurrentYear = date.getFullYear() === currentYear;
-
-      const imageUrl = post.previewImage
-        ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
-        : null;
-
-      let blurDataURL = "";
-      if (imageUrl) {
-        try {
-          const placeholder = await getImage(imageUrl);
-          blurDataURL = placeholder.base64;
-        } catch (err) {
-          console.warn("Placeholder alınamadı:", imageUrl);
-        }
-      }
 
       const formattedDate = date.toLocaleDateString("en-US", {
         month: "short",
@@ -113,26 +95,36 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
 
       return {
         title: post.title,
-        externalURL: post.mediumUrl,
-        externalBlogSource: BlogSource.MEDIUM,
+        mediumURL: post.mediumUrl,
         description: post.extendedPreviewContent?.subtitle || "",
-        thumbnailURL: imageUrl ?? "",
-        blurDataURL,
+        thumbnailURL: post.previewImage
+          ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
+          : "",
         pubDate: formattedDate,
-        isReadable: true,
       };
     });
 
-    const formatted = await Promise.all(formattedPromises);
+    console.log(formatted);
+
     allPreviews.push(...formatted);
 
     if (!next?.from) break;
     from = next.from;
 
-    await new Promise((r) => setTimeout(r, 2000));
+    // avoid Medium throttling
+    await new Promise((r) => setTimeout(r, 500));
   }
 
-  return allPreviews;
+  const articlesWithPlaceholders = await Promise.all(
+    allPreviews.map(async (article) => ({
+      ...article,
+      /*       blurDataURL: (article as any).thumbnailURL
+        ? (await getImage((article as any).thumbnailURL)).base64
+        : undefined, */
+    })),
+  );
+
+  return articlesWithPlaceholders;
 }
 
 export async function getSingleArticle(postId: string): Promise<IBlog | null> {
@@ -235,11 +227,10 @@ query PostPageQuery(
     cache: "force-cache",
     next: {
       tags: ["articles", `article-${postId}`],
-      revalidate: REVALIDATE,
     },
   });
 
-  const json: any = await res.json();
+  const json = await res.json();
 
   if (!json.data?.postResult) {
     return null;

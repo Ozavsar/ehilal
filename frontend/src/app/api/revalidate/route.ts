@@ -10,18 +10,18 @@ export async function POST(req: NextRequest) {
 
     const { model } = await req.json();
 
-    console.log("revalidating model: ", model);
+    // console.log("revalidating model: ", model);
 
     if (model === "video") {
-      revalidateTag("videos");
+      revalidateTag("videos", "max");
     } else if (model === "conference") {
-      revalidateTag("conferences");
+      revalidateTag("conferences", "max");
     } else if (model === "social-media-link") {
-      revalidateTag("social-media-links");
+      revalidateTag("social-media-links", "max");
     } else if (model === "theme") {
-      revalidateTag("theme");
+      revalidateTag("theme", "max");
     } else if (model.includes("-page")) {
-      revalidateTag(`${model.split("-")[0]}-title`);
+      revalidateTag(`${model.split("-")[0]}-title`, "max");
     } else {
       return NextResponse.json({ message: "Invalid model" }, { status: 400 });
     }

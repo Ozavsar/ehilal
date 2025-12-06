@@ -14,6 +14,7 @@ export async function getHomePageContent() {
   const response = await fetchAPI<IStrapiResponse<IStrapiHomePage>>(
     "/home-page",
     { populate: "hero_image" },
+    { tags: ["home-title"] },
   );
   return response.data;
 }
@@ -22,16 +23,27 @@ export async function getHomePageContent() {
  * Get contact page content
  */
 export async function getContactPageContent() {
-  const response =
-    await fetchAPI<IStrapiResponse<IStrapiContactPage>>("/contact-page");
+  const response = await fetchAPI<IStrapiResponse<IStrapiContactPage>>(
+    "/contact-page",
+    {},
+    {
+      tags: ["contact-title"],
+    },
+  );
   return response.data;
 }
 
 /**
  * Get page titles by page name
  */
-export async function getPageTitle(pageName: string) {
-  const response = await fetchAPI<IStrapiResponse<IPageTitle>>(`/${pageName}`);
+export async function getPageTitle(pageName: string, tags?: string[]) {
+  const response = await fetchAPI<IStrapiResponse<IPageTitle>>(
+    `/${pageName}`,
+    {},
+    {
+      tags,
+    },
+  );
   return response.data;
 }
 
@@ -42,6 +54,7 @@ export async function getNotFoundPageContent() {
   const response = await fetchAPI<IStrapiResponse<INotFoundPage>>(
     "/not-found-page",
     { populate: "image" },
+    { tags: ["not-title"] },
   );
   return response.data;
 }

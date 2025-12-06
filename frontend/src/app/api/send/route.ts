@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       from: "hello@ehilal.net",
       to: "canozfuttu07@gmail.com",
       subject: rawFormData.subject,
-      react: EmailTemplate(rawFormData),
+      react: await EmailTemplate(rawFormData),
     });
 
     console.log(data);

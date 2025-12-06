@@ -50,13 +50,17 @@ export interface IVideoPreview {
   views?: string | null | undefined;
 }
 
-export interface IBlog {
+export interface IBlogPreview {
   title: string;
   mediumURL: string;
   description: string;
   thumbnailURL: string;
   blurDataURL?: string | undefined;
   pubDate: string;
+}
+
+export interface IBlog extends IBlogPreview {
+  paragraphs: any[];
 }
 
 export interface ICourse {

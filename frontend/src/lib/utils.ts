@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import slugify, { slugifyWithCounter } from "@sindresorhus/slugify";
+import { type ClassValue, clsx } from "clsx";
 import type { Page } from "puppeteer";
-import { getPlaiceholder } from "plaiceholder";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,4 +43,28 @@ export async function autoScroll(page: Page): Promise<void> {
       }, 350);
     });
   });
+}
+
+export function createSlugCounter() {
+  return slugifyWithCounter();
+}
+
+export function getCleanSlug(
+  input: string,
+  useCounter?: ReturnType<typeof slugifyWithCounter>,
+): string {
+  let decoded = input;
+  try {
+    decoded = decodeURIComponent(input);
+  } catch {
+    decoded = input;
+  }
+
+  decoded = decoded.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+
+  if (!useCounter) {
+    return slugify(decoded, { lowercase: true, locale: "tr" });
+  }
+
+  return useCounter(decoded, { lowercase: true, locale: "tr" });
 }
