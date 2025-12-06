@@ -9,4 +9,3 @@ export enum BlogSource {
   MEDIUM = "Medium",
   SUBSTACK = "Substack",
 }
-export const MEDIUM_USER_ID = "4fcf35ac48f4" as const;
