@@ -30,7 +30,7 @@ export default async function BlogContainer({
       <div className="flex flex-col">
         <MotionGrid>
           {articles.map((article) => (
-            <ArticleCard key={article.mediumURL} {...article} />
+            <ArticleCard key={article.externalURL} {...article} />
           ))}
         </MotionGrid>
       </div>
