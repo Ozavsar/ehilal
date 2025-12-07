@@ -88,7 +88,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       },
     });
 
-    const json = await res.text();
+    const json = await res.json();
     const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
     const next =
       json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
