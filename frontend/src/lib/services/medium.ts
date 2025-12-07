@@ -104,7 +104,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       };
     });
 
-    console.log(formatted);
+    // console.log(formatted);
 
     allPreviews.push(...formatted);
 
