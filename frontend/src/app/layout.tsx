@@ -17,7 +17,7 @@ const TWITTER_HANDLE =
 const TWITTER_USER_ID =
   process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
 
-  // updated 
+// updated
 
 export const metadata: Metadata = {
   title: {
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
   description:
     "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
-  robots: "index, follow",
+  robots: SITE_URL.includes("dev.") ? "noindex, nofollow" : "index, follow",
   openGraph: {
     title: `${SITE_NAME} | Legal Engineer`,
     description:

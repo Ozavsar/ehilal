@@ -101,6 +101,10 @@ jobs:
             echo "REVALIDATE_KEY=${{ secrets.REVALIDATE_KEY }}" >> .env.local
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
             echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
+            NEXT_PUBLIC_SITE_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
+            NEXT_PUBLIC_STRAPI_API_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_STRAPI_API_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
+            echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.local
+            echo "NEXT_PUBLIC_STRAPI_API_URL=$NEXT_PUBLIC_STRAPI_API_URL" >> .env.local
 
             yarn
             yarn build

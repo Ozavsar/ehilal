@@ -60,11 +60,23 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
-        "User-Agent": "Mozilla/5.0 ... Chrome/123",
+        Accept: "application/json, text/plain, */*",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
         Referer: "https://medium.com/",
         Origin: "https://medium.com",
         "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Ch-Ua":
+          '"Chromium";v="123", "Not.A/Brand";v="24", "Google Chrome";v="123"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        DNT: "1",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       body: JSON.stringify({
         query,
@@ -104,7 +116,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       };
     });
 
-    console.log(formatted);
+    // console.log(formatted);
 
     allPreviews.push(...formatted);
 
@@ -214,11 +226,23 @@ query PostPageQuery(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
-      "User-Agent": "Mozilla/5.0 ... Chrome/123",
+      Accept: "application/json, text/plain, */*",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
       Referer: "https://medium.com/",
       Origin: "https://medium.com",
       "Accept-Language": "en-US,en;q=0.9",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Ch-Ua":
+        '"Chromium";v="123", "Not.A/Brand";v="24", "Google Chrome";v="123"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      DNT: "1",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
     },
     body: JSON.stringify({
       query,
