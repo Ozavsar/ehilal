@@ -228,7 +228,7 @@ query PostPageQuery(
       "Content-Type": "application/json",
       Accept: "application/json, text/plain, */*",
       "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
       Referer: "https://medium.com/",
       Origin: "https://medium.com",
       "Accept-Language": "en-US,en;q=0.9",
@@ -237,7 +237,7 @@ query PostPageQuery(
       "Sec-Fetch-Mode": "cors",
       "Sec-Fetch-Dest": "empty",
       "Sec-Ch-Ua":
-        '"Chromium";v="123", "Not.A/Brand";v="24", "Google Chrome";v="123"',
+        '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
       "Sec-Ch-Ua-Mobile": "?0",
       "Sec-Ch-Ua-Platform": '"Windows"',
       DNT: "1",
