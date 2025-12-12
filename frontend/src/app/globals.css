@@ -1,65 +1,165 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@plugin @tailwindcss/typography;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @plugin 'tailwind-scrollbar' {
   preferredstrategy: "pseudoelements";
 }
-@layer base {
-  :root {
-    --background: 0, 0%, 96%;
-    --foreground: 0, 0%, 40%;
-    --card: 0, 0%, 100%;
-    --card-foreground:0, 0%, 28%;
-    --popover: 0, 0%, 100%;
-    --popover-foreground: 0, 0%, 40%;
-    --primary: var(--primary-light);
-    --muted: 0, 0%, 93%;
-    --muted-foreground: 0, 0%, 46%;
-    --accent: 0, 0%, 93%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 0, 0%, 40%;
-    --radius: 0.5rem;
-    --blog-text-color: 0, 0%, 10%;
-  }
 
-  .dark {
-    --background: 0, 0%, 7%;
-    --foreground: 0, 0%, 100%;
-    --card: 228, 6%, 15%;
-    --card-foreground: 220, 9%, 87%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 0, 0%, 100%;
-    --primary: var(--primary-dark);
-    --muted: 0, 1%, 17%;
-    --muted-foreground: 0, 0%, 75%;
-    --accent: 0, 1%, 17%;
-    --accent-foreground: 0, 0%, 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0, 0%, 100%;
-    --border: 0, 1%, 17%;
-    --input: 0, 1%, 17%;
-    --ring: 212.7 26.8% 83.9%;
-    --blog-text-color: 0, 0%, 95%;
-  }
+:root {
+  --background: #f5f5f5;
+  --foreground: #666666;
+  --card: #ffffff;
+  --card-foreground: #474747;
+  --popover: #ffffff;
+  --popover-foreground: #666666;
+  --primary: hsl(var(--primary-light));
+  --muted: #ededed;
+  --muted-foreground: #757575;
+  --accent: #ededed;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #666666;
+  --radius: 0.5rem;
+  --blog-text-color: #1a1a1a;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #ffffff;
+  --card: #242630;
+  --card-foreground: #dbdde3;
+  --popover: #020617;
+  --popover-foreground: #ffffff;
+  --primary: hsl(var(--primary-dark));
+  --muted: #2b2a2a;
+  --muted-foreground: #bfbfbf;
+  --accent: #2b2a2a;
+  --accent-foreground: #ffffff;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #ffffff;
+  --border: #2b2a2a;
+  --input: #2b2a2a;
+  --ring: #c9d6e7;
+  --blog-text-color: #f2f2f2;
+}
+
+@theme inline {
+  /* Colors */
+  --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-blog-text-color: var(--blog-text-color);
+
+  /* Border Radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Breakpoints */
+  --breakpoint-sm: 540px;
+  --breakpoint-md: 720px;
+  --breakpoint-lg: 960px;
+  --breakpoint-xl: 1140px;
+  --breakpoint-2xl: 1320px;
+  --breakpoint-custom-lg: 1135px;
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-fade-in-elif: fade-in-elif 0.7s ease-out forwards 0.3s;
+  --animate-fade-in-right: fade-in-right 0.5s ease-out forwards;
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+  html {
+    @apply bg-background text-foreground scroll-smooth;
+  }
+  main {
+    @apply max-sm:py-24;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= theme(--breakpoint-sm)) {
+    max-width: theme(--breakpoint-sm);
+  }
+  @media (width >= theme(--breakpoint-md)) {
+    max-width: theme(--breakpoint-md);
+  }
+  @media (width >= theme(--breakpoint-lg)) {
+    max-width: theme(--breakpoint-lg);
+  }
+  @media (width >= theme(--breakpoint-xl)) {
+    max-width: theme(--breakpoint-xl);
+  }
+  @media (width >= theme(--breakpoint-2xl)) {
+    max-width: theme(--breakpoint-2xl);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-elif {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) translateX(0px);
   }
 }
 
 .swiper-button-prev,
 .swiper-button-next {
-  @apply bottom-0 top-0 m-0 h-full px-8 text-background dark:text-primary max-sm:px-4;
+  @apply text-background dark:text-primary top-0 bottom-0 m-0 h-full px-8 max-sm:px-4;
 }
 
 .swiper-button-prev:after,
@@ -100,9 +200,6 @@
   opacity: 0;
   transition: opacity 0.5s;
 }
-main {
-  @apply max-sm:py-24;
-}
 
 @keyframes fadeout {
   to {
@@ -120,9 +217,6 @@ main {
     transform: translateY(0);
     opacity: 1;
   }
-}
-html {
-  scroll-behavior: smooth;
 }
 
 .animate-slide-up {

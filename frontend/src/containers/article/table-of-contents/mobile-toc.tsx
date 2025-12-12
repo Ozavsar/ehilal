@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LuList } from "react-icons/lu";
 import {
   Drawer,
   DrawerClose,
@@ -26,16 +27,19 @@ export default function MobileTOC({
   return (
     <Drawer open={open} onOpenChange={setOpen} direction="bottom">
       <DrawerTrigger asChild>
-        <Button size="sm" className="fixed bottom-16 right-4 z-50 2xl:hidden">
-          Table of Contents
+        <Button size="icon" className="fixed right-4 bottom-16 z-50 2xl:hidden">
+          <LuList className="size-5" />
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="rounded-t-2xl border-t bg-background/95 shadow-2xl backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto w-full max-w-md px-6 pb-8 pt-4">
+      <DrawerContent
+        className="bg-background/95 supports-[backdrop-filter]:bg-background/90 rounded-t-2xl border-t shadow-2xl backdrop-blur-md"
+        onScroll={(e) => e.stopPropagation()}
+      >
+        <div className="mx-auto w-full max-w-md px-6 pt-4 pb-8">
           <DrawerHeader className="flex items-center justify-between px-0">
-            <DrawerTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <span className="text-lg text-primary">📘</span>
+            <DrawerTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
+              <span className="text-primary text-lg">📘</span>
               Table of Contents
             </DrawerTitle>
             <DrawerClose asChild>
@@ -49,9 +53,9 @@ export default function MobileTOC({
             </DrawerClose>
           </DrawerHeader>
 
-          <div className="mb-4 h-px w-full bg-border" />
+          <div className="bg-border mb-4 h-px w-full" />
 
-          <div className="scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent max-h-[60vh] overflow-y-auto pr-2">
+          <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted-foreground/20 max-h-[60vh] overflow-y-auto pr-2">
             <TOC
               tree={tree}
               activeId={activeId}

@@ -24,7 +24,7 @@ export default function TitleSection({
           initial={{ opacity: 0, scale: 1.2, y: 40 }}
           animate={{ opacity: 0.25, scale: 1, y: 0 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute -z-10 -translate-y-[50%] text-[110px] font-extrabold uppercase tracking-[5px] text-muted-foreground/25 dark:text-card"
+          className="text-muted-foreground/25 dark:text-card absolute top-1/3 left-1/2 -z-10 -translate-x-1/2 -translate-y-1/3 text-[110px] font-extrabold tracking-[5px] uppercase"
         >
           {backgroundText}
         </motion.span>
@@ -41,7 +41,7 @@ export default function TitleSection({
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className={plainWord ? "inline-block text-primary" : ""}
+            className={plainWord ? "text-primary inline-block" : ""}
           >
             {lastWord}
           </motion.span>
@@ -50,7 +50,7 @@ export default function TitleSection({
 
       {/* Mobile */}
       <AnimatePresence mode="wait">
-        <motion.div className="fixed left-0 top-0 z-20 w-full bg-muted py-4 pl-6 shadow-lg sm:hidden">
+        <motion.div className="bg-muted fixed top-0 left-0 z-20 w-full py-4 pl-6 shadow-lg sm:hidden">
           <motion.h2
             initial={{ opacity: 0, scale: 0.9, filter: "blur(8px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
