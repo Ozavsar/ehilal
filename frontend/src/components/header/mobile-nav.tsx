@@ -68,7 +68,7 @@ export default function MobileNav() {
                 >
                   <Icon
                     className={cn(
-                      "h-5 w-5",
+                      "size-5",
                       isActive ? "text-primary" : "text-muted-foreground",
                     )}
                   />
