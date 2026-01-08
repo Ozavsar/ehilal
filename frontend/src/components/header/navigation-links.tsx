@@ -30,7 +30,7 @@ export default function Nav() {
               visible: { opacity: 1, scale: 1 },
             }}
             transition={{ type: "spring" }}
-            className="self-end rounded-full"
+            className="cursor-pointer self-end rounded-full"
           >
             <Link href={href}>
               <Button
@@ -38,14 +38,14 @@ export default function Nav() {
                 size="icon"
                 onMouseOver={() => setHoveredItem(label)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`relative flex items-center justify-center gap-4 border border-background font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
+                className={`border-background relative flex cursor-pointer items-center justify-center gap-4 border font-bold uppercase transition-all duration-300 ${isActive ? "bg-primary text-white" : ""} ${isHovered ? "pr-12 text-white sm:w-fit sm:justify-end sm:pl-6" : ""}`}
               >
                 <span
                   className={`text-white duration-500 ${isHovered ? "opacity-100" : "opacity-0"} hidden sm:block`}
                 >
                   {isHovered ? label : null}
                 </span>
-                <div className="absolute right-[11px] flex items-center justify-center">
+                <div className="absolute right-2.75 flex items-center justify-center">
                   <Icon className="size-5 sm:size-6" />
                 </div>
               </Button>

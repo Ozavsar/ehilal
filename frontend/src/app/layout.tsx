@@ -105,7 +105,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-all selection:bg-muted selection:text-primary`}
+        className={`${GeistSans.variable} ${GeistMono.variable} antialiased relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-colors duration-300 selection:bg-primary selection:text-white`}
         suppressHydrationWarning
       >
         <Providers>

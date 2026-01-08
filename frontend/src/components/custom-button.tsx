@@ -19,7 +19,7 @@ export default function CustomButton({
 }: CustomButtonProps) {
   return (
     <Button
-      className={`group relative flex h-14 w-fit items-center gap-6 overflow-hidden rounded-full border border-primary bg-transparent px-10 pr-0 font-bold uppercase text-foreground transition-transform hover:text-white ${className}`}
+      className={`group relative flex h-14 w-fit items-center cursor-pointer gap-6 overflow-hidden rounded-full border border-primary bg-transparent px-10 pr-0 font-bold uppercase text-foreground transition-all duration-500 ease-out hover:text-white hover:scale-105 active:scale-95 ${className}`}
       onClick={onClick}
       {...props}
     >
@@ -27,7 +27,7 @@ export default function CustomButton({
       <span className="relative flex size-14 items-center justify-center rounded-full bg-primary">
         <Icon size={24} className="text-white" />{" "}
       </span>
-      <span className="absolute right-0 -z-10 h-14 w-0 rounded-full bg-primary transition-all duration-700 ease-out group-hover:w-96 group-active:w-0 group-active:duration-150" />
+      <span className="absolute inset-0 -z-10 h-full w-full origin-right scale-x-0 rounded-full bg-primary transition-transform duration-500 ease-out group-hover:scale-x-100 group-active:scale-x-0 group-active:duration-150" />
     </Button>
   );
 }

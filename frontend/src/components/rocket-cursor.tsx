@@ -112,8 +112,8 @@ export default function RocketCursor() {
         (180 / Math.PI);
 
       rocket.style.transform = `translate(${rocketPosition.x}px, ${rocketPosition.y}px) rotate(${angle}deg)`;
-      body.style.backgroundPositionX = `-${rocketPosition.x / 10}px`;
-      body.style.backgroundPositionY = `-${rocketPosition.y / 10}px`;
+      // body.style.backgroundPositionX = `-${rocketPosition.x / 10}px`; // Performance optimization
+      // body.style.backgroundPositionY = `-${rocketPosition.y / 10}px`; // Performance optimization
 
       if (tick % Math.floor(fps / fumeCount) === 0) {
         const div = document.createElement("div");
@@ -175,7 +175,7 @@ export default function RocketCursor() {
 
   return (
     <div className="rocket pointer-events-none select-none" ref={rocketRef}>
-      <svg viewBox="0 0 32 44" className="!fill-primary">
+      <svg viewBox="0 0 32 44" className="fill-primary!">
         <path d="M16 0C16 0 25 4.08 25 21C25 25.98 22.92 32.14 21.8 35H10.2C9.08 32.14 7 25.98 7 21C7 4.08 16 0 16 0ZM20 17C20 14.8 18.2 13 16 13C13.8 13 12 14.8 12 17C12 19.2 13.8 21 16 21C18.2 21 20 19.2 20 17ZM7.38 36.04C6.42 33.58 4.34 27.7 4.04 22.3L1.78 23.8C0.66 24.56 0 25.8 0 27.14V39L7.38 36.04ZM32 39V27.14C32 25.8 31.34 24.56 30.22 23.82L27.96 22.32C27.66 27.7 25.56 33.6 24.62 36.06L32 39Z" />
       </svg>
       <div className={`glow shadow-primary`}></div>

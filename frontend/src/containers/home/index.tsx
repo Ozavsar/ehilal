@@ -16,7 +16,7 @@ export default async function HomeContainer({ content }: IHomeContainerProps) {
     <main className="container flex min-h-screen items-center justify-center max-sm:py-0 max-sm:pb-4">
       <Image
         src={content.hero_image.url}
-        className="fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 animate-fade-in-elif rounded-3xl object-cover opacity-0 shadow-md shadow-slate-900 xl:block"
+        className="fixed left-10 top-10 hidden h-[calc(100vh-80px)] w-1/3 animate-fade-in-elif rounded-3xl object-cover opacity-0 shadow-2xl xl:block"
         width={700}
         height={700}
         blurDataURL={content.hero_image.blurDataURL}
@@ -24,9 +24,9 @@ export default async function HomeContainer({ content }: IHomeContainerProps) {
         alt="Elif Hilal's Hero Image"
       />
 
-      <div className="fixed -left-[83%] -top-1/2 -z-10 hidden h-[200%] w-full -rotate-[15deg] bg-primary lg:block" />
+      <div className="fixed -left-[83%] -top-1/2 -z-10 hidden h-[200%] w-full -rotate-15 bg-primary lg:block" />
 
-      <div className="flex max-w-md flex-col gap-8 max-sm:gap-4 md:max-w-[600px] md:gap-12 lg:ml-[10%] xl:ml-[35%]">
+      <div className="flex max-w-md flex-col gap-8 max-sm:gap-4 md:max-w-150 md:gap-12 lg:ml-[10%] xl:ml-[35%]">
         <Avatar className="size-52 self-center border-4 border-primary xl:hidden">
           <AvatarImage
             src={content.hero_image.url}

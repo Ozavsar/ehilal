@@ -18,7 +18,7 @@ export default function TitleSection({
   return (
     <section>
       {/* Desktop */}
-      <div className="relative flex flex-col items-center justify-center overflow-visible py-[70px] max-sm:hidden">
+      <div className="relative flex flex-col items-center justify-center overflow-visible py-17.5 max-sm:hidden">
         {/* Background text animation */}
         <motion.span
           initial={{ opacity: 0, scale: 1.2, y: 40 }}

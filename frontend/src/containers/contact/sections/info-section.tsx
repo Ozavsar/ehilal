@@ -9,6 +9,7 @@ import MotionGrid from "@/components/motion-grid";
 import { cn } from "@/lib/utils";
 
 interface IInfoSectionProps {
+  className?: string;
   content: {
     title: string;
     description: string;
@@ -24,6 +25,7 @@ interface IInfoSectionProps {
 export default function InfoSection({
   content,
   socialMediaLinks,
+  className,
 }: IInfoSectionProps) {
   const links = [
     {
@@ -63,7 +65,7 @@ export default function InfoSection({
     },
   ];
   return (
-    <div className="max-md:col-span-3">
+    <div className={cn("max-md:mb-8", className)}>
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,30 +82,25 @@ export default function InfoSection({
       >
         {content.description}
       </motion.p>
-      <MotionGrid className="mt-4 flex flex-col gap-3 text-sm">
+      <MotionGrid className="mt-4 flex flex-col gap-4 text-sm">
         {links.map(({ href, icon: Icon, title, label, lowercase }, i) => (
-          <Link key={i} href={href} aria-label={title}>
-            <motion.div className="group relative flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-xl border border-border bg-primary/5 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
-              <div className="relative z-10 flex items-center gap-4">
-                <motion.div
-                  whileHover={{ rotate: -8 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary shadow-inner shadow-primary/10"
-                >
-                  <Icon className="size-6" />
-                </motion.div>
+          <Link key={i} href={href} aria-label={title} className="w-full">
+            <motion.div
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="group border-border/50 bg-background/50 hover:border-primary/50 hover:bg-primary/5 dark:bg-card/40 relative flex w-full items-center gap-5 overflow-hidden rounded-2xl border p-5 shadow-sm transition-colors duration-300 hover:shadow-md"
+            >
+              <div className="relative z-10 flex items-center gap-5">
+                <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:shadow-primary/20 flex size-12 items-center justify-center rounded-xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:text-white group-hover:shadow-lg">
+                  <Icon className="size-5" />
+                </div>
 
-                <div className="flex flex-col">
-                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-muted-foreground group-hover:text-primary text-xs font-bold tracking-widest uppercase transition-colors">
                     {title}
                   </h3>
-                  <p
-                    className={cn(
-                      "font-semibold capitalize text-foreground",
-                      lowercase && "lowercase",
-                    )}
-                  >
-                    {label}
+                  <p className="text-foreground group-hover:text-foreground/90 font-medium transition-colors">
+                    {lowercase ? label.toLowerCase() : label}
                   </p>
                 </div>
               </div>

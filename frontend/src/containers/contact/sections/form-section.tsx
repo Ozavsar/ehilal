@@ -112,15 +112,18 @@ export default function FormSection({
                 name={field.name as keyof typeof formSchema._type}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wide uppercase">
+                      {field.label}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder={field.placeholder}
                         {...formField}
-                        className="focus-visible:ring-primary mt-1 rounded-xl px-4 py-2 focus-visible:ring-1"
+                        maxLength={100}
+                        className="mt-1"
                       />
                     </FormControl>
-                    <FormMessage>
+                    <FormMessage className="ml-1 text-xs">
                       {form.formState.errors[field.name]?.message?.toString()}
                     </FormMessage>
                   </FormItem>
@@ -137,16 +140,19 @@ export default function FormSection({
                 name={field.name as keyof typeof formSchema._type}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wide uppercase">
+                      {field.label}
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder={field.placeholder}
                         {...formField}
                         rows={5}
-                        className="focus-visible:ring-primary mt-1 rounded-xl px-4 py-2 focus-visible:ring-1"
+                        maxLength={600}
+                        className="mt-1 resize-none"
                       />
                     </FormControl>
-                    <FormMessage>
+                    <FormMessage className="ml-1 text-xs">
                       {form.formState.errors[field.name]?.message?.toString()}
                     </FormMessage>
                   </FormItem>

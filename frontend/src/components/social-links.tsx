@@ -29,7 +29,7 @@ export default async function SocialLinks() {
           aria-label={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full border border-primary p-2 text-primary hover:text-foreground"
+          className="rounded-full border border-primary p-2 text-primary transition-all duration-300 hover:scale-110 hover:bg-primary hover:text-white active:scale-95"
         >
           <Icon className="size-5 sm:size-6" />
         </a>
@@ -40,7 +40,7 @@ export default async function SocialLinks() {
         aria-label={COMPANY_LINKEDIN_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-full border border-primary p-2 text-primary hover:text-foreground"
+        className="rounded-full border border-primary p-2 text-primary transition-all duration-300 hover:scale-110 hover:bg-primary hover:text-white active:scale-95"
       >
         <LuLinkedin className="size-5 sm:size-6" />
       </a>
