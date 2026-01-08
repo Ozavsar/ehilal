@@ -89,13 +89,24 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
     const res = await fetch("https://medium.com/_/graphql", {
       method: "POST",
       headers: {
-        "User-Agent": "PostmanRuntime/7.49.1",
-        Accept: "*/*",
-        "Postman-Token": "a90cc4c4-9640-4589-a0bc-451c81a6fd5b",
-        Host: "medium.com",
-        "Accept-Encoding": "gzip, deflate, br",
-        Connection: "keep-alive",
         "Content-Type": "application/json",
+        Accept: "application/json, text/plain, */*",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+        Referer: "https://medium.com/",
+        Origin: "https://medium.com",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Ch-Ua":
+          '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        DNT: "1",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       body: JSON.stringify({
         query,
@@ -247,13 +258,24 @@ query PostPageQuery(
     const res = await fetch("https://medium.com/_/graphql", {
       method: "POST",
       headers: {
-        "User-Agent": "PostmanRuntime/7.49.1",
-        Accept: "*/*",
-        "Postman-Token": "a90cc4c4-9640-4589-a0bc-451c81a6fd5b",
-        Host: "medium.com",
-        "Accept-Encoding": "gzip, deflate, br",
-        Connection: "keep-alive",
         "Content-Type": "application/json",
+        Accept: "application/json, text/plain, */*",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+        Referer: "https://medium.com/",
+        Origin: "https://medium.com",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Ch-Ua":
+          '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        DNT: "1",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       body: JSON.stringify({
         query,
