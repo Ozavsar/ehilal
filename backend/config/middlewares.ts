@@ -34,7 +34,7 @@ export default [
   {
     name: "strapi::cors",
     config: {
-      origin: ["https://ehilal.com", "https://admin.ehilal.com"],
+      origin: ["https://ehilal.com", "https://admin.ehilal.com", "http://localhost:3169"],
       methods: ["GET", "POST", "PUT", "DELETE"],
       headers: "*",
       credentials: true,
