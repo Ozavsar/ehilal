@@ -1,9 +1,15 @@
 import "server-only";
 import { getPlaiceholder } from "plaiceholder";
+import { getStrapiURL } from "./api/fetchAPI";
+
 export const getImage = async (src: string) => {
-  const buffer = await fetch(src).then(async (res) =>
-    Buffer.from(await res.arrayBuffer()),
-  );
+  const url = src.startsWith("/") ? getStrapiURL(src) : src;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
+  }
+  const buffer = Buffer.from(await res.arrayBuffer());
 
   const {
     metadata: { height, width },
