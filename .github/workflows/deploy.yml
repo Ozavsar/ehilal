@@ -30,92 +30,20 @@ jobs:
       - name: Deploy
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            set -e  # Exit if any command fails
+            set -e
 
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            echo "nvm: $(command -v nvm || echo missing)"
+            echo "node: $(command -v node || echo missing)"
+            echo "yarn: $(command -v yarn || echo missing)"
+            echo "pm2: $(command -v pm2 || echo missing)"
+            echo "jq: $(command -v jq || echo missing)"
+
             nvm use --lts
-            BRANCH_NAME="${{ github.ref_name }}"
-            echo "Using branch with variable: $BRANCH_NAME"
-            echo "Using branch: ${{ github.ref_name }}"
-            REPO_DIR="$HOME/Github/${{ secrets.PROJECT_NAME }}/${{ github.event.repository.name }}_${{ github.ref_name }}"
-            REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-
-            # ensure repo exists
-            if [ ! -d "$REPO_DIR" ]; then
-              echo "Repository not found. Cloning fresh..."
-              mkdir -p $HOME/Github
-              cd $HOME/Github
-              git clone -b ${{ github.ref_name }} "$REPO_URL" "$REPO_DIR"
-            else
-           echo "Repository already exists. Pulling latest changes..."
-              cd "$REPO_DIR"
-              # ensure correct remote URL with token authentication
-              git remote set-url origin "$REPO_URL"
-              git fetch origin ${{ github.ref_name }}
-              git reset --hard HEAD
-              git checkout ${{ github.ref_name }}
-              git pull origin ${{ github.ref_name }}
-            fi
-
-            #### BACKEND BUILD ####
-            cd "$REPO_DIR/backend"
-
-            echo "Creating .env from GitHub secrets..."
-            echo "HOST=${{ secrets.HOST }}" > .env
-            echo "APP_KEYS=${{ secrets.APP_KEYS }}" >> .env
-            echo "API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}" >> .env
-            echo "ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}" >> .env
-            echo "TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }}" >> .env
-            echo "DATABASE_CLIENT=${{ secrets.DATABASE_CLIENT }}" >> .env
-            echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
-            echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
-            DATABASE_NAME=$(echo '${{ toJson(secrets) }}' | jq -r '.["DATABASE_NAME_${{ steps.set-secret.outputs.branch_upper }}"]')
-            echo "DATABASE_NAME=$DATABASE_NAME" >> .env
-            echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
-            echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
-            echo "DATABASE_SSL=${{ secrets.DATABASE_SSL }}" >> .env
-            echo "DATABASE_FILENAME=${{ secrets.DATABASE_FILENAME }}" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
-            echo "AWS_ACCESS_SECRET=${{ secrets.AWS_ACCESS_SECRET }}" >> .env
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
-            echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
-
-            yarn
-            yarn build
-
-            # PM2 for backend
-            if pm2 describe ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} > /dev/null; then
-              pm2 restart ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }}
-            else
-              MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$MAIDENS_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
-            fi
-
-            #### FRONTEND BUILD ####
-            cd "$REPO_DIR/frontend"
-
-            echo "YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}" > .env.local
-            echo "REVALIDATE_KEY=${{ secrets.REVALIDATE_KEY }}" >> .env.local
-            echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
-            echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
-            NEXT_PUBLIC_SITE_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
-            NEXT_PUBLIC_STRAPI_API_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_STRAPI_API_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
-            echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.local
-            echo "NEXT_PUBLIC_STRAPI_API_URL=$NEXT_PUBLIC_STRAPI_API_URL" >> .env.local
-
-            yarn
-            yarn build
-
-            # PM2 for frontend
-            if pm2 describe ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}> /dev/null; then
-              pm2 restart ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}
-            else
-              GALATA_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["FRONTEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$GALATA_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }} -- start
-            fi
-
-            echo "(￣y▽￣)╭ Ohohoho..... Deployment completed successfully!"
+            node -v
+            yarn -v
+            pm2 -v
+            jq --version
           EOF
