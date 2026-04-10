@@ -83,15 +83,15 @@ jobs:
             echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
             echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
 
-            npm install
-            npm run build
+            yarn
+            yarn build
 
             # PM2 for backend
             if pm2 describe ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} > /dev/null; then
               pm2 restart ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }}
             else
               MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$MAIDENS_PORT pm2 start npm --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
+              PORT=$MAIDENS_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
             fi
 
             #### FRONTEND BUILD ####
