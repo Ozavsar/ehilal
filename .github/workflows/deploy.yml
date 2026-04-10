@@ -83,6 +83,7 @@ jobs:
             echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
             echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
 
+            nvm use 22
             yarn
             yarn build
 
@@ -93,6 +94,8 @@ jobs:
               MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
               PORT=$MAIDENS_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
             fi
+
+            nvm use 24
 
             #### FRONTEND BUILD ####
             cd "$REPO_DIR/frontend"
