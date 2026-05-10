@@ -24,7 +24,7 @@ export default async function BlogContainer({ articles, pageNumber }: IBlogConta
       <div className="flex flex-col">
         <MotionGrid>
           {articles.map((article) => (
-            <ArticleCard key={article.externalURL} {...article} />
+            <ArticleCard key={article.mediumURL} {...article} />
           ))}
         </MotionGrid>
       </div>
