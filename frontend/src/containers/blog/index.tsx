@@ -3,7 +3,7 @@ import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ArticleCard from "./article-card";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import type { IBlogPreview } from "@/types.d";
+import type { IBlogPreview } from "@/types";
 
 interface IBlogContainerProps {
   articles: IBlogPreview[];

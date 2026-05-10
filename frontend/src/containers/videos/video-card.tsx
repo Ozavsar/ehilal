@@ -3,7 +3,7 @@ import { LuFlame } from "react-icons/lu";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { IUnifiedVideo } from "@/types.d";
+import type { IUnifiedVideo } from "@/types";
 import LinkButton from "@/components/link-button";
 
 export default function VideoCard({

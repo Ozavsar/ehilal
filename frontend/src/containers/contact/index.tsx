@@ -1,7 +1,7 @@
 import TitleSection from "@/components/title-section";
 import FormSection from "./sections/form-section";
 import InfoSection from "./sections/info-section";
-import type { IStrapiContactPage } from "@/types.d";
+import type { IStrapiContactPage } from "@/types";
 
 interface IContactContainerProps {
   socialMediaLinks: {

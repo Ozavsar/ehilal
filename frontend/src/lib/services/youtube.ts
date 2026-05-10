@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { getImage } from "../getImage";
-import type { IVideoPreview } from "@/types.d";
+import type { IVideoPreview } from "@/types";
 
 const youtube = google.youtube({
   version: "v3",

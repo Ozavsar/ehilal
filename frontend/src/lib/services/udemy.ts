@@ -3,7 +3,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { UDEMY_USER_URL } from "@/config/constants";
 import { autoScroll } from "../utils";
 import { getImage } from "../getImage";
-import type { ICourse } from "@/types.d";
+import type { ICourse } from "@/types";
 
 process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
 

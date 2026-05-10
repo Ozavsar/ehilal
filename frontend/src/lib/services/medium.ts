@@ -1,35 +1,8 @@
 import { MEDIUM_USER_ID } from "@/config/constants";
-import type { IBlogPreview, IBlog } from "@/types";
+import { getImage } from "../getImage";
+import { type IBlogPreview, type IBlog, BlogSource } from "@/types";
 
-// Simple request throttler to avoid Medium rate limiting
-const throttler = {
-  queue: [] as Array<() => void>,
-  running: 0,
-  maxConcurrent: 2, // Max concurrent requests
-  delayMs: 2000, // Delay between requests
-
-  async acquire(): Promise<void> {
-    if (this.running < this.maxConcurrent) {
-      this.running++;
-      return;
-    }
-
-    return new Promise((resolve) => {
-      this.queue.push(resolve);
-    });
-  },
-
-  async release(): Promise<void> {
-    await new Promise((r) => setTimeout(r, this.delayMs));
-    this.running--;
-
-    const next = this.queue.shift();
-    if (next) {
-      this.running++;
-      next();
-    }
-  },
-};
+export const REVALIDATE = 60 * 60; // 1 hour
 
 export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
   const allPreviews: IBlogPreview[] = [];
@@ -114,18 +87,33 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       cache: "force-cache",
       next: {
         tags: ["articles"],
+        revalidate: REVALIDATE,
       },
     });
 
-    const json = await res.json();
+    const json: any = await res.json();
     const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
     const next = json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
 
     const currentYear = new Date().getFullYear();
 
-    const formatted: IBlogPreview[] = posts.map((post: any) => {
+    const formattedPromises = posts.map(async (post: any) => {
       const date = new Date(post.firstPublishedAt);
       const isCurrentYear = date.getFullYear() === currentYear;
+
+      const imageUrl = post.previewImage
+        ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
+        : null;
+
+      let blurDataURL = "";
+      if (imageUrl) {
+        try {
+          const placeholder = await getImage(imageUrl);
+          blurDataURL = placeholder.base64;
+        } catch (err) {
+          console.warn("Placeholder alınamadı:", imageUrl);
+        }
+      }
 
       const formattedDate = date.toLocaleDateString("en-US", {
         month: "short",
@@ -135,43 +123,30 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
 
       return {
         title: post.title,
-        mediumURL: post.mediumUrl,
+        externalURL: post.mediumUrl,
+        externalBlogSource: BlogSource.MEDIUM,
         description: post.extendedPreviewContent?.subtitle || "",
-        thumbnailURL: post.previewImage
-          ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
-          : "",
+        thumbnailURL: imageUrl ?? "",
+        blurDataURL,
         pubDate: formattedDate,
+        isReadable: true,
       };
     });
 
-    // console.log(formatted);
-
+    const formatted = await Promise.all(formattedPromises);
     allPreviews.push(...formatted);
 
     if (!next?.from) break;
     from = next.from;
 
-    // avoid Medium throttling
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
-  const articlesWithPlaceholders = await Promise.all(
-    allPreviews.map(async (article) => ({
-      ...article,
-      /*       blurDataURL: (article as any).thumbnailURL
-        ? (await getImage((article as any).thumbnailURL)).base64
-        : undefined, */
-    })),
-  );
-
-  return articlesWithPlaceholders;
+  return allPreviews;
 }
 
 export async function getSingleArticle(postId: string): Promise<IBlog | null> {
-  await throttler.acquire();
-
-  try {
-    const query = `
+  const query = `
 query PostPageQuery(
   $postId: ID!,
   $postMeteringOptions: PostMeteringOptions,
@@ -253,56 +228,46 @@ query PostPageQuery(
 }
   `;
 
-    const res = await fetch("https://medium.com/_/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json, text/plain, */*",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-        Referer: "https://medium.com/",
-        Origin: "https://medium.com",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Sec-Fetch-Site": "same-origin",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
-        "Sec-Ch-Ua-Mobile": "?0",
-        "Sec-Ch-Ua-Platform": '"Windows"',
-        DNT: "1",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
-      body: JSON.stringify({
-        query,
-        variables: { postId, includeShouldFollowPost: false },
-      }),
-      cache: "force-cache",
-      next: {
-        tags: ["articles", `article-${postId}`],
-      },
-    });
+  const res = await fetch("https://medium.com/_/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json, text/plain, */*",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      Referer: "https://medium.com/",
+      Origin: "https://medium.com",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      DNT: "1",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+    body: JSON.stringify({
+      query,
+      variables: { postId, includeShouldFollowPost: false },
+    }),
+    cache: "force-cache",
+    next: {
+      tags: ["articles", `article-${postId}`],
+      revalidate: REVALIDATE,
+    },
+  });
 
-    const contentType = res.headers.get("content-type");
-    if (!res.ok || !contentType?.includes("application/json")) {
-      console.error(
-        `Medium API error for getAllArticlePreviews: status ${res.status}, postId: ${postId}`,
-      );
-      throw new Error(`Medium API returned non-JSON response: ${res.status}`);
-    }
+  const json: any = await res.json();
 
-    const json = await res.json();
-
-    if (!json.data?.postResult) {
-      return null;
-    }
-
-    return {
-      ...json.data.postResult,
-      paragraphs: json.data.postResult.content.bodyModel.paragraphs || [],
-    };
-  } finally {
-    await throttler.release();
+  if (!json.data?.postResult) {
+    return null;
   }
+
+  return {
+    ...json.data.postResult,
+    paragraphs: json.data.postResult.content.bodyModel.paragraphs || [],
+  };
 }

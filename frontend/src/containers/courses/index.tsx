@@ -1,6 +1,6 @@
 import MotionGrid from "@/components/motion-grid";
 import CourseCard from "./course-card";
-import type { ICourse } from "@/types.d";
+import type { ICourse } from "@/types";
 
 interface ICourseContainerProps {
   courses: ICourse[];

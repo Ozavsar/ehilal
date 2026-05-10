@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { LuX } from "react-icons/lu";
-import type { IImage } from "@/types.d";
+import type { IImage } from "@/types";
 
 interface FullScreenImageProps {
   images: IImage[];

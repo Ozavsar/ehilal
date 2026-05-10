@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ConferenceCard from "./conference-card";
-import type { IStrapiConference } from "@/types.d";
+import type { IStrapiConference } from "@/types";
 
 interface IConferencesContainerProps {
   conferences: IStrapiConference[];

@@ -1,5 +1,5 @@
 import { fetchAPI } from "../api/fetchAPI";
-import type { IStrapiConference, IStrapiResponse } from "@/types.d";
+import type { IStrapiConference, IStrapiResponse } from "@/types";
 import { getImage } from "../getImage";
 
 /**

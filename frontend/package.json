@@ -7,8 +7,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "tw:fix": "tailwind-suggest-canonical-classes \"{src,containers,components}/**/*.{ts,tsx}\"",
-    "tw:check": "tailwind-suggest-canonical-classes \"{src,containers,components}/**/*.{ts,tsx}\" --check"
+    "tw:fix": "tailwind-suggest-canonical-classes \"src/{app,containers,components}/**/*.{ts,tsx}\"",
+    "tw:check": "tailwind-suggest-canonical-classes \"src/{app,containers,components}/**/*.{ts,tsx}\" --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -65,6 +65,7 @@
     "@types/qs": "^6.9.18",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
+    "baseline-browser-mapping": "^2.10.29",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "postcss": "^8",

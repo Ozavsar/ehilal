@@ -1,33 +1,48 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Metadata } from "next";
 import ArticleContainer from "@/containers/article";
 import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import { getAllArticlePreviews, getSingleArticle } from "@/lib/services/medium";
+import {
+  getAllArticlePreviews as getAllMediumArticlePreviews,
+  getSingleArticle,
+} from "@/lib/services/medium";
+import { getAllArticlePreviews as getAllSubstackArticlePreviews } from "@/lib/services/substack";
 import { getCleanSlug } from "@/lib/utils";
 import { buildMeta } from "@/lib/metadata";
+import { MEDIUM_USERNAME } from "@/config/constants";
 
 export const dynamicParams = true;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
+
+function getMediumArticleUrl(articleId: string): string {
+  return `https://medium.com/p/${articleId}`;
+}
+
+function getMediumProfileUrl(): string {
+  return `https://medium.com/@${MEDIUM_USERNAME}`;
+}
 
 export default async function BlogPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   if (isNaN(Number(params.page))) {
     const articleId = params.page.split("-").pop() || "";
 
+    let article;
     try {
-      const article = await getSingleArticle(articleId);
-
-      if (!article) {
-        return notFound();
-      }
-
-      return <ArticleContainer article={article} />;
+      article = await getSingleArticle(articleId);
     } catch (error) {
       console.error("Error fetching article:", params.page, error);
-      return notFound();
+      redirect(getMediumArticleUrl(articleId));
     }
+
+    if (!article) {
+      redirect(getMediumArticleUrl(articleId));
+    }
+
+    return <ArticleContainer article={article} />;
   } else {
     const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -35,38 +50,47 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
       return notFound();
     }
 
+    let articles;
     try {
-      const articles = await getAllArticlePreviews();
-
-      if (!articles || articles.length === 0) {
-        return notFound();
-      }
-
-      const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
-      if (pageNum > totalPages) {
-        return notFound();
-      }
-
-      return <BlogContainer articles={articles} pageNumber={pageNum.toString()} />;
+      articles = [
+        ...(await getAllMediumArticlePreviews()),
+        ...(await getAllSubstackArticlePreviews()),
+      ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+      console.log(`Fetched ${articles.length} articles for page ${pageNum}`);
     } catch (error) {
+      console.error("Error fetching articles:", error);
+      redirect(getMediumProfileUrl());
+    }
+
+    if (!articles || articles.length === 0) {
+      redirect(getMediumProfileUrl());
+    }
+
+    const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
+    if (pageNum > totalPages) {
       return notFound();
     }
+
+    return <BlogContainer articles={articles} pageNumber={pageNum.toString()} />;
   }
 }
 
 export async function generateStaticParams() {
   try {
-    const articles = await getAllArticlePreviews();
+    const articles = [
+      ...(await getAllMediumArticlePreviews()),
+      ...(await getAllSubstackArticlePreviews()),
+    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
     const pageCount = Math.ceil((articles?.length || 0) / ITEMS_PER_PAGE);
-
     const pageNumbers = Array.from({ length: pageCount || 1 }, (_, i) => ({
       page: (i + 1).toString(),
     }));
-
-    const blogSlugs = articles.map((article) => {
-      const slug = getCleanSlug(article.mediumURL.split("/").pop()!);
-      return { page: slug };
-    });
+    const blogSlugs = articles
+      .filter((a) => a.isReadable)
+      .map((article) => {
+        const slug = getCleanSlug(article.externalURL.split("/").pop()!);
+        return { page: slug };
+      });
 
     return [...pageNumbers, ...blogSlugs];
   } catch (error) {
@@ -80,10 +104,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ page: string }>;
 }): Promise<Metadata> {
-  try {
-    const { page } = await params;
+  const { page } = await params;
+  const isArticle = isNaN(Number(page));
 
-    if (isNaN(Number(page))) {
+  try {
+    if (isArticle) {
       const articleId = page.split("-").pop() || "";
       const article = await getSingleArticle(articleId);
       if (!article) {
@@ -112,7 +137,11 @@ export async function generateMetadata({
     const pageNum = parseInt(page, 10);
     if (pageNum < 1) throw new Error("Invalid page number");
 
-    const articles = await getAllArticlePreviews();
+    const articles = [
+      ...(await getAllMediumArticlePreviews()),
+      ...(await getAllSubstackArticlePreviews()),
+    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+
     const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
     if (pageNum > totalPages) throw new Error("Page exceeds total pages");
 

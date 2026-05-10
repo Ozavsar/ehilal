@@ -2,7 +2,7 @@ import Image from "next/image";
 import { LuStar, LuUsers } from "react-icons/lu";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { ICourse } from "@/types.d";
+import type { ICourse } from "@/types";
 
 export default function CourseCard({
   blurDataURL,

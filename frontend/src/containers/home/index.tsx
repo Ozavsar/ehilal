@@ -5,7 +5,7 @@ import AnimatedText from "@/components/animated-text";
 import CustomButton from "@/components/custom-button";
 import SocialLinks from "@/components/social-links";
 import { ROUTES } from "@/config/constants/app-routes";
-import type { IStrapiHomePage } from "@/types.d";
+import type { IStrapiHomePage } from "@/types";
 
 interface IHomeContainerProps {
   content: IStrapiHomePage;

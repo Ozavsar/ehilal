@@ -1,6 +1,4 @@
-import { StaticImageData } from "next/image";
-
-interface IImageFormat {
+export interface IImageFormat {
   ext: string;
   url: string;
   hash: string;
@@ -13,7 +11,7 @@ interface IImageFormat {
   sizeInBytes: number;
 }
 
-interface IImage {
+export interface IImage {
   id: number;
   documentId: string;
   name: string;
@@ -169,4 +167,9 @@ export interface IBlogPreview {
   blurDataURL?: string | undefined;
   pubDate: string;
   isReadable?: boolean;
+}
+
+export enum BlogSource {
+  MEDIUM = "Medium",
+  SUBSTACK = "Substack",
 }

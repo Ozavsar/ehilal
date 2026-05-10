@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Gallery from "./gallery";
-import type { IStrapiConference } from "@/types.d";
+import type { IStrapiConference } from "@/types";
 
 export default function ConferenceCard({ title, date, location, images }: IStrapiConference) {
   return (

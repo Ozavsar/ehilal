@@ -3,7 +3,7 @@ import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import VideoCard from "./video-card";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import type { IUnifiedVideo } from "@/types.d";
+import type { IUnifiedVideo } from "@/types";
 
 interface IVideosContainerProps {
   videos: IUnifiedVideo[];

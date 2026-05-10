@@ -1,7 +1,7 @@
 import { LuLinkedin, LuYoutube } from "react-icons/lu";
 import { BsTwitterX } from "react-icons/bs";
 import { getSocialMediaLinks } from "@/lib/services";
-import { COMPANY_LINKEDIN_URL, YOUTUBE_TURKISH_CHANNEL_URL } from "@/config/constants";
+import { COMPANY_LINKEDIN_URL } from "@/config/constants";
 
 export default async function SocialLinks() {
   const socialLinks = await getSocialMediaLinks();
@@ -17,10 +17,6 @@ export default async function SocialLinks() {
     { href: COMPANY_LINKEDIN_URL, icon: LuLinkedin },
     {
       href: socialLinks.youtube || "#",
-      icon: LuYoutube,
-    },
-    {
-      href: YOUTUBE_TURKISH_CHANNEL_URL,
       icon: LuYoutube,
     },
   ];

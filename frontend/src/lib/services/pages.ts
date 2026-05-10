@@ -5,7 +5,7 @@ import type {
   IStrapiResponse,
   IPageTitle,
   INotFoundPage,
-} from "@/types.d";
+} from "@/types";
 
 /**
  * Get home page content
