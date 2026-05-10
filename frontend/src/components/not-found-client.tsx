@@ -271,7 +271,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
           >
             {/* Space helmet effect */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/50 via-primary/25 to-primary/50 opacity-70 blur-xl"
+              className="absolute inset-0 rounded-full bg-linear-to-r from-primary/50 via-primary/25 to-primary/50 opacity-70 blur-xl"
               animate={{
                 scale: [1, 1.05, 1],
                 opacity: [0.7, 0.9, 0.7],
@@ -285,7 +285,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
 
             <div className="absolute inset-0 overflow-hidden rounded-full border-2 border-muted bg-primary backdrop-blur-sm">
               {/* Helmet visor reflection */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-br from-primary via-transparent to-transparent" />
 
               {/* Your image */}
               {imageUrl ? (

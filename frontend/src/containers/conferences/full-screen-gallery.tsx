@@ -16,7 +16,7 @@ export default function FullScreenImage({
   onClose,
 }: FullScreenImageProps) {
   return (
-    <div className="fixed inset-0 z-40 !mt-0 flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm">
+    <div className="fixed inset-0 z-40 mt-0! flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm">
       <button
         onClick={onClose}
         className="absolute right-4 top-4 z-50 text-primary hover:text-foreground"

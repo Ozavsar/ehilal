@@ -6,10 +6,13 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "tw:fix": "tailwind-suggest-canonical-classes \"{src,containers,components}/**/*.{ts,tsx}\"",
+    "tw:check": "tailwind-suggest-canonical-classes \"{src,containers,components}/**/*.{ts,tsx}\" --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@laststance/tailwind-suggest-canonical-classes": "^0.1.1",
     "@plaiceholder/next": "^3.0.0",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
     "@radix-ui/react-avatar": "^1.1.3",
