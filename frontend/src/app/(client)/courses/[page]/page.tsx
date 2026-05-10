@@ -10,9 +10,7 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
-export default async function CoursesPage(props: {
-  params: Promise<{ page: string }>;
-}) {
+export default async function CoursesPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -76,8 +74,7 @@ export async function generateMetadata({
       });
     }
 
-    const title =
-      pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
+    const title = pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
     const description =
       pageNum > 1
         ? `Discover ${SITE_NAME}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`

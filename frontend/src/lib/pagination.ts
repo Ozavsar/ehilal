@@ -60,10 +60,7 @@ export function generatePagination(
   for (const page of pages) {
     if (page === "...") {
       // Add ellipsis only between numbers
-      if (
-        uniquePages.length > 0 &&
-        uniquePages[uniquePages.length - 1] !== "..."
-      ) {
+      if (uniquePages.length > 0 && uniquePages[uniquePages.length - 1] !== "...") {
         uniquePages.push(page);
       }
     } else if (!seenNumbers.has(page)) {

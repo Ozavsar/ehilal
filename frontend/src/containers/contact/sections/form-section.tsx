@@ -65,11 +65,7 @@ const formFields = [
   },
 ];
 
-export default function FormSection({
-  className = "",
-}: {
-  className?: string;
-}) {
+export default function FormSection({ className = "" }: { className?: string }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
   });
@@ -99,11 +95,7 @@ export default function FormSection({
       className={`${className}`}
     >
       <Form {...form}>
-        <form
-          action={submitAction}
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8"
-        >
+        <form action={submitAction} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             {formFields.slice(0, 3).map((field) => (
               <FormField

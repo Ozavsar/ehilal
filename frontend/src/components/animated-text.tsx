@@ -19,11 +19,7 @@ interface AnimatedTextProps {
   props?: any;
 }
 
-export default function AnimatedText({
-  text,
-  className,
-  ...props
-}: AnimatedTextProps) {
+export default function AnimatedText({ text, className, ...props }: AnimatedTextProps) {
   const ref = useRef<HTMLParagraphElement>(null);
   const isInView = useInView(ref, { amount: 0.5, once: true });
   const textArray = Array.isArray(text) ? text : [text];
@@ -43,11 +39,7 @@ export default function AnimatedText({
           {line.split(" ").map((word, index) => (
             <span key={index} className="inline-block">
               {word.split("").map((char, i) => (
-                <motion.span
-                  key={char + i}
-                  variants={characterVariants}
-                  className="inline-block"
-                >
+                <motion.span key={char + i} variants={characterVariants} className="inline-block">
                   {char}
                 </motion.span>
               ))}

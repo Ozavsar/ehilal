@@ -10,19 +10,13 @@ interface IBlogContainerProps {
   pageNumber: string;
 }
 
-export default async function BlogContainer({
-  articles,
-  pageNumber,
-}: IBlogContainerProps) {
+export default async function BlogContainer({ articles, pageNumber }: IBlogContainerProps) {
   const currentPage = parseInt(pageNumber, 10);
 
   const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
 
   articles = articles
-    ? articles.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE,
-      )
+    ? articles.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
     : [];
 
   return (

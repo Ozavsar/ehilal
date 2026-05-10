@@ -10,25 +10,17 @@ interface FullScreenImageProps {
   onClose: () => void;
 }
 
-export default function FullScreenImage({
-  images,
-  title,
-  onClose,
-}: FullScreenImageProps) {
+export default function FullScreenImage({ images, title, onClose }: FullScreenImageProps) {
   return (
-    <div className="fixed inset-0 z-40 mt-0! flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm">
+    <div className="bg-opacity-90 fixed inset-0 z-40 mt-0! flex items-center justify-center bg-black backdrop-blur-sm">
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-50 text-primary hover:text-foreground"
+        className="text-primary hover:text-foreground absolute top-4 right-4 z-50"
         aria-label="Close full screen image"
       >
         <LuX size={24} />
       </button>
-      <Swiper
-        modules={[Navigation]}
-        navigation
-        className="relative h-screen w-screen"
-      >
+      <Swiper modules={[Navigation]} navigation className="relative h-screen w-screen">
         {images.map((image, index) => (
           <SwiperSlide key={index}>
             <Image

@@ -105,10 +105,7 @@ export default function RocketCursor() {
       };
 
       angle =
-        Math.atan2(
-          mousePosition.x - rocketCenter.x,
-          -(mousePosition.y - rocketCenter.y),
-        ) *
+        Math.atan2(mousePosition.x - rocketCenter.x, -(mousePosition.y - rocketCenter.y)) *
         (180 / Math.PI);
 
       rocket.style.transform = `translate(${rocketPosition.x}px, ${rocketPosition.y}px) rotate(${angle}deg)`;
@@ -150,11 +147,7 @@ export default function RocketCursor() {
         });
       }
 
-      if (
-        Math.abs(xSpeed) < 0.1 &&
-        Math.abs(ySpeed) < 0.1 &&
-        mousePosition.x !== 0
-      ) {
+      if (Math.abs(xSpeed) < 0.1 && Math.abs(ySpeed) < 0.1 && mousePosition.x !== 0) {
         heart.style.opacity = "1";
       } else {
         heart.style.opacity = "0";

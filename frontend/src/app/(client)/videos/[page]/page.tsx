@@ -7,9 +7,7 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
-export default async function VideosPage(props: {
-  params: Promise<{ page: string }>;
-}) {
+export default async function VideosPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -34,9 +32,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata(props: {
-  params: Promise<{ page: string }>;
-}) {
+export async function generateMetadata(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 

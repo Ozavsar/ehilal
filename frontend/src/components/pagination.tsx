@@ -11,10 +11,7 @@ interface IPaginationProps {
   currentPage: number;
 }
 
-export default function Pagination({
-  totalPages,
-  currentPage,
-}: IPaginationProps) {
+export default function Pagination({ totalPages, currentPage }: IPaginationProps) {
   const pathname = usePathname();
 
   const createPageURL = (pageNumber: number | string) => {
@@ -112,11 +109,7 @@ function PaginationArrow({
   );
 
   const icon =
-    direction === "left" ? (
-      <LuArrowLeft className="w-4" />
-    ) : (
-      <LuArrowRight className="w-4" />
-    );
+    direction === "left" ? <LuArrowLeft className="w-4" /> : <LuArrowRight className="w-4" />;
 
   return isDisabled ? (
     <div className={className}>{icon}</div>

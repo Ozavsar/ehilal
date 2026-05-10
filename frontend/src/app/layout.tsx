@@ -12,10 +12,8 @@ import { getTheme } from "@/lib/services";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
-const TWITTER_HANDLE =
-  process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
-const TWITTER_USER_ID =
-  process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
+const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
+const TWITTER_USER_ID = process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
 
 // updated
 
@@ -105,7 +103,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} antialiased relative grid min-h-screen grid-rows-[auto_1fr_auto] transition-colors duration-300 selection:bg-primary selection:text-white`}
+        className={`${GeistSans.variable} ${GeistMono.variable} selection:bg-primary relative grid min-h-screen grid-rows-[auto_1fr_auto] antialiased transition-colors duration-300 selection:text-white`}
         suppressHydrationWarning
       >
         <Providers>

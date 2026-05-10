@@ -28,7 +28,7 @@ export default function MobileNav() {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed bottom-0 left-0 right-0 z-50 flex w-full justify-around border-t bg-background sm:hidden"
+      className="bg-background fixed right-0 bottom-0 left-0 z-50 flex w-full justify-around border-t sm:hidden"
     >
       <motion.div
         variants={container}
@@ -51,7 +51,7 @@ export default function MobileNav() {
                 {isActive && (
                   <motion.div
                     layoutId="activeBg"
-                    className="absolute inset-0 bg-primary/10"
+                    className="bg-primary/10 absolute inset-0"
                     transition={{
                       type: "spring",
                       stiffness: 350,
@@ -67,10 +67,7 @@ export default function MobileNav() {
                   className="relative z-10"
                 >
                   <Icon
-                    className={cn(
-                      "size-5",
-                      isActive ? "text-primary" : "text-muted-foreground",
-                    )}
+                    className={cn("size-5", isActive ? "text-primary" : "text-muted-foreground")}
                   />
                 </motion.div>
                 <span
@@ -86,7 +83,7 @@ export default function MobileNav() {
               {isActive && (
                 <motion.div
                   layoutId="activeIndicator"
-                  className="absolute bottom-0.5 h-1 w-8 rounded-full bg-primary"
+                  className="bg-primary absolute bottom-0.5 h-1 w-8 rounded-full"
                   transition={{
                     type: "spring",
                     stiffness: 350,

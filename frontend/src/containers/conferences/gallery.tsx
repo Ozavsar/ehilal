@@ -24,11 +24,7 @@ export default function Gallery({ images, title }: Props) {
   };
   return (
     <>
-      <Swiper
-        modules={[Navigation]}
-        navigation
-        className="h-full w-full text-primary p-0"
-      >
+      <Swiper modules={[Navigation]} navigation className="text-primary h-full w-full p-0">
         {images.map((image, index) => (
           <SwiperSlide key={index}>
             <Image
@@ -45,11 +41,7 @@ export default function Gallery({ images, title }: Props) {
         ))}
       </Swiper>
       {fullScreenImage && (
-        <FullScreenGallery
-          images={images}
-          title={title}
-          onClose={closeFullScreen}
-        />
+        <FullScreenGallery images={images} title={title} onClose={closeFullScreen} />
       )}
     </>
   );

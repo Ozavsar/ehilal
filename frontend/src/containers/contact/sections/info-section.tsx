@@ -22,11 +22,7 @@ interface IInfoSectionProps {
   };
 }
 
-export default function InfoSection({
-  content,
-  socialMediaLinks,
-  className,
-}: IInfoSectionProps) {
+export default function InfoSection({ content, socialMediaLinks, className }: IInfoSectionProps) {
   const links = [
     {
       href: `mailto:${socialMediaLinks.email}`,

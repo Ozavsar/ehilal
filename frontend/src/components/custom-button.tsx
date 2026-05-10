@@ -19,15 +19,15 @@ export default function CustomButton({
 }: CustomButtonProps) {
   return (
     <Button
-      className={`group relative flex h-14 w-fit items-center cursor-pointer gap-6 overflow-hidden rounded-full border border-primary bg-transparent px-10 pr-0 font-bold uppercase text-foreground transition-all duration-500 ease-out hover:text-white hover:scale-105 active:scale-95 ${className}`}
+      className={`group border-primary text-foreground relative flex h-14 w-fit cursor-pointer items-center gap-6 overflow-hidden rounded-full border bg-transparent px-10 pr-0 font-bold uppercase transition-all duration-500 ease-out hover:scale-105 hover:text-white active:scale-95 ${className}`}
       onClick={onClick}
       {...props}
     >
       {text}
-      <span className="relative flex size-14 items-center justify-center rounded-full bg-primary">
+      <span className="bg-primary relative flex size-14 items-center justify-center rounded-full">
         <Icon size={24} className="text-white" />{" "}
       </span>
-      <span className="absolute inset-0 -z-10 h-full w-full origin-right scale-x-0 rounded-full bg-primary transition-transform duration-500 ease-out group-hover:scale-x-100 group-active:scale-x-0 group-active:duration-150" />
+      <span className="bg-primary absolute inset-0 -z-10 h-full w-full origin-right scale-x-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-x-100 group-active:scale-x-0 group-active:duration-150" />
     </Button>
   );
 }

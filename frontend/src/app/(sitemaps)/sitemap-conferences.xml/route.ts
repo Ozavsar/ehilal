@@ -8,9 +8,7 @@ export async function GET() {
   const now = new Date().toISOString();
 
   const response = await getAllConferences(0, 1);
-  const totalPages = Math.ceil(
-    response?.meta?.pagination?.total / ITEMS_PER_PAGE || 1,
-  );
+  const totalPages = Math.ceil(response?.meta?.pagination?.total / ITEMS_PER_PAGE || 1);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -100,8 +100,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
-        "Sec-Ch-Ua":
-          '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+        "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
         "Sec-Ch-Ua-Mobile": "?0",
         "Sec-Ch-Ua-Platform": '"Windows"',
         DNT: "1",
@@ -120,8 +119,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
 
     const json = await res.json();
     const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
-    const next =
-      json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
+    const next = json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
 
     const currentYear = new Date().getFullYear();
 
@@ -269,8 +267,7 @@ query PostPageQuery(
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
-        "Sec-Ch-Ua":
-          '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+        "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
         "Sec-Ch-Ua-Mobile": "?0",
         "Sec-Ch-Ua-Platform": '"Windows"',
         DNT: "1",

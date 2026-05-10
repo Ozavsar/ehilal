@@ -4,15 +4,7 @@ export default function Logo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width={512} height={512} fill="none" {...props}>
       <rect x={8} y={8} width={496} height={496} rx={248} fill={props.fill} />
-      <rect
-        x={8}
-        y={8}
-        width={496}
-        height={496}
-        rx={248}
-        stroke={props.color}
-        strokeWidth={16}
-      />
+      <rect x={8} y={8} width={496} height={496} rx={248} stroke={props.color} strokeWidth={16} />
       <path
         d="M293 152.909c0-4.868-1.226-8.839-3.679-11.913-2.453-3.331-5.432-4.996-8.936-4.996H163.964c0 10.76 1.489 18.702 4.467 23.826 2.979 5.124 7.621 7.685 13.929 7.685H293v86.08H135c0 10.76 1.489 18.702 4.468 23.826 2.978 5.124 7.533 7.686 13.665 7.686H293v88.386H176.841c-6.132 0-10.687 2.561-13.666 7.685-2.978 5.124-4.468 13.066-4.468 23.826h121.678c3.504 0 6.483-1.537 8.936-4.611 2.453-3.331 3.679-7.43 3.679-12.298V152.909z"
         fill={props.color}

@@ -1,10 +1,4 @@
-import {
-  LuContact,
-  LuHouse,
-  LuNotebookPen,
-  LuPresentation,
-  LuVideo,
-} from "react-icons/lu";
+import { LuContact, LuHouse, LuNotebookPen, LuPresentation, LuVideo } from "react-icons/lu";
 import { SiUdemy } from "react-icons/si";
 
 export const INTERNAL_ROUTES = {

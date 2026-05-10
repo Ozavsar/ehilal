@@ -99,9 +99,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
         >
           Message Content:
         </h2>
-        <p style={{ color: "#fff", lineHeight: "1.6", fontSize: "16px" }}>
-          {message}
-        </p>
+        <p style={{ color: "#fff", lineHeight: "1.6", fontSize: "16px" }}>{message}</p>
       </div>
 
       <div

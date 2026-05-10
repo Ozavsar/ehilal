@@ -10,9 +10,7 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
-export default async function ConferencesPage(props: {
-  params: Promise<{ page: string }>;
-}) {
+export default async function ConferencesPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   const pageNum = parseInt(params.page ?? "1", 10);
 
@@ -29,9 +27,7 @@ export default async function ConferencesPage(props: {
       return notFound();
     }
 
-    const totalPages = Math.ceil(
-      response.meta.pagination.total / ITEMS_PER_PAGE,
-    );
+    const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
 
     if (pageNum > totalPages) {
       return notFound();
@@ -58,9 +54,7 @@ export async function generateStaticParams() {
       return [{ page: "1" }];
     }
 
-    const totalPages = Math.ceil(
-      response.meta.pagination.total / ITEMS_PER_PAGE,
-    );
+    const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
 
     return Array.from({ length: totalPages }, (_, i) => ({
       page: (i + 1).toString(),
@@ -97,9 +91,7 @@ export async function generateMetadata({
       });
     }
 
-    const totalPages = Math.ceil(
-      response.meta.pagination.total / ITEMS_PER_PAGE,
-    );
+    const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
 
     if (pageNum > totalPages) {
       return buildMeta({
@@ -109,8 +101,7 @@ export async function generateMetadata({
       });
     }
 
-    const title =
-      pageNum > 1 ? `Conferences – Page ${pageNum}` : "Conferences & Talks";
+    const title = pageNum > 1 ? `Conferences – Page ${pageNum}` : "Conferences & Talks";
     const description =
       pageNum > 1
         ? `Explore the conferences and talks attended by ${SITE_NAME} — page ${pageNum}.`

@@ -23,9 +23,7 @@ export async function GET() {
     .map((article) => {
       const slug = getCleanSlug(article.mediumURL.split("/").pop()!);
       if (!slug) return "";
-      const date = article.pubDate
-        ? new Date(article.pubDate).toISOString()
-        : now;
+      const date = article.pubDate ? new Date(article.pubDate).toISOString() : now;
       return `
       <url>
         <loc>${baseUrl}${INTERNAL_ROUTES.BLOG.href(slug)}</loc>

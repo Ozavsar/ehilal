@@ -42,10 +42,7 @@ export default function MotionGrid({
       variants={container}
       initial="hidden"
       animate="show"
-      className={cn(
-        `grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3`,
-        className,
-      )}
+      className={cn(`grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3`, className)}
     >
       {Array.isArray(children) ? (
         children.map((child, index) => (

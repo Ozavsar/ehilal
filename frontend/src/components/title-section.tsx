@@ -7,10 +7,7 @@ interface TitleSectionProps {
   backgroundText: string;
 }
 
-export default function TitleSection({
-  text,
-  backgroundText,
-}: TitleSectionProps) {
+export default function TitleSection({ text, backgroundText }: TitleSectionProps) {
   const words = text.trim().split(" ");
   const lastWord = words.pop() || "";
   const plainWord = words.join(" ");
@@ -61,8 +58,7 @@ export default function TitleSection({
             }}
             className="text-2xl font-black uppercase"
           >
-            {plainWord}{" "}
-            <span className={plainWord ? "text-primary" : ""}>{lastWord}</span>
+            {plainWord} <span className={plainWord ? "text-primary" : ""}>{lastWord}</span>
           </motion.h2>
         </motion.div>
       </AnimatePresence>

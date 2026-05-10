@@ -19,10 +19,7 @@ export default async function ContactContainer({
 }: IContactContainerProps) {
   return (
     <main className="container">
-      <TitleSection
-        backgroundText={content.page_title_background}
-        text={content.page_title}
-      />
+      <TitleSection backgroundText={content.page_title_background} text={content.page_title} />
       <div className="grid grid-flow-row-dense grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12">
         <InfoSection content={content} socialMediaLinks={socialMediaLinks} />
         <FormSection className="col-span-1 md:col-span-2 md:pl-8" />

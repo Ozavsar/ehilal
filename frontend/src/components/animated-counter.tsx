@@ -1,12 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import {
-  KeyframeOptions,
-  animate,
-  useInView,
-  useIsomorphicLayoutEffect,
-} from "framer-motion";
+import { KeyframeOptions, animate, useInView, useIsomorphicLayoutEffect } from "framer-motion";
 
 interface AnimatedCounterProps {
   from: number;
@@ -14,11 +9,7 @@ interface AnimatedCounterProps {
   animationOptions?: KeyframeOptions;
 }
 
-export default function AnimatedCounter({
-  from,
-  to,
-  animationOptions,
-}: AnimatedCounterProps) {
+export default function AnimatedCounter({ from, to, animationOptions }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
 
@@ -27,9 +18,7 @@ export default function AnimatedCounter({
 
     if (!element || !isInView) return;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion)",
-    ).matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion)").matches;
 
     if (prefersReducedMotion) {
       element.textContent = String(to);

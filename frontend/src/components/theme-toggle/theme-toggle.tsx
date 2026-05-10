@@ -5,12 +5,7 @@ import "./theme-toggle.css";
 
 type AnimationVariant = "circle" | "circle-blur" | "gif" | "polygon";
 
-type StartPosition =
-  | "center"
-  | "top-left"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-right";
+type StartPosition = "center" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 export interface ThemeToggleButtonProps {
   theme?: "light" | "dark";
@@ -51,10 +46,8 @@ export const ThemeToggleButton = ({
     };
 
     if (variant === "circle") {
-      const cx =
-        start === "center" ? "50" : start.includes("left") ? "0" : "100";
-      const cy =
-        start === "center" ? "50" : start.includes("top") ? "0" : "100";
+      const cx = start === "center" ? "50" : start.includes("left") ? "0" : "100";
+      const cy = start === "center" ? "50" : start.includes("top") ? "0" : "100";
       css = `
         @supports (view-transition-name: root) {
           ::view-transition-old(root) { 
@@ -75,10 +68,8 @@ export const ThemeToggleButton = ({
         }
       `;
     } else if (variant === "circle-blur") {
-      const cx =
-        start === "center" ? "50" : start.includes("left") ? "0" : "100";
-      const cy =
-        start === "center" ? "50" : start.includes("top") ? "0" : "100";
+      const cx = start === "center" ? "50" : start.includes("left") ? "0" : "100";
+      const cy = start === "center" ? "50" : start.includes("top") ? "0" : "100";
       css = `
         @supports (view-transition-name: root) {
           ::view-transition-old(root) { 
@@ -186,7 +177,7 @@ export const ThemeToggleButton = ({
       id="switch"
       ref={switchRef}
       onClick={handleClick}
-      className="fixed -right-6 top-1 scale-50 cursor-pointer sm:right-4 sm:top-8 sm:scale-75"
+      className="fixed top-1 -right-6 scale-50 cursor-pointer sm:top-8 sm:right-4 sm:scale-75"
     >
       <div id="contentwrapper">
         <div id="circle"></div>

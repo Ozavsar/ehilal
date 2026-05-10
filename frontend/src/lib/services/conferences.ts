@@ -16,11 +16,9 @@ export async function getAllConferences(start?: number, limit?: number) {
       ? { ...baseQuery, pagination: { start, limit } }
       : baseQuery;
 
-  const response = await fetchAPI<IStrapiResponse<IStrapiConference[]>>(
-    "/conferences",
-    query,
-    { tags: ["conferences"] },
-  );
+  const response = await fetchAPI<IStrapiResponse<IStrapiConference[]>>("/conferences", query, {
+    tags: ["conferences"],
+  });
 
   const dataWithPlaceholders = await Promise.all(
     response.data.map(async (conference) => {

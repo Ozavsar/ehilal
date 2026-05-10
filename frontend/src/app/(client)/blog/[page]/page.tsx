@@ -11,9 +11,7 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
-export default async function BlogPage(props: {
-  params: Promise<{ page: string }>;
-}) {
+export default async function BlogPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
   if (isNaN(Number(params.page))) {
     const articleId = params.page.split("-").pop() || "";
@@ -49,9 +47,7 @@ export default async function BlogPage(props: {
         return notFound();
       }
 
-      return (
-        <BlogContainer articles={articles} pageNumber={pageNum.toString()} />
-      );
+      return <BlogContainer articles={articles} pageNumber={pageNum.toString()} />;
     } catch (error) {
       return notFound();
     }

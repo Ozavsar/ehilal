@@ -1,9 +1,7 @@
 import qs from "qs";
 
 export function getStrapiURL(path = ""): string {
-  return `${
-    process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"
-  }${path}`;
+  return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"}${path}`;
 }
 
 export async function fetchAPI<T>(
@@ -33,9 +31,7 @@ export async function fetchAPI<T>(
     };
 
     const queryString = qs.stringify(urlParamsObject, { encode: false });
-    const requestUrl = `${getStrapiURL(
-      `/api${path}${queryString ? `?${queryString}` : ""}`,
-    )}`;
+    const requestUrl = `${getStrapiURL(`/api${path}${queryString ? `?${queryString}` : ""}`)}`;
 
     const response = await fetch(requestUrl, mergedOptions);
 

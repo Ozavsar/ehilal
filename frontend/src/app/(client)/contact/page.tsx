@@ -19,9 +19,7 @@ export default async function ContactPage() {
       return notFound();
     }
 
-    return (
-      <ContactContainer content={content} socialMediaLinks={socialMediaLinks} />
-    );
+    return <ContactContainer content={content} socialMediaLinks={socialMediaLinks} />;
   } catch (error) {
     console.error("Error in Contact page:", error);
     return notFound();

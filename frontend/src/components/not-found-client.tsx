@@ -16,9 +16,7 @@ interface NotFoundClientProps {
 export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
   const router = useRouter();
   const [clickCount, setClickCount] = useState(0);
-  const [stars, setStars] = useState<
-    { x: number; y: number; size: number; opacity: number }[]
-  >([]);
+  const [stars, setStars] = useState<{ x: number; y: number; size: number; opacity: number }[]>([]);
   const [planets, setPlanets] = useState<
     { x: number; y: number; size: number; color: string; speed: number }[]
   >([]);
@@ -82,17 +80,10 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
   const getImageMessage = () => {
     if (clickCount === 0) return "";
     if (clickCount === 1) return <p>Houston, we have a problem...</p>;
-    if (clickCount === 2)
-      return <p>This page seems to have drifted into deep space!</p>;
-    if (clickCount === 3)
-      return <p>Our rocket is searching, but can&apos;t find it anywhere.</p>;
+    if (clickCount === 2) return <p>This page seems to have drifted into deep space!</p>;
+    if (clickCount === 3) return <p>Our rocket is searching, but can&apos;t find it anywhere.</p>;
     if (clickCount === 4) return <p>Maybe it got sucked into a black hole?</p>;
-    return (
-      <p>
-        Initiating emergency return protocol. Prepare for lightspeed jump to
-        home!
-      </p>
-    );
+    return <p>Initiating emergency return protocol. Prepare for lightspeed jump to home!</p>;
   };
 
   if (clickCount > 5) {
@@ -247,10 +238,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
                 stiffness: 200,
                 delay: index * 0.1,
               }}
-              className={cn(
-                "inline-block",
-                index === 1 ? "text-primary" : "text-white",
-              )}
+              className={cn("inline-block", index === 1 ? "text-primary" : "text-white")}
             >
               {char}
             </motion.span>
@@ -262,16 +250,13 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="relative mt-8 sm:size-64 size-52 cursor-pointer sm:h-80 sm:w-80"
+          className="relative mt-8 size-52 cursor-pointer sm:size-64 sm:h-80 sm:w-80"
           onClick={handleImageClick}
         >
-          <motion.div
-            animate={imageControls}
-            className="relative h-full w-full"
-          >
+          <motion.div animate={imageControls} className="relative h-full w-full">
             {/* Space helmet effect */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-linear-to-r from-primary/50 via-primary/25 to-primary/50 opacity-70 blur-xl"
+              className="from-primary/50 via-primary/25 to-primary/50 absolute inset-0 rounded-full bg-linear-to-r opacity-70 blur-xl"
               animate={{
                 scale: [1, 1.05, 1],
                 opacity: [0.7, 0.9, 0.7],
@@ -283,9 +268,9 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
               }}
             />
 
-            <div className="absolute inset-0 overflow-hidden rounded-full border-2 border-muted bg-primary backdrop-blur-sm">
+            <div className="border-muted bg-primary absolute inset-0 overflow-hidden rounded-full border-2 backdrop-blur-sm">
               {/* Helmet visor reflection */}
-              <div className="absolute inset-0 bg-linear-to-br from-primary via-transparent to-transparent" />
+              <div className="from-primary absolute inset-0 bg-linear-to-br via-transparent to-transparent" />
 
               {/* Your image */}
               {imageUrl ? (
@@ -301,16 +286,14 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
                 </div>
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
-                  <span className="text-lg text-gray-400">
-                    Astronaut missing
-                  </span>
+                  <span className="text-lg text-gray-400">Astronaut missing</span>
                 </div>
               )}
             </div>
 
             {/* Floating elements around the astronaut */}
             <motion.div
-              className="absolute -right-4 -top-4 h-8 w-8 rounded-full bg-yellow-300"
+              className="absolute -top-4 -right-4 h-8 w-8 rounded-full bg-yellow-300"
               animate={{
                 x: [0, 10, 0, -10, 0],
                 y: [0, -10, 0, 10, 0],
@@ -349,12 +332,12 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="absolute -top-16 left-0 right-0 rounded-lg bg-primary/80 p-3 text-sm font-medium backdrop-blur-sm"
+                className="bg-primary/80 absolute -top-16 right-0 left-0 rounded-lg p-3 text-sm font-medium backdrop-blur-sm"
               >
                 <div className="relative">
                   {/* Radio transmission waves */}
                   <motion.div
-                    className="absolute -left-6 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary"
+                    className="bg-primary absolute top-1/2 -left-6 h-2 w-2 -translate-y-1/2 rounded-full"
                     animate={{
                       opacity: [0, 1, 0],
                       scale: [0.5, 1.5, 0.5],
@@ -366,7 +349,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
                     }}
                   />
                   <motion.div
-                    className="absolute -left-10 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-primary"
+                    className="bg-primary absolute top-1/2 -left-10 h-2 w-2 -translate-y-1/2 rounded-full"
                     animate={{
                       opacity: [0, 0.7, 0],
                       scale: [0.5, 2, 0.5],
@@ -398,7 +381,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="mt-2 sm:mt-4 max-sm:text-xs max-md:text-sm text-gray-400"
+          className="mt-2 text-gray-400 max-md:text-sm max-sm:text-xs sm:mt-4"
         >
           <p>
             The page you&apos;re looking for has drifted beyond our radar.
@@ -420,7 +403,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
           <Button
             asChild
             variant="outline"
-            className="border-primary/75 bg-transparent text-primary hover:bg-primary/20 hover:text-white"
+            className="border-primary/75 text-primary hover:bg-primary/20 bg-transparent hover:text-white"
           >
             <Link href="/">
               <motion.span

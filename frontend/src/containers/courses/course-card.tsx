@@ -1,11 +1,6 @@
 import Image from "next/image";
 import { LuStar, LuUsers } from "react-icons/lu";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { ICourse } from "@/types.d";
 
@@ -38,11 +33,9 @@ export default function CourseCard({
       </CardHeader>
       <CardContent className="flex flex-1">
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
-          <h2 className="line-clamp-2 text-lg font-bold text-foreground sm:text-2xl">
-            {title}
-          </h2>
+          <h2 className="text-foreground line-clamp-2 text-lg font-bold sm:text-2xl">{title}</h2>
         </a>
-        <p className="line-clamp-2 text-sm text-muted-foreground">{headline}</p>
+        <p className="text-muted-foreground line-clamp-2 text-sm">{headline}</p>
         <div className="mt-auto flex items-center gap-2 text-sm max-sm:my-1 max-sm:justify-around max-sm:text-xs">
           <span>{contentInfo}</span>
           <span>•</span>
@@ -51,28 +44,22 @@ export default function CourseCard({
           <span>{instructionalLevel}</span>
         </div>
         <div className="flex items-center gap-2 text-sm max-sm:my-1 max-sm:justify-between max-sm:text-xs">
-          <div className="flex items-center gap-1 text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1">
             {rating && (
               <>
                 <div className="relative">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <LuStar
-                        key={i}
-                        className="size-4 text-muted-foreground"
-                      />
+                      <LuStar key={i} className="text-muted-foreground size-4" />
                     ))}
                   </div>
                   <div
-                    className="absolute left-0 top-0 flex overflow-hidden"
+                    className="absolute top-0 left-0 flex overflow-hidden"
                     style={{ width: `${(parseFloat(rating) / 5) * 100}%` }}
                   >
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <LuStar
-                          key={i}
-                          className="size-4 fill-yellow-400 text-yellow-400"
-                        />
+                        <LuStar key={i} className="size-4 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
                   </div>
@@ -81,24 +68,17 @@ export default function CourseCard({
               </>
             )}
           </div>
-          <div className="flex items-center gap-1 text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1">
             <LuUsers className="h-4 w-4" />
             <span>{numReviews}</span>
           </div>
         </div>
       </CardContent>
       <CardFooter className="mt-2">
-        <a
-          href={udemyURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full"
-        >
-          <Button className="w-full hover:bg-primary/80">
+        <a href={udemyURL} target="_blank" rel="noopener noreferrer" className="w-full">
+          <Button className="hover:bg-primary/80 w-full">
             View on{" "}
-            <span className="text-[#a435f0] font-bold mix-blend-difference">
-              &nbsp;Udemy
-            </span>
+            <span className="font-bold text-[#a435f0] mix-blend-difference">&nbsp;Udemy</span>
           </Button>
         </a>
       </CardFooter>

@@ -18,11 +18,9 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
       ? { ...baseQuery, pagination: { start, limit } }
       : baseQuery;
 
-  const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>(
-    "/videos",
-    query,
-    { tags: ["videos"] },
-  );
+  const response = await fetchAPI<IStrapiResponse<IStrapiVideo[]>>("/videos", query, {
+    tags: ["videos"],
+  });
 
   return response;
 }
@@ -88,24 +86,17 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   );
 
   // 5. Combine all videos and sort them
-  const allVideos = [...processedStrapiVideos, ...filteredYoutubeVideos].sort(
-    (a, b) => {
-      // Sort by featured first, then by publish date
-      if (a.isFeatured === b.isFeatured) {
-        return (
-          new Date(b.publish_date).getTime() -
-          new Date(a.publish_date).getTime()
-        );
-      }
-      return a.isFeatured ? -1 : 1;
-    },
-  );
+  const allVideos = [...processedStrapiVideos, ...filteredYoutubeVideos].sort((a, b) => {
+    // Sort by featured first, then by publish date
+    if (a.isFeatured === b.isFeatured) {
+      return new Date(b.publish_date).getTime() - new Date(a.publish_date).getTime();
+    }
+    return a.isFeatured ? -1 : 1;
+  });
   const allVideosWithPlaceholders = await Promise.all(
     allVideos.map(async (video) => ({
       ...video,
-      blurDataURL: video.thumbnailURL
-        ? (await getImage(video.thumbnailURL)).base64
-        : undefined,
+      blurDataURL: video.thumbnailURL ? (await getImage(video.thumbnailURL)).base64 : undefined,
     })),
   );
 

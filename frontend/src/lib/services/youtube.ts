@@ -7,9 +7,7 @@ const youtube = google.youtube({
   auth: process.env.YOUTUBE_API_KEY,
 });
 
-export async function getUploadedVideos(
-  channelIds: string[],
-): Promise<IVideoPreview[]> {
+export async function getUploadedVideos(channelIds: string[]): Promise<IVideoPreview[]> {
   try {
     const channelResponse = await youtube.channels.list({
       part: ["contentDetails"],
@@ -17,8 +15,7 @@ export async function getUploadedVideos(
     });
 
     const uploadsPlaylistId =
-      channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists
-        ?.uploads;
+      channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 
     if (!uploadsPlaylistId) throw new Error("Uploads playlist ID not found");
 
@@ -48,9 +45,7 @@ export async function getUploadedVideos(
   }
 }
 
-export async function getYoutubeVideoById(
-  id: string,
-): Promise<IVideoPreview | null> {
+export async function getYoutubeVideoById(id: string): Promise<IVideoPreview | null> {
   const response = await youtube.videos.list({
     part: ["snippet", "statistics"],
     id: [id],

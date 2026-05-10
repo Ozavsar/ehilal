@@ -258,10 +258,7 @@
   left: 20%;
   top: 50%;
 
-  background: radial-gradient(
-    rgba(255, 231, 193, 0.9) 30%,
-    rgba(237, 155, 61, 1)
-  );
+  background: radial-gradient(rgba(255, 231, 193, 0.9) 30%, rgba(237, 155, 61, 1));
   box-shadow:
     -2px 0 10px 1px rgba(237, 155, 61, 0.7),
     0 0 8px 3px rgba(237, 155, 61, 0.5);
@@ -282,10 +279,7 @@
   top: 50%;
   transform: translate(0, -50%);
 
-  background: radial-gradient(
-    rgba(255, 231, 193, 0.9) 1%,
-    rgba(237, 155, 61, 0.9)
-  );
+  background: radial-gradient(rgba(255, 231, 193, 0.9) 1%, rgba(237, 155, 61, 0.9));
   box-shadow:
     5px 0 5px 1px rgba(237, 155, 61, 0.5),
     0px 2px 8px 3px rgba(237, 155, 61, 0.5),

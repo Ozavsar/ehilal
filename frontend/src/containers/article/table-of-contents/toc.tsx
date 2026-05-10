@@ -31,7 +31,7 @@ export default function TOC({
               onClick={() => handleScrollTo(node.id)}
               className={`block text-start text-xs transition-colors ${
                 isActive
-                  ? "font-medium text-primary"
+                  ? "text-primary font-medium"
                   : "text-muted-foreground hover:text-primary/70"
               }`}
             >

@@ -9,10 +9,7 @@ export default async function CoursesLayout({ children }: CoursesLayoutProps) {
   const content = await getPageTitle("courses-page", ["courses-title"]);
   return (
     <>
-      <TitleSection
-        text={content.page_title}
-        backgroundText={content.page_title_background}
-      />
+      <TitleSection text={content.page_title} backgroundText={content.page_title_background} />
       {children}
     </>
   );

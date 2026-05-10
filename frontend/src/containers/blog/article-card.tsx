@@ -1,10 +1,5 @@
 import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import type { IBlogPreview } from "@/types.d";
 import LinkButton from "@/components/link-button";
 import Link from "next/link";
@@ -37,22 +32,15 @@ export default function ArticleCard({
       </CardHeader>
       <CardContent>
         <Link href={`/blog/${slug}`}>
-          <h2 className="line-clamp-2 text-lg font-bold text-foreground">
-            {title}
-          </h2>
+          <h2 className="text-foreground line-clamp-2 text-lg font-bold">{title}</h2>
         </Link>
-        <p className="line-clamp-2 text-sm text-muted-foreground">
-          {description}
-        </p>
+        <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
       </CardContent>
       <CardFooter className="mt-auto flex justify-between">
         <LinkButton href={mediumURL} rel="noopener noreferrer">
-          Read on{" "}
-          <span className="font-bold text-[#242424] dark:text-foreground">
-            Medium
-          </span>
+          Read on <span className="dark:text-foreground font-bold text-[#242424]">Medium</span>
         </LinkButton>
-        <span className="text-xs text-muted-foreground">{pubDate}</span>
+        <span className="text-muted-foreground text-xs">{pubDate}</span>
       </CardFooter>
     </Card>
   );

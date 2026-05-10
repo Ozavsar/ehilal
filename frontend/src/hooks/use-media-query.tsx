@@ -9,10 +9,7 @@ type UseMediaQueryOptions = {
 
 export function useMediaQuery(
   query: string,
-  {
-    defaultValue = false,
-    initializeWithValue = true,
-  }: UseMediaQueryOptions = {},
+  { defaultValue = false, initializeWithValue = true }: UseMediaQueryOptions = {},
 ): boolean {
   const [matches, setMatches] = useState<boolean>(() => {
     if (typeof window === "undefined") return defaultValue;

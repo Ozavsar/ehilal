@@ -13,8 +13,7 @@ export async function GET(request: Request) {
     const title = url.searchParams.get("title");
 
     const themeResponse = await getTheme();
-    const themeColor =
-      theme === "dark" ? themeResponse.primaryDark : themeResponse.primaryLight;
+    const themeColor = theme === "dark" ? themeResponse.primaryDark : themeResponse.primaryLight;
     const bgColor = theme === "dark" ? "hsl(0, 0%, 7%)" : "hsl(0, 0%, 96%)";
 
     if (source === "favicon") {
