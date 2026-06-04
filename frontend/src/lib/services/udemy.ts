@@ -37,8 +37,6 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
     `?page=1&fields[course]=${encodeURIComponent(fields)}` +
     `&filter_hq_courses=true&ordering=lang&page_size=${ITEMS_PER_PAGE}`;
 
-  console.log("Fetching Udemy courses from:", url);
-
   const res = await fetch(url, {
     cache: "force-cache",
     next: {

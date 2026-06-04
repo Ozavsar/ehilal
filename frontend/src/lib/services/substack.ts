@@ -31,12 +31,11 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
     data.items.map(async (item: any) => {
       const post = item.post;
       const date = new Date(post.post_date);
-      const isCurrentYear = date.getFullYear() === currentYear;
 
       const formattedDate = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
-        ...(isCurrentYear ? {} : { year: "numeric" }),
+        year: "numeric",
       });
 
       let blurDataURL = "";

@@ -99,7 +99,6 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
 
     const formattedPromises = posts.map(async (post: any) => {
       const date = new Date(post.firstPublishedAt);
-      const isCurrentYear = date.getFullYear() === currentYear;
 
       const imageUrl = post.previewImage
         ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
@@ -118,7 +117,7 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
       const formattedDate = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
-        ...(isCurrentYear ? {} : { year: "numeric" }),
+        year: "numeric",
       });
 
       return {
