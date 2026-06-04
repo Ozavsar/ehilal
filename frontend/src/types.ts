@@ -65,7 +65,6 @@ export interface ICourse {
   title: string;
   headline: string;
   contentInfo: string;
-  numLectures: string;
   instructionalLevel: string;
   numReviews: string;
   udemyURL: string;

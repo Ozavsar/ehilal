@@ -9,6 +9,7 @@ Personal portfolio website for Elif Hilal Kara (ehilal.net). Monorepo with a **N
 ## Commands
 
 ### Frontend (`frontend/`)
+
 ```bash
 yarn dev          # Start dev server (uses --webpack flag)
 yarn build        # Production build (uses --webpack flag)
@@ -17,6 +18,7 @@ yarn lint         # ESLint
 ```
 
 ### Backend (`backend/`)
+
 ```bash
 yarn develop      # Start Strapi in dev mode
 yarn build        # Build Strapi admin panel
@@ -28,6 +30,7 @@ Package manager: **Yarn** for both frontend and backend.
 ## Architecture
 
 ### Frontend (`frontend/src/`)
+
 - **App Router** with route groups: `(client)` for pages, `(sitemaps)` for XML sitemaps
 - **`lib/api/fetchAPI.ts`** — Central API client for all Strapi requests. Uses bearer token auth, `qs` for query building, and Next.js ISR caching (24h default revalidation).
 - **`lib/services/`** — Service layer wrapping fetchAPI and external integrations:
@@ -43,25 +46,33 @@ Package manager: **Yarn** for both frontend and backend.
 - **`types.d.ts`** — TypeScript types matching Strapi content models
 
 ### Backend (`backend/`)
+
 - Standard Strapi 5 structure with factory-based controllers/routes/services
 - Content types: `home-page`, `blog-page`, `conference`, `conferences-page`, `contact-page`, `courses-page`, `not-found-page`, `social-media-link`, `theme`, `video`, `videos-page`
 - PostgreSQL database, AWS S3 for media uploads
 - CORS configured for `ehilal.com`, `admin.ehilal.com`, `localhost:3169`
 
 ### Data Flow
+
 Frontend server components call services → services call `fetchAPI()` → fetchAPI hits Strapi REST API with bearer token → responses follow `IStrapiResponse<T>` shape with `data` and `meta.pagination`. External content (YouTube, Medium, Udemy) is fetched directly from those services.
 
 ### Dynamic Theming
+
 Primary colors are fetched from Strapi's `theme` content type, converted to HSL, and applied as CSS custom properties at the layout level.
 
 ### Deployment
+
 GitHub Actions (`.github/workflows/deploy.yml`) deploys both projects to a VPS via SSH on push to `main` or `dev`. Both run as PM2 processes. Branch-specific env vars control ports and database names.
 
 ### API Routes
+
 - `/api/og` — Dynamic Open Graph image generation
 - `/api/revalidate` — On-demand ISR revalidation (requires `REVALIDATE_KEY`)
 - `/api/send` — Contact form email submission
 
 ### Key Environment Variables
+
 - **Frontend**: `NEXT_PUBLIC_STRAPI_API_URL`, `BEARER_TOKEN`, `YOUTUBE_API_KEY`, `RESEND_API_KEY`, `REVALIDATE_KEY`
 - **Backend**: `DATABASE_*` (PostgreSQL), `AWS_*` (S3), `APP_KEYS`, `JWT_SECRET`
+
+You can read @frontend\AGENTS.md for frontend updates

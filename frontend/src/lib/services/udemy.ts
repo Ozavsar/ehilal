@@ -1,90 +1,85 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { UDEMY_USER_URL } from "@/config/constants";
-import { autoScroll } from "../utils";
+import { UDEMY_USER_ID, ITEMS_PER_PAGE } from "@/config/constants";
 import { getImage } from "../getImage";
 import type { ICourse } from "@/types";
 
-process.env.NODE_ENV === "production" && puppeteer.use(StealthPlugin());
+export const REVALIDATE = 60 * 60 * 24; // 24 hours
 
-export const getAllCourses = async () => {
-  // Instead of scraping, return dummy data
+interface IUdemyCourse {
+  title: string;
+  url: string;
+  headline: string;
+  content_info: string;
+  instructional_level_simple: string;
+  avg_rating: number;
+  num_reviews: number;
+  image_480x270: string;
+}
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+interface IUdemyResponse {
+  count: number;
+  results: IUdemyCourse[];
+}
+
+export const getAllCourses = async (): Promise<ICourse[]> => {
+  const fields = [
+    "@default",
+    "headline",
+    "instructional_level_simple",
+    "avg_rating",
+    "num_reviews",
+    "content_info",
+    "rating",
+    "image_100x100",
+  ].join(",");
+
+  const url =
+    `https://www.udemy.com/api-2.0/users/${UDEMY_USER_ID}/taught-profile-courses/` +
+    `?page=1&fields[course]=${encodeURIComponent(fields)}` +
+    `&filter_hq_courses=true&ordering=lang&page_size=${ITEMS_PER_PAGE}`;
+
+  console.log("Fetching Udemy courses from:", url);
+
+  const res = await fetch(url, {
+    cache: "force-cache",
+    next: {
+      tags: ["courses"],
+      revalidate: REVALIDATE,
+    },
   });
 
-  const page = await browser.newPage();
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Udemy courses: ${res.status} ${res.statusText}`);
+  }
 
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-  );
+  const json: IUdemyResponse = await res.json();
+  const results = json.results ?? [];
 
-  await page.goto(UDEMY_USER_URL, {
-    waitUntil: "networkidle2",
-  });
-  await autoScroll(page);
+  const courses = await Promise.all(
+    results.map(async (course): Promise<ICourse> => {
+      const thumbnailURL = course.image_480x270 || null;
 
-  const courses = await page.evaluate(() => {
-    const courseElements = document.querySelectorAll(
-      "section[class*='vertical-card-module--card--']",
-    );
-    const courseList: ICourse[] = [];
-
-    courseElements.forEach((courseElement) => {
-      const titleElement = courseElement.querySelector("h3[class*='card-title-module--title--'] a");
-      const headlineElement = courseElement.querySelector(
-        "span[data-purpose='safely-set-inner-html:course-card:course-headline']",
-      );
-      const ratingElement = courseElement.querySelector("span[data-testid='seo-rating']");
-      const contentInfoElement = courseElement.querySelector(
-        "span[data-testid='seo-content-info']",
-      );
-      const numReviews = courseElement.querySelector("span[data-testid='seo-num-reviews']");
-      const numLecturesElement = courseElement.querySelector(
-        "span[data-testid='seo-num-lectures']",
-      );
-      const instructionalLevelElement = courseElement.querySelector(
-        "span[data-testid='seo-instructional-level']",
-      );
-      const thumbnailElement = courseElement.querySelector("img");
-
-      const thumbnailElementBig = thumbnailElement
-        ? thumbnailElement
-            .getAttribute("srcset")
-            ?.split(", ")
-            .map((src) => {
-              const [url, size] = src.split(" ");
-              return { url, width: parseInt(size) };
-            })
-            .sort((a, b) => b.width - a.width)[0]?.url
-        : null;
-
-      if (titleElement) {
-        courseList.push({
-          title: (titleElement.firstChild as HTMLElement)?.textContent?.trim() || "No Title",
-          headline: headlineElement?.textContent?.trim() || "No Headline",
-          rating: ratingElement?.textContent?.split(":")[1].split("/")[0].trim() || "No Rating",
-          contentInfo: contentInfoElement?.textContent?.trim() || "No Content Info",
-          numLectures: numLecturesElement?.textContent?.trim() || "No Lectures Info",
-          numReviews: numReviews?.textContent?.trim() || "No Reviews",
-          instructionalLevel: instructionalLevelElement?.textContent?.trim() || "No Level Info",
-          udemyURL: "https://www.udemy.com" + titleElement.getAttribute("href") || "No URL",
-          thumbnailURL: thumbnailElementBig || null,
-        });
+      let blurDataURL: string | undefined;
+      if (thumbnailURL) {
+        try {
+          blurDataURL = (await getImage(thumbnailURL)).base64;
+        } catch {
+          console.warn("Udemy placeholder alınamadı:", thumbnailURL);
+        }
       }
-    });
 
-    return courseList;
-  });
-
-  await browser.close();
-  const coursesWithPlaceholders = await Promise.all(
-    courses.map(async (course) => ({
-      ...course,
-      blurDataURL: course.thumbnailURL ? (await getImage(course.thumbnailURL)).base64 : undefined,
-    })),
+      return {
+        title: course.title,
+        headline: course.headline,
+        contentInfo: course.content_info,
+        instructionalLevel: course.instructional_level_simple,
+        numReviews: String(course.num_reviews),
+        rating: course.avg_rating ? course.avg_rating.toFixed(1) : null,
+        udemyURL: `https://www.udemy.com${course.url}`,
+        thumbnailURL,
+        blurDataURL,
+      };
+    }),
   );
-  return coursesWithPlaceholders;
+
+  return courses;
 };

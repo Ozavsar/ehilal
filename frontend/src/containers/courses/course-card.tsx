@@ -12,7 +12,6 @@ export default function CourseCard({
   rating,
   headline,
   contentInfo,
-  numLectures,
   instructionalLevel,
   numReviews,
 }: ICourse) {
@@ -38,8 +37,6 @@ export default function CourseCard({
         <p className="text-muted-foreground line-clamp-2 text-sm">{headline}</p>
         <div className="mt-auto flex items-center gap-2 text-sm max-sm:my-1 max-sm:justify-around max-sm:text-xs">
           <span>{contentInfo}</span>
-          <span>•</span>
-          <span>{numLectures} lectures</span>
           <span>•</span>
           <span>{instructionalLevel}</span>
         </div>

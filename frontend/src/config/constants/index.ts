@@ -1,4 +1,5 @@
 export const UDEMY_USER_URL = "https://www.udemy.com/user/elif-hilal-umucu/" as const;
+export const UDEMY_USER_ID = "56902668" as const;
 export const MEDIUM_USER_ID = "4fcf35ac48f4" as const;
 export const MEDIUM_USERNAME = "Elifhilalkara";
 export const YOUTUBE_CHANNEL_ID = "UCwPEpxjzJvCrG2Lz3S-PHrw" as const;
