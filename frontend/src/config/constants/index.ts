@@ -6,5 +6,7 @@ export const YOUTUBE_CHANNEL_ID = "UCwPEpxjzJvCrG2Lz3S-PHrw" as const;
 export const YOUTUBE_TURKISH_CHANNEL_URL = "https://www.youtube.com/@elifhilalkara";
 export const ITEMS_PER_PAGE = 9 as const;
 export const COMPANY_LINKEDIN_URL = "https://www.linkedin.com/company/karakodcenter/" as const;
+export const COMPANY_URL = "https://karakod.io/" as const;
+export const LEGALIFI_URL = "https://legalifi.io/" as const;
 export const SUBSTACK_USERNAME = "elifhilalkara";
 export const SUBSTACK_USER_ID = "11168454";

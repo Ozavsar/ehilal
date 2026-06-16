@@ -19,7 +19,7 @@ export default function CustomButton({
 }: CustomButtonProps) {
   return (
     <Button
-      className={`group border-primary text-foreground relative flex h-14 w-fit cursor-pointer items-center gap-6 overflow-hidden rounded-full border bg-transparent px-10 pr-0 font-bold uppercase transition-all duration-500 ease-out hover:scale-105 hover:text-white active:scale-95 ${className}`}
+      className={`group border-primary text-foreground relative flex h-14 w-fit cursor-pointer items-center gap-6 overflow-hidden rounded-full border bg-transparent px-10 pr-0 font-bold uppercase transition-all duration-500 ease-out hover:text-white ${className}`}
       onClick={onClick}
       {...props}
     >
