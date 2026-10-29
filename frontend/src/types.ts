@@ -110,6 +110,8 @@ export interface IStrapiHomePage extends IStrapiBasePage, IPageTitle {
 export interface IStrapiContactPage extends IStrapiBasePage, IPageTitle {
   title: string;
   description: string;
+  // Server-only: never pass to client components
+  form_recipient_email?: string | null;
 }
 
 export interface IStrapiConference extends IStrapiBasePage {
