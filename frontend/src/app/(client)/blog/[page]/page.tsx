@@ -119,17 +119,22 @@ export async function generateMetadata({
         });
       }
 
+      // getSingleArticle returns the raw Medium post: subtitle + previewImage hold the preview data
+      const description =
+        article.previewContent?.subtitle?.trim() ||
+        `Read the article "${article.title}" by ${SITE_NAME}.`;
+      const imageUrl = article.previewImage?.id
+        ? `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`
+        : `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}`;
+
       return buildMeta({
         title: article.title,
-        description:
-          article.description ||
-          `
-          Read the article "${article.title}" by ${SITE_NAME}.`,
+        description,
         path: `/blog/${page}`,
         type: "article",
         image: {
-          url: article.thumbnailURL,
-          alt: article.title,
+          url: imageUrl,
+          alt: article.previewImage?.alt || article.title,
         },
       });
     }

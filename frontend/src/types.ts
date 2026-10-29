@@ -44,21 +44,39 @@ export interface IVideoPreview {
   thumbnailURL: string | null | undefined;
   title: string | null | undefined;
   description: string | null | undefined;
-  publishedAt: string;
+  publishedAt: string; // ISO 8601, "" if unknown
   views?: string | null | undefined;
 }
 
-export interface IBlogPreview {
-  title: string;
-  mediumURL: string;
-  description: string;
-  thumbnailURL: string;
-  blurDataURL?: string | undefined;
-  pubDate: string;
+export interface IMediumParagraph {
+  name: string;
+  text: string;
+  type: string;
+  markups: { type: string; href: string | null }[];
+  mixtapeMetadata: { href: string } | null;
+  metadata: { id: string } | null;
+  iframe: { mediaResource: { iframeSrc: string; title: string } } | null;
 }
 
-export interface IBlog extends IBlogPreview {
-  paragraphs: any[];
+// Subset of the raw Medium `postResult` (PostPageQuery) returned by getSingleArticle
+export interface IBlog {
+  id: string;
+  title: string;
+  uniqueSlug: string;
+  mediumUrl: string;
+  firstPublishedAt: number;
+  latestPublishedAt: number;
+  readingTime: number;
+  isLocked: boolean;
+  previewImage: {
+    id: string;
+    alt: string | null;
+    originalWidth: number;
+    originalHeight: number;
+  } | null;
+  previewContent: { subtitle: string | null } | null;
+  tags: { displayTitle: string; normalizedTagSlug: string }[];
+  paragraphs: IMediumParagraph[];
 }
 
 export interface ICourse {
@@ -155,7 +173,7 @@ export interface IUnifiedVideo {
   description: string;
   url: string;
   thumbnailURL: string;
-  publish_date: string;
+  publish_date: string; // ISO 8601; format only when displaying
   isFeatured?: boolean;
   source: "youtube" | "strapi";
   blurDataURL?: string;
