@@ -4,13 +4,29 @@ import { getTheme } from "@/lib/services";
 
 export const runtime = "edge";
 
+const MAX_TITLE_LENGTH = 80;
+
+// Not `immutable`: the theme colour comes from Strapi and can change under the same URL
+const headers = {
+  "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+};
+
+// Caps by code points so surrogate pairs (emoji) are never split
+function truncateTitle(title: string | null) {
+  if (!title) return title;
+  const chars = Array.from(title);
+  if (chars.length <= MAX_TITLE_LENGTH) return title;
+  const truncated = chars.slice(0, MAX_TITLE_LENGTH - 1).join("");
+  return `${truncated.trimEnd()}…`;
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
 
     const theme = (url.searchParams.get("theme") as "light" | "dark") || "dark";
     const source = url.searchParams.get("source") || "og";
-    const title = url.searchParams.get("title");
+    const title = truncateTitle(url.searchParams.get("title"));
 
     const themeResponse = await getTheme();
     const themeColor = theme === "dark" ? themeResponse.primaryDark : themeResponse.primaryLight;
@@ -20,6 +36,7 @@ export async function GET(request: Request) {
       return new ImageResponse(<Logo fill={bgColor} color={themeColor} />, {
         width: 512,
         height: 512,
+        headers,
       });
     }
 
@@ -59,6 +76,7 @@ export async function GET(request: Request) {
         {
           width: 1200,
           height: 630,
+          headers,
         },
       );
     }
@@ -81,6 +99,7 @@ export async function GET(request: Request) {
       {
         width: 1200,
         height: 630,
+        headers,
       },
     );
   } catch (error: any) {
