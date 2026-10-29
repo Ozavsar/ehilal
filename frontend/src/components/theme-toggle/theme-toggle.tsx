@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
+import { cn } from "@/lib/utils";
 import "./theme-toggle.css";
 
 type AnimationVariant = "circle" | "circle-blur" | "gif" | "polygon";
@@ -22,12 +23,7 @@ export const ThemeToggleButton = ({
   url,
   onClick,
 }: ThemeToggleButtonProps) => {
-  const switchRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!switchRef.current) return;
-    if (theme === "dark") switchRef.current.classList.add("off");
-    else switchRef.current.classList.remove("off");
-  }, [theme]);
+  const isDark = theme === "dark";
 
   const handleClick = useCallback(() => {
     // Inject animation styles for this specific transition
@@ -172,41 +168,48 @@ export const ThemeToggleButton = ({
     onClick?.();
   }, [onClick, variant, start, url, theme]);
 
+  // Decorative parts are spans (valid inside <button>). text-start undoes the button's centered
+  // text-align and the block wrappers keep the old div layout (some parts use static position).
   return (
-    <div
+    <button
+      type="button"
       id="switch"
-      ref={switchRef}
       onClick={handleClick}
-      className="fixed top-1 -right-6 scale-50 cursor-pointer sm:top-8 sm:right-4 sm:scale-75"
+      aria-label="Dark mode"
+      aria-pressed={isDark}
+      className={cn(
+        "focus-visible:outline-primary fixed top-1 -right-6 scale-50 cursor-pointer text-start focus-visible:outline-2 focus-visible:outline-offset-4 sm:top-8 sm:right-4 sm:scale-75",
+        isDark && "off",
+      )}
     >
-      <div id="contentwrapper">
-        <div id="circle"></div>
+      <span id="contentwrapper" aria-hidden="true">
+        <span id="circle"></span>
 
-        <div id="stars">
-          <div className="star"></div>
-          <div className="star"></div>
-          <div className="star"></div>
-          <div id="shtngstarwrapper">
-            <div id="shootingstar"></div>
-          </div>
-        </div>
+        <span id="stars" className="block">
+          <span className="star"></span>
+          <span className="star"></span>
+          <span className="star"></span>
+          <span id="shtngstarwrapper" className="block">
+            <span id="shootingstar"></span>
+          </span>
+        </span>
 
-        <div>
-          <div className="cloud">
-            <div className="cloudpart"></div>
-            <div className="cloudpart"></div>
-          </div>
-          <div className="cloud">
-            <div className="cloudpart"></div>
-            <div className="cloudpart"></div>
-          </div>
-          <div className="cloud">
-            <div className="cloudpart"></div>
-            <div className="cloudpart"></div>
-            <div className="cloudpart"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <span className="block">
+          <span className="cloud">
+            <span className="cloudpart"></span>
+            <span className="cloudpart"></span>
+          </span>
+          <span className="cloud">
+            <span className="cloudpart"></span>
+            <span className="cloudpart"></span>
+          </span>
+          <span className="cloud">
+            <span className="cloudpart"></span>
+            <span className="cloudpart"></span>
+            <span className="cloudpart"></span>
+          </span>
+        </span>
+      </span>
+    </button>
   );
 };

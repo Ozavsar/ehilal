@@ -1,33 +1,38 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { ThemeToggleButton } from "../theme-toggle/theme-toggle";
 import { useThemeTransition } from "@/hooks/use-theme-transition";
 
-const ThemeToggle = () => {
-  const { setTheme, theme } = useTheme();
-  const { startTransition } = useThemeTransition();
-  const [mounted, setMounted] = useState(false);
+const noopSubscribe = () => () => {};
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+const ThemeToggle = () => {
+  // `theme` can be "system"; `resolvedTheme` is the theme actually applied
+  const { setTheme, resolvedTheme } = useTheme();
+  const { startTransition } = useThemeTransition();
+  // false on the server and during hydration, true afterwards
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+  const isDark = resolvedTheme === "dark";
 
   const handleThemeToggle = useCallback(() => {
-    const newTheme = theme === "dark" ? "light" : "dark";
     startTransition(() => {
-      setTheme(newTheme);
+      setTheme(isDark ? "light" : "dark");
     });
-  }, [theme, setTheme, startTransition]);
+  }, [isDark, setTheme, startTransition]);
 
-  if (!mounted) {
+  // resolvedTheme is undefined until next-themes reads the system preference
+  if (!mounted || (resolvedTheme !== "dark" && resolvedTheme !== "light")) {
     return null;
   }
 
   return (
     <ThemeToggleButton
-      theme={theme === "dark" ? "dark" : "light"}
+      theme={isDark ? "dark" : "light"}
       onClick={handleThemeToggle}
       variant="circle-blur"
       start="top-right"

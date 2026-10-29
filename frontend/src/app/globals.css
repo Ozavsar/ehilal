@@ -4,6 +4,9 @@
   preferredstrategy: "pseudoelements";
 }
 
+/* dark: follows the site theme (next-themes sets class="dark" on <html>), not the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f5f5f5;
   --foreground: #666666;
