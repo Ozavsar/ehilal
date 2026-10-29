@@ -721,6 +721,7 @@ export interface ApiSocialMediaLinkSocialMediaLink
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     email: Schema.Attribute.String & Schema.Attribute.Required;
+    instagram: Schema.Attribute.String;
     linkedin: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

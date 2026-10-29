@@ -77,6 +77,7 @@ export interface IStrapiSocialLinks extends IStrapiBasePage {
   linkedin: string;
   twitter_x: string;
   youtube: string;
+  instagram?: string | null;
 }
 
 export interface IStrapiBasePage {

@@ -26,6 +26,9 @@
     "youtube": {
       "type": "string",
       "required": true
+    },
+    "instagram": {
+      "type": "string"
     }
   }
 }

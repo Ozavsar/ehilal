@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { COMPANY_LINKEDIN_URL } from "@/config/constants";
 import { LuLinkedin, LuMail, LuYoutube } from "react-icons/lu";
-import { BsTwitterX } from "react-icons/bs";
+import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import MotionGrid from "@/components/motion-grid";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,17 @@ interface IInfoSectionProps {
     twitter_x: string;
     linkedin: string;
     youtube: string;
+    instagram?: string | null;
   };
+}
+
+// Links copied from the Instagram app carry a query string (?igsh=...), so parse instead of splitting
+function getInstagramHandle(url: string) {
+  try {
+    return "@" + new URL(url).pathname.split("/").filter(Boolean)[0];
+  } catch {
+    return url;
+  }
 }
 
 export default function InfoSection({ content, socialMediaLinks, className }: IInfoSectionProps) {
@@ -52,6 +62,17 @@ export default function InfoSection({ content, socialMediaLinks, className }: II
       label: socialMediaLinks.youtube?.split("/")[3] || "@elifhilalumucu",
       lowercase: true,
     },
+    ...(socialMediaLinks.instagram
+      ? [
+          {
+            href: socialMediaLinks.instagram,
+            icon: BsInstagram,
+            title: "Follow on Instagram",
+            label: getInstagramHandle(socialMediaLinks.instagram),
+            lowercase: true,
+          },
+        ]
+      : []),
     {
       href: COMPANY_LINKEDIN_URL,
       icon: LuLinkedin,

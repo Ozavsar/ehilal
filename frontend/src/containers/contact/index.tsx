@@ -9,6 +9,7 @@ interface IContactContainerProps {
     twitter_x: string;
     linkedin: string;
     youtube: string;
+    instagram?: string | null;
   };
   content: IStrapiContactPage;
 }
