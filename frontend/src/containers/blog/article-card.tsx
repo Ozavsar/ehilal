@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn, getCleanSlug } from "@/lib/utils";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { buttonVariants } from "@/components/ui/button";
-import { LuExternalLink } from "react-icons/lu";
+import { LuBookOpen, LuExternalLink } from "react-icons/lu";
 import LinkButton from "@/components/link-button";
 
 interface ArticleCardProps {
@@ -68,7 +68,7 @@ export default function ArticleCard({
   return (
     <Card className="h-full overflow-visible pt-0">
       <CardHeader className="relative overflow-visible px-0">
-        <ConditionalLink className="overflow-hidden rounded-t-md">
+        <ConditionalLink className="group relative block overflow-hidden rounded-t-md focus-visible:outline-none">
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={`${title} Thumbnail`}
@@ -78,8 +78,17 @@ export default function ArticleCard({
             blurDataURL={blurDataURL}
             placeholder={blurDataURL ? "blur" : "empty"}
             draggable={false}
-            className="aspect-video object-cover transition-transform duration-500 select-none hover:scale-105"
+            className="aspect-video object-cover transition-transform duration-500 select-none group-hover:scale-105 group-focus-visible:scale-105"
           />
+          {/* Hover cue and keyboard focus indicator, same as the video and conference cards */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+          >
+            <span className="bg-primary flex size-12 items-center justify-center rounded-full text-white shadow-md">
+              {isReadable ? <LuBookOpen size={22} /> : <LuExternalLink size={20} />}
+            </span>
+          </span>
         </ConditionalLink>
         <div className="bg-primary text-primary-foreground before:border-b-primary absolute bottom-5 -left-2 isolate flex size-12 flex-col items-center justify-center shadow-md before:absolute before:-top-1.5 before:left-0.5 before:rotate-135 before:border-[6.5px] before:border-transparent before:shadow-md before:content-['']">
           <span className="text-sm leading-none font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
