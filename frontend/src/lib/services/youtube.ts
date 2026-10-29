@@ -1,11 +1,19 @@
-import { google } from "googleapis";
-import { getImage } from "../getImage";
+import { google, type youtube_v3 } from "googleapis";
 import type { IVideoPreview } from "@/types";
 
 const youtube = google.youtube({
   version: "v3",
   auth: process.env.YOUTUBE_API_KEY,
 });
+
+// Not every size exists for every video, so fall back from the largest down
+const pickThumbnailURL = (thumbnails?: youtube_v3.Schema$ThumbnailDetails): string =>
+  thumbnails?.maxres?.url ??
+  thumbnails?.standard?.url ??
+  thumbnails?.high?.url ??
+  thumbnails?.medium?.url ??
+  thumbnails?.default?.url ??
+  "";
 
 export async function getUploadedVideos(channelIds: string[]): Promise<IVideoPreview[]> {
   try {
@@ -29,10 +37,9 @@ export async function getUploadedVideos(channelIds: string[]): Promise<IVideoPre
       id: item.snippet?.resourceId?.videoId,
       title: item.snippet?.title || "",
       description: item.snippet?.description || "",
-      thumbnailURL: item.snippet?.thumbnails?.standard?.url || "",
-      publishedAt: item.snippet?.publishedAt
-        ? new Date(item.snippet.publishedAt).toLocaleDateString("tr-TR")
-        : "",
+      thumbnailURL: pickThumbnailURL(item.snippet?.thumbnails),
+      // Keep the ISO string; formatting happens where the date is displayed
+      publishedAt: item.snippet?.publishedAt ?? "",
     }));
 
     // @todo: Remove limit before the final product
@@ -58,10 +65,8 @@ export async function getYoutubeVideoById(id: string): Promise<IVideoPreview | n
     id: video.id,
     title: video.snippet?.title,
     description: video.snippet?.description,
-    thumbnailURL: video.snippet?.thumbnails?.high?.url,
-    publishedAt: video.snippet?.publishedAt
-      ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
-      : "unknown",
+    thumbnailURL: pickThumbnailURL(video.snippet?.thumbnails),
+    publishedAt: video.snippet?.publishedAt ?? "",
     views: video.statistics?.viewCount,
   };
 }
@@ -111,9 +116,9 @@ export async function getVideoCaptions(videoId: string): Promise<any[]> {
   }
 }
 
+// Blur placeholders are added later for the visible page only (see lib/services/videos.ts)
 export async function getYoutubeVideoDetails(id: string): Promise<{
   thumbnailURL: string;
-  blurDataURL: string;
   publishedAt: string;
 } | null> {
   try {
@@ -125,15 +130,9 @@ export async function getYoutubeVideoDetails(id: string): Promise<{
     const video = response.data.items?.[0];
     if (!video) return null;
 
-    const thumbnailURL = video.snippet?.thumbnails?.standard?.url || "";
-    const placeholder = await getImage(thumbnailURL);
-
     return {
-      thumbnailURL,
-      blurDataURL: placeholder.base64,
-      publishedAt: video.snippet?.publishedAt
-        ? new Date(video.snippet.publishedAt).toLocaleDateString("tr-TR")
-        : "unknown",
+      thumbnailURL: pickThumbnailURL(video.snippet?.thumbnails),
+      publishedAt: video.snippet?.publishedAt ?? "",
     };
   } catch (err) {
     console.error("YouTube API error:", err);

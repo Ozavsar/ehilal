@@ -10,11 +10,15 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
+// Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
+const parsePageNumber = (page: string | undefined) =>
+  page && /^[1-9]\d*$/.test(page) ? Number(page) : NaN;
+
 export default async function CoursesPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
-  const pageNum = parseInt(params.page ?? "1", 10);
+  const pageNum = parsePageNumber(params.page);
 
-  if (isNaN(pageNum) || pageNum < 1) {
+  if (isNaN(pageNum)) {
     return notFound();
   }
 
@@ -23,7 +27,18 @@ export default async function CoursesPage(props: { params: Promise<{ page: strin
     return notFound();
   }
 
-  return <CourseContainer courses={courses} />;
+  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
+  if (pageNum > totalPages) {
+    return notFound();
+  }
+
+  return (
+    <CourseContainer
+      courses={courses.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE)}
+      pageNumber={pageNum.toString()}
+      totalPages={totalPages}
+    />
+  );
 }
 
 export async function generateStaticParams() {
@@ -42,9 +57,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { page } = await params;
-    const pageNum = parseInt(page ?? "1", 10);
+    const pageNum = parsePageNumber(page);
 
-    if (isNaN(pageNum) || pageNum < 1) {
+    if (isNaN(pageNum)) {
       return buildMeta({
         title: "Page Not Found",
         description: "Invalid courses page number.",

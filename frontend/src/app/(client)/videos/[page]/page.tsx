@@ -1,17 +1,21 @@
 import { notFound } from "next/navigation";
 import VideosContainer from "@/containers/videos";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import { getAllVideos } from "@/lib/services/videos";
+import { getAllVideos, withVideoPlaceholders } from "@/lib/services/videos";
 
 export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
+// Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
+const parsePageNumber = (page: string | undefined) =>
+  page && /^[1-9]\d*$/.test(page) ? Number(page) : NaN;
+
 export default async function VideosPage(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
-  const pageNum = parseInt(params.page ?? "1", 10);
+  const pageNum = parsePageNumber(params.page);
 
-  if (isNaN(pageNum) || pageNum < 1) {
+  if (isNaN(pageNum)) {
     return notFound();
   }
 
@@ -20,7 +24,19 @@ export default async function VideosPage(props: { params: Promise<{ page: string
     return notFound();
   }
 
-  return <VideosContainer videos={videos} pageNumber={pageNum.toString()} />;
+  const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
+  if (pageNum > totalPages) {
+    return notFound();
+  }
+
+  // Placeholders only for the videos on this page
+  const pageVideos = await withVideoPlaceholders(
+    videos.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE),
+  );
+
+  return (
+    <VideosContainer videos={pageVideos} pageNumber={pageNum.toString()} totalPages={totalPages} />
+  );
 }
 
 export async function generateStaticParams() {

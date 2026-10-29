@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { LuFlame } from "react-icons/lu";
+import { LuFlame, LuPlay } from "react-icons/lu";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,16 @@ export default function VideoCard({
   isFeatured,
 }: IUnifiedVideo) {
   const videoUrl = url || "#";
+  // publish_date is an ISO string; pin the time zone so the day doesn't depend on the server
+  const publishDate = new Date(publish_date);
+  const formattedDate = isNaN(publishDate.getTime())
+    ? null
+    : publishDate.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Europe/Istanbul",
+      });
 
   return (
     <Card className="border-muted flex h-full flex-col gap-0 overflow-hidden rounded-[5px] border">
@@ -28,15 +38,29 @@ export default function VideoCard({
               Featured
             </Badge>
           )}
-          <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="h-auto w-full">
+          <a
+            href={videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute inset-0 block focus-visible:outline-none"
+          >
             <Image
               src={thumbnailURL || "/images/blog/default-blog.jpg"}
               alt={title || ""}
               blurDataURL={blurDataURL ? blurDataURL : undefined}
               placeholder={blurDataURL ? "blur" : "empty"}
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105 group-has-[a:focus-visible]:scale-105"
               fill
             />
+            {/* Hover cue and keyboard focus indicator; the card's overflow-hidden clips a regular outline */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100"
+            >
+              <span className="bg-primary flex size-12 items-center justify-center rounded-full text-white shadow-md">
+                <LuPlay size={22} fill="currentColor" className="ml-0.5" />
+              </span>
+            </span>
           </a>
         </div>
       </CardHeader>
@@ -57,13 +81,7 @@ export default function VideoCard({
           </LinkButton>
         )}
 
-        <p className="text-muted-foreground text-xs">
-          {new Date(publish_date).toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </p>
+        {formattedDate && <p className="text-muted-foreground text-xs">{formattedDate}</p>}
       </CardFooter>
     </Card>
   );

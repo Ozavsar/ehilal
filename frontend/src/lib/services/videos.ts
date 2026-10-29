@@ -25,11 +25,10 @@ export async function getAllStrapiVideos(start?: number, limit?: number) {
   return response;
 }
 
-const parseDateToISO = (dateStr: string) => {
-  const [day, month, year] = dateStr.split(".").map(Number);
-  return new Date(year, month - 1, day).toISOString();
-};
-
+/**
+ * get all videos (YouTube channel + Strapi), sorted, without blur placeholders.
+ * Use `withVideoPlaceholders` on the slice that is actually rendered.
+ */
 export async function getAllVideos(): Promise<IUnifiedVideo[]> {
   // 1. Get YouTube videos from the channel
   const youtubeVideos = await getUploadedVideos([YOUTUBE_CHANNEL_ID]);
@@ -40,7 +39,7 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     description: video.description!,
     url: `https://www.youtube.com/watch?v=${video.id}`,
     thumbnailURL: video.thumbnailURL!,
-    publish_date: parseDateToISO(video.publishedAt!),
+    publish_date: video.publishedAt,
     isFeatured: false,
     source: "youtube" as const,
   }));
@@ -59,9 +58,10 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
       // Check if the video is a YouTube video
       let youtubeId = extractYoutubeId(video.url);
       if (youtubeId) {
-        const youtubeDetails = await getYoutubeVideoDetails(youtubeId);
-        if (youtubeDetails) {
-          thumbnailURL = thumbnailURL || youtubeDetails.thumbnailURL;
+        // Only spend YouTube API quota when Strapi has no thumbnail of its own
+        if (!thumbnailURL) {
+          const youtubeDetails = await getYoutubeVideoDetails(youtubeId);
+          thumbnailURL = youtubeDetails?.thumbnailURL || "";
         }
         source = "youtube";
       }
@@ -93,14 +93,27 @@ export async function getAllVideos(): Promise<IUnifiedVideo[]> {
     }
     return a.isFeatured ? -1 : 1;
   });
-  const allVideosWithPlaceholders = await Promise.all(
-    allVideos.map(async (video) => ({
-      ...video,
-      blurDataURL: video.thumbnailURL ? (await getImage(video.thumbnailURL)).base64 : undefined,
-    })),
-  );
 
-  return allVideosWithPlaceholders;
+  return allVideos;
+}
+
+/**
+ * add blur placeholders; a broken thumbnail only loses its placeholder.
+ */
+export async function withVideoPlaceholders(videos: IUnifiedVideo[]): Promise<IUnifiedVideo[]> {
+  return Promise.all(
+    videos.map(async (video) => {
+      if (!video.thumbnailURL) return video;
+
+      try {
+        const placeholder = await getImage(video.thumbnailURL);
+        return { ...video, blurDataURL: placeholder.base64 };
+      } catch (error) {
+        console.error(`Failed to get placeholder for ${video.thumbnailURL}`, error);
+        return video;
+      }
+    }),
+  );
 }
 
 // Extract the YouTube video ID from a URL

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import ConferencesContainer from "@/containers/conferences";
 import { ITEMS_PER_PAGE } from "@/config/constants";
@@ -10,40 +11,48 @@ export const dynamicParams = true;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
-export default async function ConferencesPage(props: { params: Promise<{ page: string }> }) {
-  const params = await props.params;
-  const pageNum = parseInt(params.page ?? "1", 10);
+// Canonical positive integers only: rejects "abc", "1abc", "01", "0"
+const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
 
-  if (isNaN(pageNum) || pageNum <= 0) {
-    return notFound();
+// Shared by the page and generateMetadata so image placeholders are built once per request
+// (and not at all for out-of-range pages, which return no data)
+const getConferencesPage = cache((pageNum: number) =>
+  getAllConferences(ITEMS_PER_PAGE * (pageNum - 1), ITEMS_PER_PAGE),
+);
+
+export default async function ConferencesPage(props: { params: Promise<{ page: string }> }) {
+  const { page } = await props.params;
+
+  if (!PAGE_PARAM_PATTERN.test(page)) {
+    notFound();
   }
 
-  const start = ITEMS_PER_PAGE * (pageNum - 1);
+  const pageNum = Number(page);
 
+  let response: Awaited<ReturnType<typeof getConferencesPage>> | undefined;
   try {
-    const response = await getAllConferences(start, ITEMS_PER_PAGE);
-
-    if (!response || !response.data) {
-      return notFound();
-    }
-
-    const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
-
-    if (pageNum > totalPages) {
-      return notFound();
-    }
-
-    return (
-      <ConferencesContainer
-        conferences={response.data}
-        pageNumber={pageNum.toString()}
-        totalPages={totalPages}
-      />
-    );
+    response = await getConferencesPage(pageNum);
   } catch (error) {
     console.error("Error in Conferences page:", error);
-    return notFound();
   }
+
+  if (!response?.data) {
+    notFound();
+  }
+
+  const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
+
+  if (pageNum > totalPages) {
+    notFound();
+  }
+
+  return (
+    <ConferencesContainer
+      conferences={response.data}
+      pageNumber={pageNum.toString()}
+      totalPages={totalPages}
+    />
+  );
 }
 
 export async function generateStaticParams() {
@@ -72,9 +81,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { page } = await params;
-    const pageNum = parseInt(page ?? "1", 10);
+    const pageNum = Number(page);
 
-    if (isNaN(pageNum) || pageNum <= 0) {
+    if (!PAGE_PARAM_PATTERN.test(page)) {
       return buildMeta({
         title: "Page Not Found",
         description: "Invalid conferences page number.",
@@ -82,7 +91,7 @@ export async function generateMetadata({
       });
     }
 
-    const response = await getAllConferences(0, ITEMS_PER_PAGE);
+    const response = await getConferencesPage(pageNum);
     if (!response || !response.meta?.pagination?.total) {
       return buildMeta({
         title: "Conferences",
