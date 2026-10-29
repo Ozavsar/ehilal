@@ -1,10 +1,10 @@
 "use client";
 
+import { startTransition, useActionState, type FormEvent } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z, ZodErrorMap } from "zod";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -16,75 +16,80 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { submitAction } from "@/lib/services/resend";
-import axios from "axios";
+import { sendContactMessage } from "@/lib/actions/contact";
+import {
+  CONTACT_HONEYPOT_FIELD,
+  CONTACT_LIMITS,
+  contactFormSchema,
+  type ContactFormField,
+  type ContactFormState,
+  type ContactFormValues,
+} from "@/lib/validations/contact";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const customErrorMap: ZodErrorMap = (issue, ctx) => {
-  if (issue.code === "invalid_type" && issue.received === "undefined") {
-    return { message: "This field is required. Please provide a value." };
-  }
-  if (issue.code === "too_small") {
-    return { message: `Please enter at least ${issue.minimum} characters.` };
-  }
-  return { message: ctx.defaultError };
-};
+const defaultValues: ContactFormValues = { name: "", email: "", subject: "", message: "" };
+const initialState: ContactFormState = { status: "idle", message: "" };
 
-z.setErrorMap(customErrorMap);
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Please enter a username with at least 2 characters.")
-    .max(50, "Username should not exceed 50 characters."),
-  email: z.string().email("Please enter a valid email address."),
-  subject: z
-    .string()
-    .min(5, "Subject is required. Please provide the subject.")
-    .max(50, "Subject should not exceed 50 characters."),
-  message: z
-    .string()
-    .min(5, "Your message should contain at least 5 characters.")
-    .max(500, "Message should not exceed 500 characters."),
-});
-
-const formFields = [
-  { name: "name", label: "Name", placeholder: "Your name", type: "input" },
+const inputFields = [
+  { name: "name", label: "Name", placeholder: "Your name", type: "text", autoComplete: "name" },
   {
     name: "email",
     label: "Email",
     placeholder: "example@domain.com",
-    type: "input",
+    type: "email",
+    autoComplete: "email",
   },
-  { name: "subject", label: "Subject", placeholder: "Subject", type: "input" },
-  {
-    name: "message",
-    label: "Message",
-    placeholder: "Your message",
-    type: "textarea",
-  },
-];
+  { name: "subject", label: "Subject", placeholder: "Subject", type: "text", autoComplete: "off" },
+] as const;
 
 export default function FormSection({ className = "" }: { className?: string }) {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues,
   });
 
-  const onSubmit = async (data: Record<string, string>) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("email", data.email);
-    formData.append("subject", data.subject);
-    formData.append("message", data.message);
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: ContactFormState, formData: FormData): Promise<ContactFormState> => {
+      let result: ContactFormState;
+      try {
+        result = await sendContactMessage(prevState, formData);
+      } catch {
+        // Network failure or a stale deployment; keep the visitor's input
+        result = {
+          status: "error",
+          message: "Something went wrong. Please check your connection and try again.",
+        };
+      }
 
-    await axios.post("/api/send", formData);
-    toast.success("Form successfully submitted!");
-    form.reset({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+      if (result.status === "success") {
+        toast.success(result.message);
+        form.reset(defaultValues);
+      } else {
+        toast.error(result.message);
+        // Show server-side validation errors next to the matching fields
+        const fieldErrors = Object.entries(result.fieldErrors ?? {}) as [
+          ContactFormField,
+          string[],
+        ][];
+        fieldErrors.forEach(([name, messages], index) => {
+          form.setError(name, { type: "server", message: messages[0] }, { shouldFocus: !index });
+        });
+      }
+      return result;
+    },
+    initialState,
+  );
+
+  // Validate on the client first, then hand the native form data (incl. honeypot) to the action
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    // currentTarget is cleared after dispatch, so grab the form before async validation
+    const formElement = event.currentTarget;
+    form.handleSubmit(() => {
+      if (isPending) return;
+      const formData = new FormData(formElement);
+      startTransition(() => formAction(formData));
+    })(event);
   };
 
   return (
@@ -95,13 +100,13 @@ export default function FormSection({ className = "" }: { className?: string }) 
       className={`${className}`}
     >
       <Form {...form}>
-        <form action={submitAction} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form action={formAction} onSubmit={onSubmit} noValidate className="space-y-8">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {formFields.slice(0, 3).map((field) => (
+            {inputFields.map((field) => (
               <FormField
                 key={field.name}
                 control={form.control}
-                name={field.name as keyof typeof formSchema._type}
+                name={field.name}
                 render={({ field: formField }) => (
                   <FormItem>
                     <FormLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wide uppercase">
@@ -109,55 +114,79 @@ export default function FormSection({ className = "" }: { className?: string }) 
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type={field.type}
+                        autoComplete={field.autoComplete}
                         placeholder={field.placeholder}
+                        required
                         {...formField}
-                        maxLength={100}
+                        maxLength={CONTACT_LIMITS[field.name].max}
                         className="mt-1"
                       />
                     </FormControl>
-                    <FormMessage className="ml-1 text-xs">
-                      {form.formState.errors[field.name]?.message?.toString()}
-                    </FormMessage>
+                    <FormMessage className="ml-1 text-xs" />
                   </FormItem>
                 )}
               />
             ))}
           </div>
 
-          <div>
-            {formFields.slice(3).map((field) => (
-              <FormField
-                key={field.name}
-                control={form.control}
-                name={field.name as keyof typeof formSchema._type}
-                render={({ field: formField }) => (
-                  <FormItem>
-                    <FormLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wide uppercase">
-                      {field.label}
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={field.placeholder}
-                        {...formField}
-                        rows={5}
-                        maxLength={600}
-                        className="mt-1 resize-none"
-                      />
-                    </FormControl>
-                    <FormMessage className="ml-1 text-xs">
-                      {form.formState.errors[field.name]?.message?.toString()}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-            ))}
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wide uppercase">
+                  Message
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Your message"
+                    required
+                    {...formField}
+                    rows={5}
+                    maxLength={CONTACT_LIMITS.message.max}
+                    className="mt-1 resize-none"
+                  />
+                </FormControl>
+                <FormMessage className="ml-1 text-xs" />
+              </FormItem>
+            )}
+          />
+
+          {/* Honeypot: hidden from visitors and assistive tech; submissions that fill it are dropped */}
+          <div aria-hidden="true" className="sr-only">
+            <label htmlFor="contact-website">Website</label>
+            <input
+              id="contact-website"
+              type="text"
+              name={CONTACT_HONEYPOT_FIELD}
+              tabIndex={-1}
+              autoComplete="off"
+              defaultValue=""
+            />
           </div>
-          <div className="flex w-full max-sm:justify-center">
-            <CustomButton type="submit" text="Send Message" />
+
+          <div className="flex w-full flex-col gap-4 max-sm:items-center">
+            <CustomButton
+              type="submit"
+              text={isPending ? "Sending..." : "Send Message"}
+              disabled={isPending}
+              aria-busy={isPending}
+            />
+            <p
+              role="status"
+              aria-live="polite"
+              className={cn(
+                "ml-1 text-sm",
+                state.status === "error" ? "text-destructive" : "text-muted-foreground",
+              )}
+            >
+              {state.message}
+            </p>
           </div>
-          <ToastContainer />
         </form>
       </Form>
+      <ToastContainer />
     </motion.section>
   );
 }
