@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, getCleanSlug } from "@/lib/utils";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { buttonVariants } from "@/components/ui/button";
 import { LuExternalLink } from "react-icons/lu";
 import LinkButton from "@/components/link-button";
@@ -32,7 +33,8 @@ export default function ArticleCard({
   const publishedYear = pubDate.split(" ")[2];
   const showYear = new Date().getFullYear().toString() !== publishedYear;
 
-  const internalPath = `blog/${externalURL.split("/").pop()}`;
+  // Absolute path with the same slug as generateStaticParams; a relative "blog/..." resolved to /blog/blog/... (404)
+  const internalPath = INTERNAL_ROUTES.BLOG.href(getCleanSlug(externalURL.split("/").pop()!));
 
   const ConditionalLink = ({
     children,
