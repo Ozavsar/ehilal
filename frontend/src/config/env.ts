@@ -21,6 +21,8 @@ const serverEnvSchema = z.object({
   CONTACT_TO_EMAIL: z.string().optional(),
   // Shared with Strapi's preview handler; without it /api/preview rejects every request
   PREVIEW_SECRET: z.string().optional(),
+  // Strapi admin origins other than the API's that open the preview (comma separated; also next.config)
+  PREVIEW_ALLOWED_ORIGINS: z.string().optional(),
 });
 
 // Each variable is read literally so NEXT_PUBLIC_* values can be inlined at build time
@@ -32,6 +34,7 @@ const parsed = serverEnvSchema.safeParse({
   REVALIDATE_KEY: read(process.env.REVALIDATE_KEY),
   CONTACT_TO_EMAIL: read(process.env.CONTACT_TO_EMAIL),
   PREVIEW_SECRET: read(process.env.PREVIEW_SECRET),
+  PREVIEW_ALLOWED_ORIGINS: read(process.env.PREVIEW_ALLOWED_ORIGINS),
 });
 
 if (!parsed.success) {
@@ -40,9 +43,28 @@ if (!parsed.success) {
   throw new Error(`Invalid server environment variables: ${problems.join(", ")}`);
 }
 
+const strapiApiUrl = (parsed.data.NEXT_PUBLIC_STRAPI_API_URL ?? "http://127.0.0.1:1337").replace(
+  /\/+$/,
+  "",
+);
+
+/** Origins of the Strapi admin, which frames the site in its preview: the API's and PREVIEW_ALLOWED_ORIGINS. */
+const previewParentOrigins = [
+  strapiApiUrl,
+  ...(parsed.data.PREVIEW_ALLOWED_ORIGINS ?? "").split(","),
+]
+  .flatMap((url) => {
+    try {
+      const { origin, protocol } = new URL(url.trim());
+      return protocol === "https:" || protocol === "http:" ? [origin] : [];
+    } catch {
+      return [];
+    }
+  })
+  .filter((origin, index, all) => all.indexOf(origin) === index);
+
 export const env = {
   ...parsed.data,
-  NEXT_PUBLIC_STRAPI_API_URL: (
-    parsed.data.NEXT_PUBLIC_STRAPI_API_URL ?? "http://127.0.0.1:1337"
-  ).replace(/\/+$/, ""),
+  NEXT_PUBLIC_STRAPI_API_URL: strapiApiUrl,
+  PREVIEW_PARENT_ORIGINS: previewParentOrigins,
 };

@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       // /api/og stays open: it is the default share image, and X/LinkedIn honour robots.txt
       allow: ["/", "/api/og"],
-      disallow: ["/api/", "/theme-preview"],
+      disallow: ["/api/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

@@ -56,6 +56,28 @@ export const getThemePalette = cache(async (): Promise<Palette> => {
   }
 });
 
+/**
+ * The draft theme's photo colours, offered as quick picks in the theme preview bar. Only called in
+ * Draft Mode; never throws (the bar simply shows none).
+ */
+export async function getThemeCandidates(): Promise<string[]> {
+  try {
+    const response = await fetchAPI<
+      IStrapiResponse<Pick<IStrapiTheme, "source_type" | "image_candidates"> | null>
+    >(
+      "/theme",
+      { status: "draft", fields: ["source_type", "image_candidates"] },
+      { tags: ["theme"] },
+    );
+    const { source_type, image_candidates } = response.data ?? {};
+    if (source_type !== "image" || !Array.isArray(image_candidates)) return [];
+    return image_candidates.filter((hex) => /^#[0-9a-f]{6}$/i.test(hex));
+  } catch (error) {
+    unstable_rethrow(error);
+    return [];
+  }
+}
+
 const textOr = (value: string | null | undefined, fallback: string) => value?.trim() || fallback;
 // The links are rendered as hrefs, so only http(s) URLs are accepted
 const urlOr = (value: string | null | undefined, fallback: string) => {

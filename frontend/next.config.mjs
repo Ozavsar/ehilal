@@ -140,6 +140,15 @@ export default function config(phase) {
         // and friends, keep console.error/warn for real failures. Dev keeps every call.
         removeConsole: phase === PHASE_PRODUCTION_BUILD ? { exclude: ["error", "warn"] } : false,
       },
+      webpack(webpackConfig) {
+        // @material/material-color-utilities 0.4.0 is an ES module whose imports lack the ".js"
+        // extension, which webpack refuses for "type": "module" packages (the theme preview bar uses it)
+        webpackConfig.module.rules.push({
+          test: /[\\/]@material[\\/]material-color-utilities[\\/]/,
+          resolve: { fullySpecified: false },
+        });
+        return webpackConfig;
+      },
     }),
   );
 }

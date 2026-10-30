@@ -21,9 +21,9 @@ const isRelativePath = (url: string | null): url is string =>
   !!url && url.startsWith("/") && !url.startsWith("//") && !url.startsWith("/\\");
 
 /**
- * Strapi Preview entry point: `/api/preview?secret=…&status=draft|published&url=/theme-preview`.
- * `draft` turns Draft Mode on (the site reads draft content, e.g. the unpublished theme palette, for
- * this browser only); `published` turns it off. Then redirects to `url`.
+ * Strapi Preview entry point: `/api/preview?secret=…&status=draft|published&url=/`.
+ * `draft` turns Draft Mode on (the site reads draft content, e.g. the unpublished theme palette, and
+ * shows the theme preview bar, for this browser only); `published` turns it off. Then redirects to `url`.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;

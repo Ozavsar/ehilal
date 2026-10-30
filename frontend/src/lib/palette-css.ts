@@ -89,6 +89,10 @@ export const DEFAULT_PALETTE = defaultPaletteJson as Palette;
 const schemeVars = (scheme: Scheme) =>
   ROLES.map((role) => `--m3-${kebab(role)}:${scheme[role].toLowerCase()};`).join("");
 
+/** The light and dark schemes as CSS custom properties: light on :root, dark on .dark (next-themes). */
+export const schemesToCss = (light: Scheme, dark: Scheme) =>
+  `:root{${schemeVars(light)}}.dark{${schemeVars(dark)}}`;
+
 /**
  * The palette as CSS custom properties: light on :root, dark on .dark (next-themes), and the
  * high-contrast schemes when the OS asks for more contrast. Medium contrast is not emitted yet.
@@ -97,8 +101,7 @@ const schemeVars = (scheme: Scheme) =>
 export function paletteToCss(palette: Palette): string {
   const { schemes } = palette;
   return (
-    `:root{${schemeVars(schemes.light)}}` +
-    `.dark{${schemeVars(schemes.dark)}}` +
+    schemesToCss(schemes.light, schemes.dark) +
     `@media (prefers-contrast: more){` +
     `:root{${schemeVars(schemes["light-high-contrast"])}}` +
     `.dark{${schemeVars(schemes["dark-high-contrast"])}}` +

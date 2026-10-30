@@ -3,11 +3,19 @@ import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
 import Header from "@/components/header";
 import HistoryMorph from "@/components/history-morph";
+import ThemePreviewBar from "@/components/theme-preview-bar";
+import { env } from "@/config/env";
 import "./globals.css";
+import { draftMode } from "next/headers";
 import { unstable_rethrow } from "next/navigation";
 import JsonLd from "@/components/json-ld";
 import Providers from "@/context/providers";
-import { getSiteSettings, getSocialMediaLinks, getThemePalette } from "@/lib/services";
+import {
+  getSiteSettings,
+  getSocialMediaLinks,
+  getThemeCandidates,
+  getThemePalette,
+} from "@/lib/services";
 import { SITE_URL } from "@/config/site";
 import {
   IS_PRODUCTION_SITE,
@@ -151,8 +159,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Falls back to the default palette, so a Strapi outage can't take the whole site down from here
-  const [palette, site] = await Promise.all([getThemePalette(), getSiteSettings()]);
-  const profileUrls = await getProfileUrls(site);
+  const [palette, site, { isEnabled: isPreview }] = await Promise.all([
+    getThemePalette(),
+    getSiteSettings(),
+    draftMode(),
+  ]);
+  const [profileUrls, candidates] = await Promise.all([
+    getProfileUrls(site),
+    isPreview ? getThemeCandidates() : [],
+  ]);
   return (
     <html
       lang="en"
@@ -178,6 +193,15 @@ export default async function RootLayout({
           <HistoryMorph />
           <Header />
           {children}
+          {/* Strapi Preview (Draft Mode): change the draft palette live */}
+          {isPreview && (
+            <ThemePreviewBar
+              seed={palette.source.seed}
+              variant={palette.options.variant}
+              candidates={candidates}
+              parentOrigins={env.PREVIEW_PARENT_ORIGINS}
+            />
+          )}
         </Providers>
       </body>
     </html>
