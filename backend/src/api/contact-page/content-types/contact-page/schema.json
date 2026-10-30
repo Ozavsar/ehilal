@@ -30,14 +30,6 @@
     "form_recipient_email": {
       "type": "email",
       "required": true
-    },
-    "SEO_title": {
-      "type": "string",
-      "maxLength": 60
-    },
-    "SEO_description": {
-      "type": "text",
-      "maxLength": 300
     }
   }
 }

@@ -454,14 +454,6 @@ export interface ApiBlogPageBlogPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -533,14 +525,6 @@ export interface ApiConferencesPageConferencesPage
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -573,14 +557,6 @@ export interface ApiContactPageContactPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -612,14 +588,6 @@ export interface ApiCoursesPageCoursesPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -652,14 +620,6 @@ export interface ApiHomePageHomePage extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -690,14 +650,6 @@ export interface ApiNotFoundPageNotFoundPage extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -786,8 +738,11 @@ export interface ApiSocialMediaLinkSocialMediaLink
       'api::social-media-link.social-media-link'
     > &
       Schema.Attribute.Private;
+    medium: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    substack: Schema.Attribute.String;
     twitter_x: Schema.Attribute.String & Schema.Attribute.Required;
+    udemy: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -798,6 +753,7 @@ export interface ApiSocialMediaLinkSocialMediaLink
 export interface ApiThemeTheme extends Struct.SingleTypeSchema {
   collectionName: 'themes';
   info: {
+    description: 'Material 3 colour palette of the site, generated from a seed colour or an image on save';
     displayName: 'Theme';
     pluralName: 'themes';
     singularName: 'theme';
@@ -809,17 +765,41 @@ export interface ApiThemeTheme extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    image_candidates: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::theme.theme'> &
       Schema.Attribute.Private;
+    palette: Schema.Attribute.JSON &
+      Schema.Attribute.CustomField<'global::m3-palette'>;
     primaryDark: Schema.Attribute.String &
       Schema.Attribute.CustomField<'plugin::color-picker.color'>;
     primaryLight: Schema.Attribute.String &
       Schema.Attribute.CustomField<'plugin::color-picker.color'>;
     publishedAt: Schema.Attribute.DateTime;
+    seed_color: Schema.Attribute.String &
+      Schema.Attribute.CustomField<'plugin::color-picker.color'>;
+    source_image: Schema.Attribute.Media<'images'>;
+    source_type: Schema.Attribute.Enumeration<['color', 'image']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'color'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    variant: Schema.Attribute.Enumeration<
+      [
+        'tonal_spot',
+        'vibrant',
+        'expressive',
+        'fidelity',
+        'content',
+        'neutral',
+        'rainbow',
+        'fruit_salad',
+        'monochrome',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'tonal_spot'>;
   };
 }
 
@@ -884,14 +864,6 @@ export interface ApiVideosPageVideosPage extends Struct.SingleTypeSchema {
     page_title: Schema.Attribute.String & Schema.Attribute.Required;
     page_title_background: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    SEO_description: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 300;
-      }>;
-    SEO_title: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

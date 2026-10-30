@@ -29,6 +29,15 @@
     },
     "instagram": {
       "type": "string"
+    },
+    "medium": {
+      "type": "string"
+    },
+    "substack": {
+      "type": "string"
+    },
+    "udemy": {
+      "type": "string"
     }
   }
 }

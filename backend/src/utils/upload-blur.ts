@@ -29,6 +29,36 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /**
+ * The file's URLs, signed when the bucket is private, the stored ones otherwise.
+ */
+export function signFileUrls(
+  strapi: Core.Strapi,
+  file: Pick<BlurFile, "url" | "formats" | "provider">,
+): Promise<Pick<BlurFile, "url" | "formats">> {
+  return strapi
+    .plugin("upload")
+    .service("file")
+    .signFileUrls({ url: file.url, formats: file.formats, provider: file.provider });
+}
+
+/**
+ * The bytes of an uploaded image (a URL from signFileUrls). Also used by theme-palette.ts.
+ */
+export async function loadImage(strapi: Core.Strapi, url: string): Promise<Buffer> {
+  // Local provider: "/uploads/<file>" in the public folder
+  if (url.startsWith("/")) return readFile(path.join(strapi.dirs.static.public, url));
+
+  // Without the query string: a signed URL must not end up in the logs
+  const name = url.split("?")[0];
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${name}`);
+  if (Number(res.headers.get("content-length")) > MAX_SOURCE_BYTES) {
+    throw new Error(`${name} is too large to process`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+}
+
+/**
  * Stores a blur placeholder on every uploaded or replaced image (see utils/blur.ts), and backfills
  * images that don't have one yet. Runs in the background: never blocks or fails an upload or startup.
  */
@@ -37,32 +67,14 @@ export function registerBlurPlaceholders(strapi: Core.Strapi) {
   const findFile = (id: number): Promise<BlurFile | null> =>
     files().findOne({ where: { id }, select: BLUR_FILE_FIELDS });
 
-  async function loadImage(url: string): Promise<Buffer> {
-    // Local provider: "/uploads/<file>" in the public folder
-    if (url.startsWith("/")) return readFile(path.join(strapi.dirs.static.public, url));
-
-    // Without the query string: a signed URL must not end up in the logs
-    const name = url.split("?")[0];
-    const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${name}`);
-    if (Number(res.headers.get("content-length")) > MAX_SOURCE_BYTES) {
-      throw new Error(`${name} is too large for a placeholder`);
-    }
-    return Buffer.from(await res.arrayBuffer());
-  }
-
   async function processFile(id: number): Promise<Result> {
     try {
       const file = await findFile(id);
       if (!file || !needsBlur(file)) return "skipped";
 
-      // Signed URLs when the bucket is private, the stored ones otherwise
-      const { url, formats } = await strapi
-        .plugin("upload")
-        .service("file")
-        .signFileUrls({ url: file.url, formats: file.formats, provider: file.provider });
+      const { url, formats } = await signFileUrls(strapi, file);
       const blurDataURL = await createBlurDataURL(
-        await loadImage(getBlurSourceURL({ url, formats })),
+        await loadImage(strapi, getBlurSourceURL({ url, formats })),
       );
 
       // Re-read right before writing: merge into the current metadata, and drop the placeholder if

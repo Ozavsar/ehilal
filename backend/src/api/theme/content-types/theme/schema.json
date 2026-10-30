@@ -4,12 +4,53 @@
   "info": {
     "singularName": "theme",
     "pluralName": "themes",
-    "displayName": "Theme"
+    "displayName": "Theme",
+    "description": "Material 3 colour palette of the site, generated from a seed colour or an image on save"
   },
   "options": {
     "draftAndPublish": true
   },
   "attributes": {
+    "source_type": {
+      "type": "enumeration",
+      "enum": ["color", "image"],
+      "default": "color",
+      "required": true
+    },
+    "seed_color": {
+      "type": "customField",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "customField": "plugin::color-picker.color"
+    },
+    "source_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": [
+        "tonal_spot",
+        "vibrant",
+        "expressive",
+        "fidelity",
+        "content",
+        "neutral",
+        "rainbow",
+        "fruit_salad",
+        "monochrome"
+      ],
+      "default": "tonal_spot",
+      "required": true
+    },
+    "palette": {
+      "type": "customField",
+      "customField": "global::m3-palette"
+    },
+    "image_candidates": {
+      "type": "json"
+    },
     "primaryDark": {
       "type": "customField",
       "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",

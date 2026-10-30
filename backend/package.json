@@ -8,9 +8,13 @@
     "deploy": "strapi deploy",
     "develop": "strapi develop",
     "start": "strapi start",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "palette:default": "node scripts/palette-default.mjs",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@material/material-color-utilities": "0.4.0",
+    "@strapi/design-system": "2.2.4",
     "@strapi/plugin-cloud": "5.60.0",
     "@strapi/plugin-color-picker": "5.60.0",
     "@strapi/plugin-users-permissions": "5.60.0",
@@ -27,6 +31,7 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "patch-package": "8.0.0",
     "typescript": "^5"
   },
   "engines": {

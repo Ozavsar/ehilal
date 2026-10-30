@@ -1,4 +1,13 @@
-export default [
+// Origin of the website (e.g. https://ehilal.net): the admin shows it in the theme preview iframe
+const frontendOrigin = (url: string | undefined): string[] => {
+  try {
+    return url ? [new URL(url).origin] : [];
+  } catch {
+    return [];
+  }
+};
+
+export default ({ env }) => [
   "strapi::errors",
 
   {
@@ -25,6 +34,7 @@ export default [
           "script-src": ["'self'", "www.youtube.com"],
           "style-src": ["'self'", "'unsafe-inline'"],
           "font-src": ["'self'"],
+          "frame-src": ["'self'", ...frontendOrigin(env("FRONTEND_URL"))],
           upgradeInsecureRequests: null,
         },
       },
