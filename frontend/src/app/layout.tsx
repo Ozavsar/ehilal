@@ -1,83 +1,97 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-import RocketCursor from "@/components/rocket-cursor";
 import Header from "@/components/header";
 import "./globals.css";
 import Providers from "@/context/providers";
-import { getThemeColors } from "@/lib/services";
-import {
-  SITE_NAME,
-  SITE_URL,
-  TWITTER_HANDLE,
-  TWITTER_USER_ID,
-  themeColorVariables,
-} from "@/config/site";
+import { getSiteSettings, getThemeColors } from "@/lib/services";
+import { SITE_URL, themeColorVariables } from "@/config/site";
 
-export const metadata: Metadata = {
-  title: {
-    template: `%s | ${SITE_NAME}`,
-    default: `${SITE_NAME} | Legal Engineer`,
-  },
+// `geist/font/mono` with preload off: only article code blocks use it, so the browser fetches the
+// file on pages that render one instead of every page preloading it.
+const geistMono = localFont({
+  src: "../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+  adjustFontFallback: false,
+  preload: false,
+  fallback: [
+    "ui-monospace",
+    "SFMono-Regular",
+    "Roboto Mono",
+    "Menlo",
+    "Monaco",
+    "Liberation Mono",
+    "DejaVu Sans Mono",
+    "Courier New",
+    "monospace",
+  ],
+});
 
-  icons: {
-    icon: [
-      {
-        rel: "icon",
-        type: "image/png",
-        url: `${SITE_URL}/api/og?theme=light&source=favicon`,
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        url: `${SITE_URL}/api/og?theme=dark&source=favicon`,
-        media: "(prefers-color-scheme: dark)",
-      },
-    ],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  // Falls back to the defaults in config/site.ts, so a Strapi outage can't fail every page from here
+  const site = await getSiteSettings();
+  const defaultTitle = `${site.siteName} | ${site.jobTitle}`;
+  const { defaultOgImage } = site;
 
-  description:
-    "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
-  robots: SITE_URL.includes("dev.") ? "noindex, nofollow" : "index, follow",
-  openGraph: {
-    title: `${SITE_NAME} | Legal Engineer`,
-    description:
-      "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
-    type: "website",
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    locale: "en_US",
-    alternateLocale: ["tr_TR"],
-    images: [
-      {
-        url: `${SITE_URL}/api/og`,
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} Open Graph Image`,
-      },
-    ],
-  },
+  return {
+    title: {
+      template: `%s | ${site.siteName}`,
+      default: defaultTitle,
+    },
 
-  twitter: {
-    title: `${SITE_NAME} | Legal Engineer`,
-    description:
-      "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner.",
-    card: "summary_large_image",
-    creator: `${TWITTER_HANDLE}`,
-    creatorId: `${TWITTER_USER_ID}`,
-    site: `${TWITTER_HANDLE}`,
-    siteId: `${TWITTER_USER_ID}`,
-    images: [
-      {
-        url: `${SITE_URL}/api/og`,
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} Twitter Card Image`,
-      },
-    ],
-  },
-};
+    icons: {
+      icon: [
+        {
+          rel: "icon",
+          type: "image/png",
+          url: `${SITE_URL}/api/og?theme=light&source=favicon`,
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          rel: "icon",
+          type: "image/png",
+          url: `${SITE_URL}/api/og?theme=dark&source=favicon`,
+          media: "(prefers-color-scheme: dark)",
+        },
+      ],
+    },
+
+    description: site.siteDescription,
+    robots: SITE_URL.includes("dev.") ? "noindex, nofollow" : "index, follow",
+    openGraph: {
+      title: defaultTitle,
+      description: site.siteDescription,
+      type: "website",
+      url: SITE_URL,
+      siteName: site.siteName,
+      locale: "en_US",
+      alternateLocale: ["tr_TR"],
+      images: [
+        {
+          ...defaultOgImage,
+          alt: defaultOgImage.alt || `${site.siteName} Open Graph Image`,
+        },
+      ],
+    },
+
+    twitter: {
+      title: defaultTitle,
+      description: site.siteDescription,
+      card: "summary_large_image",
+      creator: site.twitterHandle,
+      creatorId: site.twitterUserId,
+      site: site.twitterHandle,
+      siteId: site.twitterUserId,
+      images: [
+        {
+          ...defaultOgImage,
+          alt: defaultOgImage.alt || `${site.siteName} Twitter Card Image`,
+        },
+      ],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -90,7 +104,7 @@ export default async function RootLayout({
     <html
       lang="en"
       // The Geist variables sit on <html> because the base font-family (Tailwind preflight) is set there
-      className={`${GeistSans.variable} ${GeistMono.variable} dark`}
+      className={`${GeistSans.variable} ${geistMono.variable} dark`}
       style={themeColorVariables(themeColors)}
       suppressHydrationWarning
     >
@@ -101,7 +115,6 @@ export default async function RootLayout({
         <Providers>
           <Header />
           {children}
-          <RocketCursor />
         </Providers>
       </body>
     </html>

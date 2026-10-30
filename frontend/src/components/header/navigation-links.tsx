@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { Button } from "../ui/button";
+import NavLink from "./nav-link";
 import { isNavItemActive, MENUS } from "@/config/constants/app-routes";
 
 // Entrance: each item pops in with a @starting-style transition (Tailwind `starting:`), staggered
@@ -19,7 +19,7 @@ export default function Nav() {
         const isActive = isNavItemActive(pathname, href);
         return (
           <div key={key} className={itemClassName} style={{ transitionDelay: `${index * 150}ms` }}>
-            <Link href={href}>
+            <NavLink href={href}>
               {/* Hovering widens the circle into a pill that shows the label */}
               <Button
                 variant="circle"
@@ -33,7 +33,7 @@ export default function Nav() {
                   <Icon className="size-5 sm:size-6" />
                 </div>
               </Button>
-            </Link>
+            </NavLink>
           </div>
         );
       })}

@@ -1,15 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { A11y, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { LuExpand } from "react-icons/lu";
-import FullScreenGallery, { type IGalleryImage } from "@/components/full-screen-gallery";
+import type { IGalleryImage } from "@/components/full-screen-gallery";
+import { useIdleAfterLoad } from "@/hooks/use-idle-after-load";
 // Swiper styles for the card slider and the full-screen gallery it opens
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/a11y";
+
+// The dialog (Radix) and the keyboard module load when a visitor first opens a photo
+const FullScreenGallery = dynamic(() => import("@/components/full-screen-gallery"));
 
 export interface IConferencePhoto {
   id: number;
@@ -22,6 +27,10 @@ export interface IConferencePhoto {
 interface Props {
   photos: IConferencePhoto[];
   title: string;
+  // First card on the page: its cover is the likely LCP element, so it is preloaded from the <head>.
+  // Measured against eager + fetchPriority="high" (worse simulated LCP), fetchPriority alone and
+  // plain lazy loading: same simulated LCP, but the preload paints it earliest in a real load.
+  priority?: boolean;
 }
 
 // Card width: one column below md, two up to xl, three from xl (MotionGrid in the page container).
@@ -41,7 +50,7 @@ function getFullScreenSrc({ url, large }: IConferencePhoto): string {
   return containScale * window.devicePixelRatio <= MAX_LARGE_UPSCALE ? large.url : url;
 }
 
-export default function Gallery({ photos, title }: Props) {
+export default function Gallery({ photos, title, priority = false }: Props) {
   // Full-screen images and the one opened, null when closed
   const [fullScreen, setFullScreen] = useState<{
     images: IGalleryImage[];
@@ -50,8 +59,10 @@ export default function Gallery({ photos, title }: Props) {
   // Thumbnail that opened the gallery; focus returns to it on close
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   // Off-screen slides sit next to the visible one, inside the browser's lazy-load margin, so every
-  // photo of every card would download on page load. Only the current and adjacent slides get an image.
+  // photo of every card would download on page load. Only the current slide gets an image, plus the
+  // adjacent ones once the page is idle (they would compete with the visible covers before that).
   const [activeIndex, setActiveIndex] = useState(0);
+  const preloadNeighbours = useIdleAfterLoad();
 
   const open = (index: number) =>
     setFullScreen({
@@ -84,7 +95,7 @@ export default function Gallery({ photos, title }: Props) {
               aria-label={`Open gallery: ${title}, image ${index + 1} of ${photos.length}`}
               className="group relative block h-full w-full cursor-pointer overflow-hidden focus-visible:outline-none"
             >
-              {Math.abs(index - activeIndex) <= 1 ? (
+              {Math.abs(index - activeIndex) <= (preloadNeighbours ? 1 : 0) ? (
                 // `large` is plenty for a card (at most ~510px wide) and much lighter for the optimizer
                 <Image
                   src={photo.large?.url ?? photo.url}
@@ -92,6 +103,7 @@ export default function Gallery({ photos, title }: Props) {
                   width={800}
                   height={450}
                   sizes={THUMBNAIL_SIZES}
+                  preload={priority && index === 0}
                   blurDataURL={photo.blurDataURL}
                   placeholder={photo.blurDataURL ? "blur" : "empty"}
                   className="aspect-video object-cover object-center transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105"

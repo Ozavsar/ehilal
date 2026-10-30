@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "analyze": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "tw:fix": "tailwind-suggest-canonical-classes \"src/{app,containers,components}/**/*.{ts,tsx}\"",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@laststance/tailwind-suggest-canonical-classes": "^0.1.2",
+    "@next/bundle-analyzer": "16.2.7",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",

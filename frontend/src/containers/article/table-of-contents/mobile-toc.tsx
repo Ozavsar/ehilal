@@ -1,18 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { LuList } from "react-icons/lu";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import TOC from "./toc";
+import { useIdleAfterLoad } from "@/hooks/use-idle-after-load";
 import type { IHeadingNode } from "./heading-tree";
+
+// vaul and the Radix dialog under it aren't part of the blog route's first bundle (list pages
+// share it): the drawer loads once the page is idle, or when the button is used before that
+const MobileTOCDrawer = dynamic(() => import("./mobile-toc-drawer"));
 
 export default function MobileTOC({
   tree,
@@ -22,44 +19,35 @@ export default function MobileTOC({
   activeId: string | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const idle = useIdleAfterLoad();
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} direction="bottom">
-      <DrawerTrigger asChild>
-        <Button size="icon" className="fixed right-4 bottom-16 z-(--z-floating) 2xl:hidden">
-          <LuList className="size-5" />
-        </Button>
-      </DrawerTrigger>
-
-      <DrawerContent
-        aria-describedby={undefined}
-        className="bg-background rounded-t-2xl border-t shadow-2xl"
-        onScroll={(e) => e.stopPropagation()}
+    <>
+      <Button
+        ref={triggerRef}
+        size="icon"
+        aria-label="Table of contents"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => {
+          setRequested(true);
+          setOpen(true);
+        }}
+        className="fixed right-4 bottom-16 z-(--z-floating) 2xl:hidden"
       >
-        <div className="mx-auto w-full max-w-md px-6 pt-4 pb-8">
-          <DrawerHeader className="flex items-center justify-between px-0">
-            <DrawerTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
-              <span className="text-primary text-lg">📘</span>
-              Table of Contents
-            </DrawerTitle>
-            <DrawerClose asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Close
-              </Button>
-            </DrawerClose>
-          </DrawerHeader>
-
-          <div className="bg-border mb-4 h-px w-full" />
-
-          <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted-foreground/20 max-h-[60vh] overflow-y-auto pr-2">
-            <TOC tree={tree} activeId={activeId} onLinkClick={() => setOpen(false)} />
-          </div>
-        </div>
-      </DrawerContent>
-    </Drawer>
+        <LuList className="size-5" />
+      </Button>
+      {(idle || requested) && (
+        <MobileTOCDrawer
+          open={open}
+          onOpenChange={setOpen}
+          tree={tree}
+          activeId={activeId}
+          returnFocusRef={triggerRef}
+        />
+      )}
+    </>
   );
 }

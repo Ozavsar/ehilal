@@ -15,11 +15,17 @@ const toPhoto = ({ id, url, blurDataURL, formats }: IImage): IConferencePhoto =>
   },
 });
 
-export default function ConferenceCard({ title, date, location, images }: IStrapiConference) {
+export default function ConferenceCard({
+  title,
+  date,
+  location,
+  images,
+  priority = false,
+}: IStrapiConference & { priority?: boolean }) {
   return (
     <Card className="flex h-full flex-col gap-0 overflow-hidden">
       <CardHeader className="border-primary bg-primary aspect-video h-fit overflow-hidden border-b-8 p-0">
-        <Gallery photos={images.map(toPhoto)} title={title} />
+        <Gallery photos={images.map(toPhoto)} title={title} priority={priority} />
       </CardHeader>
       <CardContent className="p-4 pb-2">
         <h2 className="text-lg font-bold">{title}</h2>

@@ -18,8 +18,8 @@ export default function ConferencesContainer({
     <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <MotionGrid>
-          {conferences.map((conference) => (
-            <ConferenceCard key={conference.documentId} {...conference} />
+          {conferences.map((conference, index) => (
+            <ConferenceCard key={conference.documentId} {...conference} priority={index === 0} />
           ))}
         </MotionGrid>
       </div>

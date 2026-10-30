@@ -1,5 +1,13 @@
 import { PHASE_PRODUCTION_BUILD } from "next/constants.js";
 import withPlaiceholder from "@plaiceholder/next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+// `yarn analyze` (or ANALYZE=true) writes the client/server/edge bundle treemaps to .next/analyze/.
+// The script name is checked so it works without setting an env var (cmd/PowerShell syntax differs).
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true" || process.env.npm_lifecycle_event === "analyze",
+  openAnalyzer: false,
+});
 
 // CSP is intentionally not set yet (YouTube iframes, remote images and inline theme styles
 // need an allow-list); roll it out as Content-Security-Policy-Report-Only first.
@@ -74,12 +82,14 @@ const nextConfig = {
 };
 
 export default function config(phase) {
-  return withPlaiceholder({
-    ...nextConfig,
-    compiler: {
-      // Safety net for production builds (server and client code alike): drop console.log/info/debug
-      // and friends, keep console.error/warn for real failures. Dev keeps every call.
-      removeConsole: phase === PHASE_PRODUCTION_BUILD ? { exclude: ["error", "warn"] } : false,
-    },
-  });
+  return withBundleAnalyzer(
+    withPlaiceholder({
+      ...nextConfig,
+      compiler: {
+        // Safety net for production builds (server and client code alike): drop console.log/info/debug
+        // and friends, keep console.error/warn for real failures. Dev keeps every call.
+        removeConsole: phase === PHASE_PRODUCTION_BUILD ? { exclude: ["error", "warn"] } : false,
+      },
+    }),
+  );
 }

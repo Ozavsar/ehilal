@@ -1,9 +1,9 @@
 "use client";
 import { useLayoutEffect, useRef } from "react";
-import Link from "next/link";
 import { isNavItemActive, MENUS } from "@/config/constants/app-routes";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import NavLink from "./nav-link";
 
 const SLIDE: KeyframeAnimationOptions = {
   duration: 400,
@@ -53,7 +53,7 @@ export default function MobileNav() {
               className="relative flex flex-1 items-center justify-center transition-[opacity,translate] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none starting:translate-y-5 starting:opacity-0"
               style={{ transitionDelay: `${200 + index * 100}ms` }}
             >
-              <Link
+              <NavLink
                 href={href}
                 className="group relative flex w-full flex-col items-center gap-1 p-2 transition-colors"
               >
@@ -74,7 +74,7 @@ export default function MobileNav() {
                 >
                   {label}
                 </span>
-              </Link>
+              </NavLink>
 
               {isActive && (
                 <div

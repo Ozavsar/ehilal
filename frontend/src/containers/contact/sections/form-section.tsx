@@ -1,13 +1,12 @@
 "use client";
 
-import { startTransition, useActionState, type FormEvent } from "react";
-import { toast } from "sonner";
+import { startTransition, useActionState, useState, type FormEvent } from "react";
+import dynamic from "next/dynamic";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
 import {
   Form,
   FormControl,
@@ -30,6 +29,11 @@ import { cn } from "@/lib/utils";
 const defaultValues: ContactFormValues = { name: "", email: "", subject: "", message: "" };
 const initialState: ContactFormState = { status: "idle", message: "" };
 
+// sonner loads with the first toast instead of with the page
+const Toaster = dynamic(() => import("@/components/ui/sonner").then((mod) => mod.Toaster), {
+  ssr: false,
+});
+
 const inputFields = [
   { name: "name", label: "Name", placeholder: "Your name", type: "text", autoComplete: "name" },
   {
@@ -47,6 +51,16 @@ export default function FormSection({ className = "" }: { className?: string }) 
     resolver: zodResolver(contactFormSchema),
     defaultValues,
   });
+  const [toasterMounted, setToasterMounted] = useState(false);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToasterMounted(true);
+    // The Toaster replays toasts created before it subscribed, so the order of the two loads doesn't matter
+    import("sonner")
+      .then(({ toast }) => toast[type](message))
+      // Without the chunk the status line below still reports the result
+      .catch(() => {});
+  };
 
   const [state, formAction, isPending] = useActionState(
     async (prevState: ContactFormState, formData: FormData): Promise<ContactFormState> => {
@@ -62,10 +76,10 @@ export default function FormSection({ className = "" }: { className?: string }) 
       }
 
       if (result.status === "success") {
-        toast.success(result.message);
+        showToast("success", result.message);
         form.reset(defaultValues);
       } else {
-        toast.error(result.message);
+        showToast("error", result.message);
         // Show server-side validation errors next to the matching fields
         const fieldErrors = Object.entries(result.fieldErrors ?? {}) as [
           ContactFormField,
@@ -189,9 +203,11 @@ export default function FormSection({ className = "" }: { className?: string }) 
       </Form>
       {/* Visual only: the status line above is what screen readers announce. inert keeps the toast out of
           the accessibility tree and focus order (aria-hidden alone would leave the focusable toast reachable) */}
-      <div inert>
-        <Toaster />
-      </div>
+      {toasterMounted && (
+        <div inert>
+          <Toaster />
+        </div>
+      )}
     </section>
   );
 }
