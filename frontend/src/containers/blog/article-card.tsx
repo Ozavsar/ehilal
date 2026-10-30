@@ -78,11 +78,13 @@ export default function ArticleCard({
   const linkProps = { slug, externalURL, title, source: externalBlogSource };
 
   return (
+    // overflow-visible lets the date ribbon stick out, so the header rounds its own top corners
+    // (the video and conference cards clip theirs with overflow-hidden instead)
     <Card className="h-full overflow-visible pt-0">
-      <CardHeader className="relative overflow-visible px-0">
+      <CardHeader className="rounded-t-card relative overflow-visible px-0">
         <ArticleLink
           {...linkProps}
-          className="group relative block overflow-hidden rounded-t-md focus-visible:outline-none"
+          className="group rounded-t-card relative block overflow-hidden focus-visible:outline-none"
         >
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
