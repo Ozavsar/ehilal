@@ -167,16 +167,19 @@
   }
 }
 
-/* Swiper's CSS is imported by the gallery components and loads after this file; the .swiper
-   prefix keeps these overrides ahead of it whatever the stylesheet order */
-.swiper .swiper-button-prev,
-.swiper .swiper-button-next {
-  @apply text-background dark:text-primary top-0 bottom-0 m-0 h-full px-8 max-sm:px-4;
+/* Swiper's CSS is imported by the gallery components and loads after this file. It positions the
+   arrows with .swiper-horizontal selectors, so matching both classes keeps these overrides ahead of
+   it whatever the stylesheet order. The arrows are full-height click areas 10px from the edges. */
+.swiper.swiper-horizontal .swiper-button-prev,
+.swiper.swiper-horizontal .swiper-button-next {
+  --swiper-navigation-sides-offset: 10px;
+  @apply text-background dark:text-primary top-0 bottom-0 m-0 h-full w-16 max-sm:w-8;
 }
 
-.swiper .swiper-button-prev:after,
-.swiper .swiper-button-next:after {
-  @apply text-3xl sm:text-4xl;
+/* Inline SVG chevron (Swiper 12+), sized like the former icon font glyph */
+.swiper.swiper-horizontal .swiper-button-prev svg,
+.swiper.swiper-horizontal .swiper-button-next svg {
+  @apply h-7.25 w-auto shrink-0 sm:h-8.5;
 }
 
 /* rocket cursor */

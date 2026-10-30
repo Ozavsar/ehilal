@@ -2,8 +2,6 @@ import { ImageResponse } from "next/og";
 import Logo from "@/components/logo";
 import { getThemeColors } from "@/lib/services";
 
-export const runtime = "edge";
-
 const MAX_TITLE_LENGTH = 80;
 
 // Not `immutable`: the theme colour comes from Strapi and can change under the same URL
