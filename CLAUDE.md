@@ -14,7 +14,8 @@ Personal portfolio website for Elif Hilal Kara (ehilal.net). Monorepo with a **N
 yarn dev          # Start dev server (uses --webpack flag)
 yarn build        # Production build (uses --webpack flag)
 yarn start        # Start production server
-yarn lint         # ESLint
+yarn lint         # ESLint (flat config, eslint.config.mjs)
+npx tsc --noEmit  # Type check
 ```
 
 ### Backend (`backend/`)
@@ -32,18 +33,35 @@ Package manager: **Yarn** for both frontend and backend.
 ### Frontend (`frontend/src/`)
 
 - **App Router** with route groups: `(client)` for pages, `(sitemaps)` for XML sitemaps
-- **`lib/api/fetchAPI.ts`** — Central API client for all Strapi requests. Uses bearer token auth, `qs` for query building, and Next.js ISR caching (24h default revalidation).
-- **`lib/services/`** — Service layer wrapping fetchAPI and external integrations:
-  - `pages.ts`, `index.ts` — Strapi CMS content
-  - `youtube.ts` — Google YouTube Data API
-  - `medium.ts`, `udemy.ts` — Puppeteer web scraping (stealth mode)
-  - `resend.ts` — Email via Resend (server action)
-  - `videos.ts` — Aggregates Strapi + YouTube videos
-- **`containers/`** — Page-level components (home, blog, videos, conferences, courses, contact, article)
-- **`components/ui/`** — shadcn/ui components (Radix UI + Tailwind CSS 4)
-- **`context/providers.tsx`** — next-themes (dark/light) + Lenis smooth scroll
-- **`config/constants/`** — Route definitions and external service URLs/IDs
-- **`types.d.ts`** — TypeScript types matching Strapi content models
+- **`lib/api/fetchAPI.ts`** — Central API client for all Strapi requests. Bearer token auth, `qs` for query building, Next.js data cache (`force-cache`, 24h default revalidation, cache tags). Failures throw a typed `ApiError` that keeps the HTTP status; `orNotFound()` turns a Strapi 404 into `notFound()`.
+- **`lib/services/`** — Service layer wrapping fetchAPI and external sources:
+  - `pages.ts`, `index.ts` — Strapi CMS content (`getThemeColors()` falls back to `DEFAULT_THEME_COLORS`)
+  - `conferences.ts`, `videos.ts` — Strapi collections; `videos.ts` merges Strapi + YouTube videos
+  - `youtube.ts` — YouTube Data API v3 via plain `fetch` (no googleapis)
+  - `medium.ts`, `substack.ts` — Medium (internal GraphQL endpoint) and Substack (feed API) via `fetch`, responses parsed with Zod
+  - `blog.ts` — Merges Medium + Substack (`Promise.allSettled`, one source may fail), paginates, looks up single articles
+  - `udemy.ts` — Udemy courses via the public API with `fetch`
+- **`lib/actions/contact.ts`** — Contact form server action: Zod validation (`lib/validations/contact.ts`, shared with the client form), honeypot, in-memory per-IP rate limit, email via Resend. Recipient is Strapi Contact Page `form_recipient_email`, falling back to `CONTACT_TO_EMAIL`.
+- **`lib/getImage.ts`** — Blur placeholders with plaiceholder
+- **`lib/metadata.ts`** — `buildMeta()` helper for page metadata (canonical, OG, Twitter)
+- **`config/site.ts`** — Public site constants (`SITE_URL`, `SITE_NAME`, Twitter, default banner, default theme colours). **`config/env.ts`** — Zod-validated server env; never import it from a Client Component.
+- **`config/constants/`** — Route definitions (`app-routes.ts`) and external service IDs
+- **`containers/`** — Page-level components (home, blog, article, videos, conferences, courses, contact)
+- **`components/`** — Shared components; `components/ui/` are shadcn/ui components (Radix UI + Tailwind CSS 4), `components/full-screen-gallery.tsx` is the shared image lightbox (conference gallery and article images)
+- **`context/providers.tsx`** — next-themes (dark/light, class based) + Lenis smooth scroll
+- **`types.ts`** — TypeScript types for Strapi content models and external sources
+- **Styling** — Tailwind 4 tokens live in `app/globals.css`: `@theme` spacing/text/radius tokens (e.g. `px-page-gutter`, `text-backdrop`, `rounded-card`) and a `--z-*` z-index scale used as `z-(--z-header)`. `cn()` in `lib/utils.ts` registers the custom token names with tailwind-merge; add new ones there too. Dark mode is class based (`@custom-variant dark`).
+- **Conventions** — TypeScript is strict (`noImplicitAny`, `noUncheckedIndexedAccess`). Comments and logs in English. No `console.log`; production builds strip it anyway (`compiler.removeConsole` keeps `error`/`warn`).
+
+### Routing
+
+- List pages (`blog`, `videos`, `courses`, `conferences`) live in `[page]` segments. Page 1 is served at the bare path (`/blog`) through a rewrite in `next.config.mjs`, and `/x/1` permanently redirects (308) to `/x`. Build list links with `INTERNAL_ROUTES.X.href()`, never hardcode `/x/1`.
+- Page segments must match `^[1-9]\d*$` and be within range, otherwise `notFound()`.
+- `/blog/[page]` also serves articles: `/blog/<slug>-<mediumPostId>`. Invalid ids 404 without a network request; a wrong slug 308-redirects to the canonical one.
+
+### Error handling
+
+"Content doesn't exist" → `notFound()`. "Source unreachable" (network error, 5xx) → throw, so `app/error.tsx` handles it and ISR keeps serving the last good version. `app/global-error.tsx` covers root layout failures.
 
 ### Backend (`backend/`)
 
@@ -54,25 +72,30 @@ Package manager: **Yarn** for both frontend and backend.
 
 ### Data Flow
 
-Frontend server components call services → services call `fetchAPI()` → fetchAPI hits Strapi REST API with bearer token → responses follow `IStrapiResponse<T>` shape with `data` and `meta.pagination`. External content (YouTube, Medium, Udemy) is fetched directly from those services.
+Frontend server components call services → services call `fetchAPI()` → fetchAPI hits Strapi REST API with bearer token → responses follow `IStrapiResponse<T>` shape with `data` and `meta` (collections add `meta.pagination`). External content (YouTube, Medium, Substack, Udemy) is fetched directly from those services with `fetch` and the Next.js data cache.
 
 ### Dynamic Theming
 
-Primary colors are fetched from Strapi's `theme` content type, converted to HSL, and applied as CSS custom properties at the layout level.
+Primary colours (hex) come from Strapi's `theme` content type and are set as `--primary-dark` / `--primary-light` CSS variables on `<html>` in the root layout (`themeColorVariables()` in `config/site.ts`).
+
+### Caching
+
+Strapi webhooks call `/api/revalidate`, which maps each model to its cache tags (`MODEL_TAGS`) and revalidates them. See `frontend/update.md` for the Next.js 16 cache audit.
 
 ### Deployment
 
-GitHub Actions (`.github/workflows/deploy.yml`) deploys both projects to a VPS via SSH on push to `main` or `dev`. Both run as PM2 processes. Branch-specific env vars control ports and database names.
+GitHub Actions (`.github/workflows/deploy.yml`) deploys both projects to a VPS via SSH on push to `main` or `dev`. Both run as PM2 processes behind Nginx. Branch-specific env vars control ports and database names. The contact form rate limit reads the client IP from `X-Real-IP`, which Nginx must set.
 
 ### API Routes
 
-- `/api/og` — Dynamic Open Graph image generation
+- `/api/og` — Dynamic Open Graph image and favicon generation
 - `/api/revalidate` — On-demand ISR revalidation (requires `REVALIDATE_KEY`)
-- `/api/send` — Contact form email submission
+
+The contact form uses a server action, not an API route.
 
 ### Key Environment Variables
 
-- **Frontend**: `NEXT_PUBLIC_STRAPI_API_URL`, `BEARER_TOKEN`, `YOUTUBE_API_KEY`, `RESEND_API_KEY`, `REVALIDATE_KEY`
+- **Frontend**: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_STRAPI_API_URL`, `BEARER_TOKEN` (required), `YOUTUBE_API_KEY`, `RESEND_API_KEY`, `REVALIDATE_KEY`, `CONTACT_TO_EMAIL`. See `frontend/.env.example`.
 - **Backend**: `DATABASE_*` (PostgreSQL), `AWS_*` (S3), `APP_KEYS`, `JWT_SECRET`
 
 You can read @frontend\AGENTS.md for frontend updates
