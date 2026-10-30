@@ -106,7 +106,9 @@ export default function InfoSection({
             href={href}
             className="state-layer group text-on-surface flex h-full min-h-18 items-center gap-4 rounded-sm px-4 py-2 focus-visible:outline-none"
           >
-            <span className="bg-secondary-container text-on-secondary-container flex size-10 shrink-0 items-center justify-center rounded-full">
+            {/* Primary fill: the card is surface-container-highest, which a container role (same
+                tone) would blend into in some palettes */}
+            <span className="bg-primary text-on-primary flex size-10 shrink-0 items-center justify-center rounded-full">
               {icon}
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
