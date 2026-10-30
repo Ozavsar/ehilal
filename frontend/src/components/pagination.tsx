@@ -1,8 +1,9 @@
 import Link from "next/link";
-import clsx from "clsx";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { generatePagination } from "@/lib/pagination";
-import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
+import { Icon } from "@/components/icon";
+import { NAV_BACK, NAV_FORWARD } from "@/components/view-transitions";
+import { cn } from "@/lib/utils";
 
 /** The paginated lists: the INTERNAL_ROUTES entries that build page links with href(). */
 type ListRoute = {
@@ -19,6 +20,7 @@ interface IPaginationProps {
 
 // Server component: the list route comes in as a prop instead of usePathname(). The links keep
 // Next's default scroll, so a new page opens at the top instead of where the old one was left.
+// Each link tags its navigation forward or back, for the list's M3 shared axis transition.
 export default function Pagination({ route, totalPages, currentPage }: IPaginationProps) {
   // Page 1 is the bare list path (/blog), pages 2..N are /blog/<n>
   const createPageURL = (pageNumber: number) => INTERNAL_ROUTES[route].href(pageNumber);
@@ -26,70 +28,73 @@ export default function Pagination({ route, totalPages, currentPage }: IPaginati
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <div className="z-(--z-pagination) mx-auto mt-8 flex items-center self-end">
+    <nav
+      aria-label="Pagination"
+      className="z-(--z-pagination) mx-auto mt-8 flex items-center gap-1 self-end sm:gap-2"
+    >
       <PaginationArrow
         direction="left"
         href={createPageURL(currentPage - 1)}
         isDisabled={currentPage <= 1}
       />
 
-      <div className="flex -space-x-px">
-        {allPages.map((page, index) => {
-          let position: "first" | "last" | "single" | "middle" | undefined;
-
-          if (index === 0) position = "first";
-          if (index === allPages.length - 1) position = "last";
-          if (allPages.length === 1) position = "single";
-          if (page === "...") position = "middle";
-
-          return (
+      <ul className="flex items-center gap-1">
+        {allPages.map((page, index) => (
+          // Two "..." entries can appear, so the value alone is not a unique key
+          <li key={`${page}-${index}`}>
             <PaginationNumber
-              // Two "..." entries can appear, so the value alone is not a unique key
-              key={`${page}-${index}`}
               href={page === "..." ? "" : createPageURL(page)}
               page={page}
-              position={position}
               isActive={currentPage === page}
+              isForward={typeof page === "number" && page > currentPage}
             />
-          );
-        })}
-      </div>
+          </li>
+        ))}
+      </ul>
 
       <PaginationArrow
         direction="right"
         href={createPageURL(currentPage + 1)}
         isDisabled={currentPage >= totalPages}
       />
-    </div>
+    </nav>
   );
 }
+
+// 40dp circles like M3 icon buttons (48dp touch targets): the current page is the selected
+// (secondary-container) one, the others carry a state layer.
+const itemClassName =
+  "touch-target relative type-label-large flex size-10 items-center justify-center rounded-full outline-primary focus-visible:outline-3 focus-visible:outline-offset-2";
 
 function PaginationNumber({
   page,
   href,
   isActive,
-  position,
+  isForward,
 }: {
   page: number | string;
   href: string;
-  position?: "first" | "last" | "middle" | "single";
   isActive: boolean;
+  isForward: boolean;
 }) {
-  const className = clsx(
-    "flex size-9 sm:size-10 items-center bg-background justify-center text-sm border border-muted",
-    {
-      "rounded-l-md": position === "first" || position === "single",
-      "rounded-r-md": position === "last" || position === "single",
-      "bg-primary border-accent": isActive,
-      "hover:bg-muted": !isActive && position !== "middle",
-      "text-gray-300": position === "middle",
-    },
-  );
+  if (page === "...") {
+    return <span className={cn(itemClassName, "text-on-surface-variant")}>…</span>;
+  }
 
-  return isActive || position === "middle" ? (
-    <div className={className}>{page}</div>
+  return isActive ? (
+    <span
+      aria-current="page"
+      className={cn(itemClassName, "bg-secondary-container text-on-secondary-container")}
+    >
+      {page}
+    </span>
   ) : (
-    <Link href={href} className={className}>
+    <Link
+      href={href}
+      aria-label={`Page ${page}`}
+      transitionTypes={[isForward ? NAV_FORWARD : NAV_BACK]}
+      className={cn(itemClassName, "state-layer text-on-surface-variant")}
+    >
       {page}
     </Link>
   );
@@ -104,23 +109,21 @@ function PaginationArrow({
   direction: "left" | "right";
   isDisabled?: boolean;
 }) {
-  const className = clsx(
-    "flex size-8 sm:size-10 items-center justify-center rounded-md border border-muted",
-    {
-      "pointer-events-none text-gray-500": isDisabled,
-      "hover:bg-muted": !isDisabled,
-      "mr-1 md:mr-4": direction === "left",
-      "ml-1 md:ml-4": direction === "right",
-    },
-  );
+  const label = direction === "left" ? "Previous page" : "Next page";
+  const icon = <Icon name={direction === "left" ? "arrow_back" : "arrow_forward"} />;
 
-  const icon =
-    direction === "left" ? <LuArrowLeft className="w-4" /> : <LuArrowRight className="w-4" />;
-
+  // A disabled arrow is plain text for assistive tech too: no link, no name to announce
   return isDisabled ? (
-    <div className={className}>{icon}</div>
+    <span aria-hidden="true" className={cn(itemClassName, "text-on-surface/38")}>
+      {icon}
+    </span>
   ) : (
-    <Link className={className} href={href}>
+    <Link
+      className={cn(itemClassName, "state-layer text-on-surface-variant")}
+      href={href}
+      aria-label={label}
+      transitionTypes={[direction === "left" ? NAV_BACK : NAV_FORWARD]}
+    >
       {icon}
     </Link>
   );

@@ -56,7 +56,6 @@ const useFormField = () => {
     id,
     name: fieldContext.name,
     formItemId: `${id}-form-item`,
-    formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
     ...fieldState,
   };
@@ -74,7 +73,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 
     return (
       <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn("space-y-2", className)} {...props} />
+        <div ref={ref} className={cn("group/field flex flex-col gap-1", className)} {...props} />
       </FormItemContext.Provider>
     );
   },
@@ -83,17 +82,25 @@ FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+    /** M3 required field: an asterisk after the label. Visual only, the control's `required`
+     * tells assistive tech. */
+    required?: boolean;
+  }
+>(({ className, required, children, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
+      // M3: the label takes the primary colour while its field has focus, the error colour on error
+      className={cn(error ? "text-error" : "group-focus-within/field:text-primary", className)}
       htmlFor={formItemId}
       {...props}
-    />
+    >
+      {children}
+      {required && <span aria-hidden="true">*</span>}
+    </Label>
   );
 });
 FormLabel.displayName = "FormLabel";
@@ -102,36 +109,20 @@ const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+  const { error, formItemId, formMessageId } = useFormField();
 
   return (
     <Slot
       ref={ref}
       id={formItemId}
-      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      // The error message is only rendered (and referenced) while there is an error
+      aria-describedby={error ? formMessageId : undefined}
       aria-invalid={!!error}
       {...props}
     />
   );
 });
 FormControl.displayName = "FormControl";
-
-const FormDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
-  const { formDescriptionId } = useFormField();
-
-  return (
-    <p
-      ref={ref}
-      id={formDescriptionId}
-      className={cn("text-muted-foreground text-sm", className)}
-      {...props}
-    />
-  );
-});
-FormDescription.displayName = "FormDescription";
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
@@ -148,7 +139,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-destructive text-sm font-medium", className)}
+      className={cn("text-error type-body-small px-4", className)}
       {...props}
     >
       {body}
@@ -157,13 +148,4 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
-export {
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
-};
+export { useFormField, Form, FormItem, FormLabel, FormControl, FormMessage, FormField };

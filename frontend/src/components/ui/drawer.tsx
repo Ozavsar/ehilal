@@ -25,7 +25,7 @@ const DrawerOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-(--z-overlay) bg-black/80", className)}
+    className={cn("bg-scrim/32 fixed inset-0 z-(--z-overlay)", className)}
     {...props}
   />
 ));
@@ -40,12 +40,17 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "bg-background fixed inset-x-0 bottom-0 z-(--z-overlay) mt-24 flex h-auto flex-col rounded-t-[10px] border",
+        // M3 bottom sheet: surface-container-low, 28dp top corners, elevation 1, at most 640dp wide
+        "bg-surface-container-low text-on-surface shadow-elevation-1 fixed inset-x-0 bottom-0 z-(--z-overlay) mx-auto mt-24 flex h-auto w-full max-w-160 flex-col rounded-t-xl",
         className,
       )}
       {...props}
     >
-      <div className="bg-muted mx-auto mt-4 h-2 w-25 rounded-full" />
+      {/* M3 drag handle: 32x4dp, 22dp from the top edge */}
+      <div
+        aria-hidden="true"
+        className="bg-on-surface-variant/40 mx-auto mt-5.5 h-1 w-8 shrink-0 rounded-full"
+      />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
@@ -53,7 +58,7 @@ const DrawerContent = React.forwardRef<
 DrawerContent.displayName = "DrawerContent";
 
 const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)} {...props} />
+  <div className={cn("grid gap-2 p-4 text-center sm:text-left", className)} {...props} />
 );
 DrawerHeader.displayName = "DrawerHeader";
 
@@ -66,11 +71,7 @@ const DrawerTitle = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DrawerPrimitive.Title
-    ref={ref}
-    className={cn("text-lg leading-none font-semibold tracking-tight", className)}
-    {...props}
-  />
+  <DrawerPrimitive.Title ref={ref} className={cn("type-title-large", className)} {...props} />
 ));
 DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
 
@@ -80,7 +81,7 @@ const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Description
     ref={ref}
-    className={cn("text-muted-foreground text-sm", className)}
+    className={cn("text-on-surface-variant type-body-medium", className)}
     {...props}
   />
 ));

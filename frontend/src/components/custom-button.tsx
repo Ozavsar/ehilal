@@ -1,28 +1,43 @@
-import { LuArrowRight } from "react-icons/lu";
-import type { IconType } from "react-icons/lib";
+import Link from "next/link";
+import { Icon } from "@/components/icon";
+import type { IconName } from "@/components/icon-names";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-interface CustomButtonProps extends Omit<ButtonProps, "children"> {
+interface CustomButtonProps extends Omit<ButtonProps, "children" | "asChild"> {
   text: string;
-  icon?: IconType;
+  icon?: IconName;
+  /** Renders a link styled as the button, instead of a <button> (never nest one in a link) */
+  href?: string;
 }
 
+// The page's main call to action: an M3 filled button at the medium size (56dp) with a trailing
+// icon that nudges forward on hover.
 export default function CustomButton({
   text,
-  className = "",
-  icon: Icon = LuArrowRight,
+  className,
+  icon = "arrow_forward",
+  href,
+  size = "lg",
   ...props
 }: CustomButtonProps) {
-  return (
-    <Button
-      className={`group border-primary text-foreground relative flex h-14 w-fit cursor-pointer items-center gap-6 overflow-hidden rounded-full border bg-transparent px-10 pr-0 font-bold uppercase transition-all duration-500 ease-out hover:text-white ${className}`}
-      {...props}
-    >
+  const content = (
+    <>
       {text}
-      <span className="bg-primary relative flex size-14 items-center justify-center rounded-full">
-        <Icon size={24} className="text-white" />{" "}
-      </span>
-      <span className="bg-primary absolute inset-0 z-(--z-behind) h-full w-full origin-right scale-x-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-x-100 group-active:scale-x-0 group-active:duration-150" />
+      <Icon
+        name={icon}
+        className="ease-standard transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none"
+      />
+    </>
+  );
+
+  return href ? (
+    <Button asChild size={size} className={cn("group w-fit pr-5", className)} {...props}>
+      <Link href={href}>{content}</Link>
+    </Button>
+  ) : (
+    <Button size={size} className={cn("group w-fit pr-5", className)} {...props}>
+      {content}
     </Button>
   );
 }

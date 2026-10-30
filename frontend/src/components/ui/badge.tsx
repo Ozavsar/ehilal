@@ -3,15 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// Static labels shaped like M3 chips (32dp, 8dp corners, label-large); not interactive, so no
+// state layer. Icons inside are 18dp like a chip's leading icon.
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex h-8 items-center gap-2 rounded-sm px-4 type-label-large [--icon-size:18px]",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-foreground hover:bg-primary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground border-primary",
+        default: "bg-primary text-on-primary",
+        destructive: "bg-error-container text-on-error-container",
+        // Highlights such as "Featured"
+        tertiary: "bg-tertiary-container text-on-tertiary-container",
+        // M3 assist chip look
+        outline: "border border-outline-variant text-on-surface-variant",
       },
     },
     defaultVariants: {
@@ -21,8 +25,7 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant }), className)} {...props} />;

@@ -28,26 +28,24 @@ export default function ErrorPage({
     });
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 text-center md:py-4">
+    <main
+      id="main"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 text-center sm:px-6 md:py-4"
+    >
       <p
         aria-hidden="true"
-        className="text-muted-foreground/25 dark:text-card tracking-backdrop text-6xl font-extrabold uppercase select-none sm:text-9xl"
+        className="text-outline-variant type-display-large uppercase select-none"
       >
         Oops
       </p>
-      <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h1 className="type-headline-small sm:type-headline-medium mt-6">
         Houston, we have a <span className="text-primary">problem</span>
       </h1>
-      <p className="text-muted-foreground mt-2 max-w-md max-md:text-sm sm:mt-4">
+      <p className="text-on-surface-variant type-body-medium sm:type-body-large mt-2 max-w-md sm:mt-4">
         This page couldn&apos;t be loaded right now. Please try again in a moment.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:mt-8">
-        <Button
-          variant="outline"
-          onClick={retry}
-          disabled={isRetrying}
-          className="border-primary/75 text-primary hover:bg-primary/20 bg-transparent hover:text-white"
-        >
+        <Button variant="outline" onClick={retry} disabled={isRetrying}>
           {isRetrying ? "Retrying…" : "Try again"}
         </Button>
         <Button asChild variant="link">

@@ -1,3 +1,7 @@
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+// A secondary link in a card footer, as an M3 text button (same height as a small filled button)
 export default function LinkButton({
   children,
   className,
@@ -6,11 +10,9 @@ export default function LinkButton({
   children: React.ReactNode;
 }) {
   return (
-    <a
-      {...props}
-      className={`text-foreground after:bg-foreground relative inline-flex items-center gap-1 text-xs after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-bottom-right after:scale-x-0 after:transition-transform after:duration-300 after:ease-[cubic-bezier(0.65_0.05_0.36_1)] hover:after:origin-bottom-left hover:after:scale-x-100 ${className || ""}`}
-    >
+    <a {...props} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), className)}>
       {children}
+      {props.target === "_blank" && <span className="sr-only"> (opens in a new tab)</span>}
     </a>
   );
 }

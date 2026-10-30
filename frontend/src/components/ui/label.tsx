@@ -6,8 +6,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// Field label above an M3 outlined text field (body-small, the size of the field's floating label)
 const labelVariants = cva(
-  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+  "type-body-small text-on-surface-variant peer-disabled:cursor-not-allowed peer-disabled:opacity-38",
 );
 
 const Label = React.forwardRef<

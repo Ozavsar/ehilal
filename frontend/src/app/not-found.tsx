@@ -1,6 +1,8 @@
 import { cache } from "react";
 import { unstable_rethrow } from "next/navigation";
-import { NotFoundClient } from "@/components/not-found-client";
+import type { Metadata } from "next";
+import NotFoundView from "@/containers/not-found";
+import { PAGE_SEO } from "@/config/seo";
 import { getNotFoundPageContent } from "@/lib/services/pages";
 
 // A Strapi outage must not turn every 404 into an error page, so render without CMS content instead
@@ -19,14 +21,11 @@ const getContent = cache(async () => {
 
 export default async function NotFound() {
   const content = await getContent();
-  return <NotFoundClient imageUrl={content?.image?.url} />;
+  return <NotFoundView image={content?.image} />;
 }
 
-export async function generateMetadata() {
-  const content = await getContent();
-
-  return {
-    title: content?.SEO_title || "404 Not Found",
-    description: content?.SEO_description || "This page does not exist.",
-  };
-}
+// No canonical or social tags: the page answers 404 for any path, and Next.js marks it noindex
+export const metadata: Metadata = {
+  title: PAGE_SEO.NOT_FOUND.title,
+  description: PAGE_SEO.NOT_FOUND.description,
+};
