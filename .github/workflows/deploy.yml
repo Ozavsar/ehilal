@@ -82,6 +82,10 @@ jobs:
             echo "AWS_ACCESS_SECRET=${{ secrets.AWS_ACCESS_SECRET }}" >> .env
             echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
             echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
+            # Strapi Preview opens the frontend's draft-mode route; both sides share PREVIEW_SECRET
+            echo "PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}" >> .env
+            FRONTEND_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
+            echo "FRONTEND_URL=$FRONTEND_URL" >> .env
 
             yarn
             yarn build
@@ -102,6 +106,7 @@ jobs:
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
             echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
             echo "CONTACT_TO_EMAIL=${{ secrets.CONTACT_TO_EMAIL }}" >> .env.local
+            echo "PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}" >> .env.local
             NEXT_PUBLIC_SITE_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
             NEXT_PUBLIC_STRAPI_API_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_STRAPI_API_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
             echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.local
