@@ -38,7 +38,7 @@ export async function getAllConferences(start?: number, limit?: number) {
 }
 
 /**
- * Number of conferences, without loading any images (sitemap, generateStaticParams).
+ * Number of conferences, without loading any images (generateStaticParams).
  */
 export async function getConferenceCount(): Promise<number> {
   const response = await fetchAPI<IStrapiCollectionResponse<Pick<IStrapiConference, "date">>>(

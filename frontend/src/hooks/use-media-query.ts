@@ -17,3 +17,13 @@ export function useMediaQuery(query: string): boolean {
     () => false,
   );
 }
+
+/** Live `prefers-reduced-motion: reduce`. False on the server and during hydration. */
+export function usePrefersReducedMotion(): boolean {
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
+}
+
+/** Swiper's `speed`: its default 300ms slide, 0 (the slide changes at once) under reduced motion */
+export function useSlideSpeed(): number {
+  return usePrefersReducedMotion() ? 0 : 300;
+}

@@ -1,5 +1,4 @@
-import { LuContact, LuHouse, LuNotebookPen, LuPresentation, LuVideo } from "react-icons/lu";
-import { SiUdemy } from "react-icons/si";
+import type { IconName } from "@/components/icon-names";
 
 // Page 1 of a list lives at the bare path (next.config rewrites it to /x/1), pages 2..N at /x/<n>.
 // The blog also uses /blog/<slug> for articles.
@@ -8,39 +7,43 @@ const listHref =
   (page: number | string = 1): string =>
     String(page) === "1" ? path : `${path}/${page}`;
 
+// `icon`: the Material Symbol the navigation shows for the destination (filled when active)
 export const INTERNAL_ROUTES = {
-  HOME: { path: "/", label: "Home", icon: LuHouse },
+  HOME: { path: "/", label: "Home", icon: "home" },
 
   CONFERENCES: {
     path: "/conferences",
     label: "Conferences",
-    icon: LuPresentation,
+    icon: "co_present",
     href: listHref("/conferences"),
   },
 
   BLOG: {
     path: "/blog",
     label: "Blog",
-    icon: LuNotebookPen,
+    icon: "article",
     href: listHref("/blog"),
   },
 
   VIDEOS: {
     path: "/videos",
     label: "Videos",
-    icon: LuVideo,
+    icon: "smart_display",
     href: listHref("/videos"),
   },
 
   COURSES: {
     path: "/courses",
     label: "Courses",
-    icon: SiUdemy,
+    icon: "school",
     href: listHref("/courses"),
   },
 
-  CONTACT: { path: "/contact", label: "Contact", icon: LuContact },
-} as const;
+  CONTACT: { path: "/contact", label: "Contact", icon: "mail" },
+} as const satisfies Record<
+  string,
+  { path: string; label: string; icon: IconName; href?: unknown }
+>;
 
 export const MENUS = {
   NAV: Object.entries(INTERNAL_ROUTES).map(([key, route]) => ({

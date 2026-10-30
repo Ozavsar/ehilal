@@ -53,6 +53,7 @@ const LIST_QUERY = `
               subtitle
             }
             firstPublishedAt
+            latestPublishedAt
           }
           pagingInfo {
             next {
@@ -121,6 +122,8 @@ const listResponseSchema = z.object({
             previewImage: z.object({ id: z.string() }).nullish(),
             extendedPreviewContent: z.object({ subtitle: z.string().nullish() }).nullish(),
             firstPublishedAt: z.number(),
+            // Last time the post was (re)published; Medium's updatedAt also moves on stats changes
+            latestPublishedAt: z.number().nullish(),
           }),
         ),
         pagingInfo: z.object({
@@ -226,19 +229,20 @@ async function fetchAllArticlePreviews(): Promise<IBlogPreview[]> {
       .userResult.homepagePostsConnection;
 
     previews.push(
-      ...posts.map(
-        (post): IBlogPreview => ({
-          title: post.title,
-          externalURL: post.mediumUrl,
-          externalBlogSource: BlogSource.MEDIUM,
-          description: post.extendedPreviewContent?.subtitle || "",
-          thumbnailURL: post.previewImage?.id
-            ? `${MEDIUM_IMAGE_URL}/da:true/${post.previewImage.id}`
-            : "",
-          publishedAt: new Date(post.firstPublishedAt).toISOString(),
-          slug: getMediumArticleSlug(post.mediumUrl),
-        }),
-      ),
+      ...posts.map((post): IBlogPreview => ({
+        title: post.title,
+        externalURL: post.mediumUrl,
+        externalBlogSource: BlogSource.MEDIUM,
+        description: post.extendedPreviewContent?.subtitle || "",
+        thumbnailURL: post.previewImage?.id
+          ? `${MEDIUM_IMAGE_URL}/da:true/${post.previewImage.id}`
+          : "",
+        publishedAt: new Date(post.firstPublishedAt).toISOString(),
+        updatedAt: post.latestPublishedAt
+          ? new Date(post.latestPublishedAt).toISOString()
+          : undefined,
+        slug: getMediumArticleSlug(post.mediumUrl),
+      })),
     );
 
     const next = pagingInfo.next?.from;
@@ -286,27 +290,25 @@ export async function getSingleArticle(postId: string): Promise<IBlog | null> {
     previewImage: post.previewImage
       ? { id: post.previewImage.id, alt: post.previewImage.alt ?? null }
       : null,
-    paragraphs: paragraphs.map(
-      (p): IMediumParagraph => ({
-        name: p.name,
-        text: p.text ?? "",
-        type: p.type,
-        metadata: p.metadata
-          ? {
-              id: p.metadata.id,
-              originalWidth: p.metadata.originalWidth ?? undefined,
-              originalHeight: p.metadata.originalHeight ?? undefined,
-            }
-          : null,
-        iframe: p.iframe
-          ? {
-              mediaResource: {
-                iframeSrc: p.iframe.mediaResource.iframeSrc,
-                title: p.iframe.mediaResource.title ?? null,
-              },
-            }
-          : null,
-      }),
-    ),
+    paragraphs: paragraphs.map((p): IMediumParagraph => ({
+      name: p.name,
+      text: p.text ?? "",
+      type: p.type,
+      metadata: p.metadata
+        ? {
+            id: p.metadata.id,
+            originalWidth: p.metadata.originalWidth ?? undefined,
+            originalHeight: p.metadata.originalHeight ?? undefined,
+          }
+        : null,
+      iframe: p.iframe
+        ? {
+            mediaResource: {
+              iframeSrc: p.iframe.mediaResource.iframeSrc,
+              title: p.iframe.mediaResource.title ?? null,
+            },
+          }
+        : null,
+    })),
   };
 }

@@ -12,7 +12,15 @@ export const useThemeTransition = () => {
     }
     // flushSync commits the theme change inside the callback, so the view transition captures
     // the new state instead of racing React's scheduler
-    document.startViewTransition(() => flushSync(updateFn));
+    const update = () => flushSync(updateFn);
+    try {
+      // The "theme" type keeps the page transitions' navigation anchor (app/globals.css) out of
+      // the circular reveal, which has to cover the whole page
+      document.startViewTransition({ update, types: ["theme"] });
+    } catch {
+      // Browsers from before view transition types only take the callback
+      document.startViewTransition(update);
+    }
   }, []);
 
   return { startTransition };

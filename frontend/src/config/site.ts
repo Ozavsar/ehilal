@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { COMPANY_LINKEDIN_URL, COMPANY_URL, LEGALIFI_URL } from "@/config/constants";
 import type { ISiteSettings } from "@/types";
 
@@ -25,14 +24,3 @@ export const DEFAULT_SITE_SETTINGS: ISiteSettings = {
   karakodLinkedinUrl: COMPANY_LINKEDIN_URL,
   legalifiUrl: LEGALIFI_URL,
 };
-
-// Used when the Strapi theme can't be loaded or a colour is unset; keep in sync with the CMS values
-export const DEFAULT_THEME_COLORS = { primaryDark: "#607304", primaryLight: "#bf2821" } as const;
-
-// Hex colours that globals.css uses as --primary in the dark and light themes
-export function themeColorVariables(colors: { primaryDark: string; primaryLight: string }) {
-  return {
-    "--primary-dark": colors.primaryDark,
-    "--primary-light": colors.primaryLight,
-  } as CSSProperties;
-}

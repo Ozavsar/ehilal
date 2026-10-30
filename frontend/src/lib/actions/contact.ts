@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { EmailTemplate } from "@/components/email-template";
 import { env } from "@/config/env";
-import { getTheme } from "@/lib/services";
+import { getThemePalette } from "@/lib/services";
 import { getContactPageContent } from "@/lib/services/pages";
 import {
   CONTACT_HONEYPOT_FIELD,
@@ -88,8 +88,8 @@ export async function sendContactMessage(
 
   try {
     // Theme colors and recipient come from Strapi; the mail still goes out with fallbacks if Strapi is unreachable
-    const [theme, contactPage] = await Promise.all([
-      getTheme().catch(() => null),
+    const [palette, contactPage] = await Promise.all([
+      getThemePalette(),
       getContactPageContent().catch(() => null),
     ]);
 
@@ -109,7 +109,7 @@ export async function sendContactMessage(
       replyTo: data.email,
       // Collapse whitespace so the subject stays a single header line
       subject: `[ehilal.net] ${data.subject.replace(/\s+/g, " ")}`,
-      react: await EmailTemplate({ ...data, primaryColor: theme?.primaryDark || undefined }),
+      react: await EmailTemplate({ ...data, colors: palette.schemes.light }),
     });
 
     if (error) {

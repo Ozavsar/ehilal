@@ -8,23 +8,34 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f5f5f5;
-  --foreground: #666666;
-  --card: #ffffff;
-  --card-foreground: #474747;
-  --popover: #ffffff;
-  --popover-foreground: #666666;
-  --primary: var(--primary-light);
-  --muted: #ededed;
-  --muted-foreground: #757575;
-  --accent: #ededed;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #666666;
-  --radius: 0.5rem;
+  /* Colours: the Material 3 roles arrive as --m3-* variables from the root layout (palette from
+     Strapi, see lib/palette.ts), light on :root and dark on .dark. Use them through the --color-*
+     tokens below (bg-surface, text-on-surface-variant, ...). */
+
+  /* M3 durations, for keyframes and component CSS. In class names use the bare numbers, which
+     are the same values: duration-200 (short4), duration-300 (medium2), duration-400 (medium4) */
+  --duration-short1: 50ms;
+  --duration-short2: 100ms;
+  --duration-short3: 150ms;
+  --duration-short4: 200ms;
+  --duration-medium1: 250ms;
+  --duration-medium2: 300ms;
+  --duration-medium3: 350ms;
+  --duration-medium4: 400ms;
+  --duration-long1: 450ms;
+  --duration-long2: 500ms;
+  --duration-long3: 550ms;
+  --duration-long4: 600ms;
+  --duration-extra-long1: 700ms;
+  --duration-extra-long2: 800ms;
+  --duration-extra-long3: 900ms;
+  --duration-extra-long4: 1000ms;
+
+  /* M3 state layer opacities (.state-layer below) */
+  --state-hover: 0.08;
+  --state-focus: 0.12;
+  --state-pressed: 0.12;
+  --state-dragged: 0.16;
 
   /* Stacking scale, low to high. Use through z-(--z-*) or var(--z-*), never a bare number.
      Most layers share the root stacking context with third-party ones (swiper containers sit
@@ -32,34 +43,14 @@
   --z-behind: -10; /* decorative backdrops: home stripe, page-title word, button hover fill */
   --z-pagination: 9;
   --z-raised: 10; /* content lifted over a sibling backdrop (badges, card content, 404 content) */
-  --z-title-bar: 20; /* fixed mobile page-title bar */
-  --z-header: 21; /* fixed header: theme toggle, side nav, mobile bottom nav */
+  --z-header: 21; /* fixed header: navigation rail / bar and the theme toggle */
   /* Decorative rocket cursor: over content and the header, under floating controls and overlays */
   --z-cursor-trail: 30; /* rocket cursor fumes */
   --z-cursor: 31; /* rocket cursor */
-  --z-floating: 50; /* floating controls: article TOC button, mobile bottom nav, gallery close */
+  --z-floating: 50; /* floating controls: article Contents FAB, gallery close */
   --z-overlay: 50; /* vaul drawer overlay and panel (portaled after the TOC button) */
   --z-modal: 60; /* full-screen gallery: above the header, the drawer and the TOC button */
   --z-toast: 999999999; /* sonner's own default: toasts stay above everything */
-}
-
-.dark {
-  --background: #121212;
-  --foreground: #ffffff;
-  --card: #242630;
-  --card-foreground: #dbdde3;
-  --popover: #020617;
-  --popover-foreground: #ffffff;
-  --primary: var(--primary-dark);
-  --muted: #2b2a2a;
-  --muted-foreground: #bfbfbf;
-  --accent: #2b2a2a;
-  --accent-foreground: #ffffff;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #ffffff;
-  --border: #2b2a2a;
-  --input: #2b2a2a;
-  --ring: #c9d6e7;
 }
 
 @theme inline {
@@ -67,92 +58,352 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Colors */
-  --color-primary: var(--primary);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  /* Material 3 colour roles (bg-primary, text-on-primary, bg-surface-container-low, border-outline-variant, ...).
+     Register them nowhere else: tailwind-merge treats any unknown bg-/text-/border- value as a colour */
+  --color-primary: var(--m3-primary);
+  --color-on-primary: var(--m3-on-primary);
+  --color-primary-container: var(--m3-primary-container);
+  --color-on-primary-container: var(--m3-on-primary-container);
+  --color-primary-fixed: var(--m3-primary-fixed);
+  --color-primary-fixed-dim: var(--m3-primary-fixed-dim);
+  --color-on-primary-fixed: var(--m3-on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--m3-on-primary-fixed-variant);
+  --color-secondary: var(--m3-secondary);
+  --color-on-secondary: var(--m3-on-secondary);
+  --color-secondary-container: var(--m3-secondary-container);
+  --color-on-secondary-container: var(--m3-on-secondary-container);
+  --color-secondary-fixed: var(--m3-secondary-fixed);
+  --color-secondary-fixed-dim: var(--m3-secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--m3-on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--m3-on-secondary-fixed-variant);
+  --color-tertiary: var(--m3-tertiary);
+  --color-on-tertiary: var(--m3-on-tertiary);
+  --color-tertiary-container: var(--m3-tertiary-container);
+  --color-on-tertiary-container: var(--m3-on-tertiary-container);
+  --color-tertiary-fixed: var(--m3-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--m3-tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--m3-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--m3-on-tertiary-fixed-variant);
+  --color-error: var(--m3-error);
+  --color-on-error: var(--m3-on-error);
+  --color-error-container: var(--m3-error-container);
+  --color-on-error-container: var(--m3-on-error-container);
+  --color-surface: var(--m3-surface);
+  --color-on-surface: var(--m3-on-surface);
+  --color-surface-variant: var(--m3-surface-variant);
+  --color-on-surface-variant: var(--m3-on-surface-variant);
+  --color-surface-dim: var(--m3-surface-dim);
+  --color-surface-bright: var(--m3-surface-bright);
+  --color-surface-container-lowest: var(--m3-surface-container-lowest);
+  --color-surface-container-low: var(--m3-surface-container-low);
+  --color-surface-container: var(--m3-surface-container);
+  --color-surface-container-high: var(--m3-surface-container-high);
+  --color-surface-container-highest: var(--m3-surface-container-highest);
+  --color-outline: var(--m3-outline);
+  --color-outline-variant: var(--m3-outline-variant);
+  --color-inverse-surface: var(--m3-inverse-surface);
+  --color-inverse-on-surface: var(--m3-inverse-on-surface);
+  --color-inverse-primary: var(--m3-inverse-primary);
+  --color-shadow: var(--m3-shadow);
+  --color-scrim: var(--m3-scrim);
+  --color-surface-tint: var(--m3-surface-tint);
 
-  /* Border Radius */
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  /* Breakpoints */
-  --breakpoint-sm: 540px;
-  --breakpoint-md: 720px;
-  --breakpoint-lg: 960px;
-  --breakpoint-xl: 1140px;
-  --breakpoint-2xl: 1320px;
-
-  /* Animations */
-  --animate-hero-in: hero-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  /* Keyframe animations (keyframes below). Inline, so a component can retune the fade timing on
+     the element itself: [--m3-enter-duration:200ms] [--m3-exit-duration:100ms] (menus) */
+  --animate-hero-in: hero-in var(--duration-long2) var(--ease-emphasized-decelerate) both;
+  /* Fade: popups appearing within the screen (dialog, menu, popover, toast) */
+  --animate-m3-fade-enter: m3-fade-enter var(--m3-enter-duration, var(--duration-medium4))
+    var(--ease-emphasized-decelerate) both;
+  --animate-m3-fade-exit: m3-fade-exit var(--m3-exit-duration, var(--duration-short3))
+    var(--ease-emphasized-accelerate) both;
+  /* Scrims cover the viewport: opacity only, no scale */
+  --animate-m3-scrim-enter: m3-scrim-enter var(--m3-enter-duration, var(--duration-medium4))
+    var(--ease-emphasized-decelerate) both;
+  --animate-m3-scrim-exit: m3-fade-exit var(--m3-exit-duration, var(--duration-short3))
+    var(--ease-emphasized-accelerate) both;
+  /* Fade through: swapping unrelated content (tab panels, destinations) */
+  --animate-m3-fade-through-enter: m3-fade-through-enter var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-fade-through-exit: m3-fade-through-exit var(--duration-long1) var(--ease-emphasized)
+    both;
+  /* Shared axis: spatial or hierarchical steps. .m3-axis-backward flips the X/Y direction */
+  --animate-m3-shared-axis-x-enter: m3-shared-axis-x-enter var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-shared-axis-x-exit: m3-shared-axis-x-exit var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-shared-axis-y-enter: m3-shared-axis-y-enter var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-shared-axis-y-exit: m3-shared-axis-y-exit var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-shared-axis-z-enter: m3-shared-axis-z-enter var(--duration-long1)
+    var(--ease-emphasized) both;
+  --animate-m3-shared-axis-z-exit: m3-shared-axis-z-exit var(--duration-long1)
+    var(--ease-emphasized) both;
 }
 
-/* Layout and type tokens. Register new names in the twMerge config in lib/utils.ts too, otherwise
-   cn() can mistake e.g. text-backdrop for a colour and drop the real colour class. */
+/* Material 3 foundations: window size classes, shape, elevation, easing, layout. Register new
+   names in the twMerge config in lib/utils.ts too. */
 @theme {
-  /* Side padding of the list and article pages from lg up */
-  --spacing-page-gutter: 6rem;
-  /* Room kept clear for the fixed mobile title bar (top) and bottom nav */
-  --spacing-bar-offset: 6rem;
-  /* Distance of the home hero image from the viewport edges */
-  --spacing-hero-inset: 2.5rem;
+  /* Window size classes: sm medium (600), md expanded (840), lg large (1200), xl extra-large (1600) */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 840px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1600px;
 
-  /* TitleSection heading and the large faded words behind titles and on the error pages */
-  --text-page-title: 56px;
+  /* Shape scale. This redefines rounded-xs ... rounded-2xl; 3xl/4xl are off-scale */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-lg-increased: 20px;
+  --radius-xl: 28px;
+  --radius-xl-increased: 32px;
+  --radius-2xl: 48px;
+  --radius-3xl: initial;
+  --radius-4xl: initial;
+
+  /* Elevation levels 0-5 (same shadows in dark mode; surfaces separate by surface-container-*) */
+  --shadow-elevation-0: 0 0 #0000;
+  --shadow-elevation-1: 0 1px 2px 0 #0000004d, 0 1px 3px 1px #00000026;
+  --shadow-elevation-2: 0 1px 2px 0 #0000004d, 0 2px 6px 2px #00000026;
+  --shadow-elevation-3: 0 1px 3px 0 #0000004d, 0 4px 8px 3px #00000026;
+  --shadow-elevation-4: 0 2px 3px 0 #0000004d, 0 6px 10px 4px #00000026;
+  --shadow-elevation-5: 0 4px 4px 0 #0000004d, 0 8px 12px 6px #00000026;
+
+  /* Easing. Hover/colour: standard; entering: emphasized-decelerate; leaving: emphasized-accelerate */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-legacy: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-legacy-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-legacy-accelerate: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Navigation rail width (left, from sm) and navigation bar height (bottom, below sm) */
+  --spacing-rail: 6rem;
+  --spacing-nav-bar: 5rem;
+
+  /* Content max width of the list pages (max-w-content; the container utility uses it too) */
+  --container-content: 1200px;
+}
+
+/* Decorative word behind page titles (TitleSection): outside the M3 type scale on purpose. Register
+   new names in the twMerge config in lib/utils.ts, otherwise cn() can mistake them for colours. */
+@theme {
   --text-backdrop: 110px;
+  /* The 404 digits: a decorative numeral larger than the M3 display roles */
+  --text-numeral: clamp(6rem, 3rem + 10vw, 10rem);
   --tracking-backdrop: 5px;
-  /* Tiny labels: mobile nav captions, article date ribbon year */
-  --text-2xs: 10px;
+}
 
-  --radius-card: 5px;
+/* M3 type scale: size, line height, tracking and weight of each role (the family stays Geist Sans,
+   inherited; add font-mono for code). Utilities, not text-* tokens: tailwind-merge reads an unknown
+   text-* as a colour. Registered as one class group in lib/utils.ts. */
+@utility type-display-large {
+  font-size: 3.5625rem;
+  line-height: 4rem;
+  letter-spacing: -0.015625rem;
+  font-weight: 400;
+}
+@utility type-display-medium {
+  font-size: 2.8125rem;
+  line-height: 3.25rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-display-small {
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-headline-large {
+  font-size: 2rem;
+  line-height: 2.5rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-headline-medium {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-headline-small {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-title-large {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+@utility type-title-medium {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.009375rem;
+  font-weight: 500;
+}
+@utility type-title-small {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.00625rem;
+  font-weight: 500;
+}
+@utility type-body-large {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.03125rem;
+  font-weight: 400;
+}
+@utility type-body-medium {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.015625rem;
+  font-weight: 400;
+}
+@utility type-body-small {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.025rem;
+  font-weight: 400;
+}
+@utility type-label-large {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.00625rem;
+  font-weight: 500;
+}
+@utility type-label-medium {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.03125rem;
+  font-weight: 500;
+}
+@utility type-label-small {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  letter-spacing: 0.03125rem;
+  font-weight: 500;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-outline-variant outline-primary/50;
   }
   html {
-    @apply bg-background text-foreground;
-  }
-  main {
-    @apply max-sm:py-bar-offset;
+    @apply bg-surface text-on-surface;
   }
   ::selection {
-    @apply bg-primary text-white;
+    @apply bg-primary text-on-primary;
   }
 }
 
+/* M3 touch target: on touch screens a control under 48dp (40dp icon buttons, 32dp small buttons,
+   pagination) still takes taps on a 48 x 48dp area centred on it. The element must be positioned
+   (.state-layer is). */
+@utility touch-target {
+  @media (pointer: coarse) {
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 48px);
+      height: max(100%, 48px);
+      translate: -50% -50%;
+    }
+  }
+}
+
+/* M3 state layer: currentColor (the "on" colour of the surface) over the element's background and
+   under its content, 8% hover / 12% focus-visible / 12% pressed. A component, so position
+   utilities (absolute, fixed) on the same element still win over its position: relative. */
+@layer components {
+  .state-layer {
+    position: relative;
+    isolation: isolate;
+  }
+  .state-layer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-short3) var(--ease-standard);
+  }
+  .state-layer:hover::after {
+    opacity: var(--state-hover);
+  }
+  .state-layer:focus-visible::after {
+    opacity: var(--state-focus);
+  }
+  .state-layer:active::after,
+  .state-layer[data-pressed]::after {
+    opacity: var(--state-pressed);
+  }
+  .state-layer:disabled::after,
+  .state-layer[data-disabled]::after,
+  .state-layer[aria-disabled="true"]::after,
+  .state-layer-none::after {
+    opacity: 0;
+  }
+
+  /* Material Symbols (components/icon.tsx). The span holds a ligature name, so everything that
+     could change the text (uppercase, tracking, wrapping) is reset; the 1em box keeps the layout
+     stable while the font loads (display: block paints nothing until then). Size via
+     --icon-size (inherited, so a parent can size every icon inside it), fill via --icon-fill. */
+  .material-symbols {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    font-family: var(--font-icon);
+    font-size: var(--icon-size, 24px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    direction: ltr;
+    user-select: none;
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" var(--icon-fill, 0);
+    transition: font-variation-settings var(--duration-short3) var(--ease-standard);
+  }
+  /* Set by the layout's guard when the icon font failed: keep the box, never show the names */
+  :root.icons-unavailable .material-symbols {
+    visibility: hidden;
+  }
+
+  /* Shared axis X/Y backward navigation: reverses the direction of the m3-shared-axis keyframes */
+  .m3-axis-backward {
+    --m3-axis-distance: -30px;
+  }
+}
+
+/* Page container: M3 window margins (16 compact, 24 from medium) around the content max width */
 @utility container {
+  width: 100%;
+  max-width: calc(var(--container-content) + 2rem);
   margin-inline: auto;
   padding-inline: 1rem;
   @media (width >= theme(--breakpoint-sm)) {
-    max-width: theme(--breakpoint-sm);
-  }
-  @media (width >= theme(--breakpoint-md)) {
-    max-width: theme(--breakpoint-md);
-  }
-  @media (width >= theme(--breakpoint-lg)) {
-    max-width: theme(--breakpoint-lg);
-  }
-  @media (width >= theme(--breakpoint-xl)) {
-    max-width: theme(--breakpoint-xl);
-  }
-  @media (width >= theme(--breakpoint-2xl)) {
-    max-width: theme(--breakpoint-2xl);
+    max-width: calc(var(--container-content) + 3rem);
+    padding-inline: 1.5rem;
   }
 }
 
@@ -167,13 +418,357 @@
   }
 }
 
+/* M3 transition patterns (material-components-android timings). They animate the independent
+   scale/translate properties, so a positioning transform on the same element survives. */
+@keyframes m3-fade-enter {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes m3-fade-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes m3-scrim-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Fade through: the outgoing content is gone at 35%, the incoming one starts there */
+@keyframes m3-fade-through-enter {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+/* Page fade through (view transitions): the incoming page's half, run after the outgoing fade */
+@keyframes m3-fade-through-in {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+@keyframes m3-fade-through-exit {
+  from {
+    opacity: 1;
+  }
+  35%,
+  to {
+    opacity: 0;
+  }
+}
+/* Shared axis: 30dp travel plus the fade-through threshold */
+@keyframes m3-shared-axis-x-enter {
+  from {
+    opacity: 0;
+    translate: var(--m3-axis-distance, 30px) 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes m3-shared-axis-x-exit {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    translate: calc(-1 * var(--m3-axis-distance, 30px)) 0;
+  }
+}
+@keyframes m3-shared-axis-y-enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--m3-axis-distance, 30px);
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes m3-shared-axis-y-exit {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--m3-axis-distance, 30px));
+  }
+}
+@keyframes m3-shared-axis-z-enter {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes m3-shared-axis-z-exit {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+    scale: 1.1;
+  }
+}
+
+/* Reduced motion: M3 keeps opacity-only motion. These later definitions replace the moving
+   keyframes above, so every animate-m3-* (and the hero) is safe without per-element variants. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes hero-in {
+    from,
+    to {
+      transform: none;
+    }
+  }
+  @keyframes m3-fade-enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes m3-fade-through-enter {
+    from,
+    35% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes m3-fade-through-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes m3-shared-axis-x-enter {
+    from,
+    35% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes m3-shared-axis-x-exit {
+    from {
+      opacity: 1;
+    }
+    35%,
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes m3-shared-axis-y-enter {
+    from,
+    35% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes m3-shared-axis-y-exit {
+    from {
+      opacity: 1;
+    }
+    35%,
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes m3-shared-axis-z-enter {
+    from,
+    35% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes m3-shared-axis-z-exit {
+    from {
+      opacity: 1;
+    }
+    35%,
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+/* Page view transitions: React <ViewTransition> boundaries (components/view-transitions.tsx) give
+   these classes to the page parts they animate. Clicks during a transition reach the live page. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* The navigation rail / bar stays a still layer above the content in page transitions, so only
+   the content moves and its live new state shows the active indicator sliding. Not in the theme
+   toggle's transition (type "theme"), whose circular reveal covers the whole page, nor in the
+   photo gallery's (type "gallery"), which opens above the navigation. */
+:root:active-view-transition:not(:active-view-transition-type(theme, gallery)) [data-nav-anchor] {
+  view-transition-name: site-nav;
+}
+::view-transition-group(site-nav) {
+  z-index: var(--z-header);
+  animation: none;
+}
+::view-transition-old(site-nav) {
+  display: none;
+}
+::view-transition-new(site-nav) {
+  animation: none;
+}
+
+/* Fade through (navigation destinations): the old page fades out (short2), then the new one fades
+   in and grows from 92% around the middle of the viewport (short4) */
+::view-transition-old(.fade-through) {
+  animation: m3-fade-exit var(--duration-short2) var(--ease-emphasized-accelerate) both;
+}
+::view-transition-new(.fade-through) {
+  transform-origin: 50% 50vh;
+  animation: m3-fade-through-in var(--duration-short4) var(--ease-emphasized-decelerate)
+    var(--duration-short2) both;
+}
+
+/* Shared axis X (list pages): forward enters from the right, back from the left. Both grids stay
+   in the new grid's place (no travel between scroll positions), only the axis slide moves them. */
+::view-transition-group(.axis-x-forward),
+::view-transition-group(.axis-x-back) {
+  animation: none;
+}
+::view-transition-old(.axis-x-forward),
+::view-transition-old(.axis-x-back) {
+  animation: m3-shared-axis-x-exit var(--duration-long1) var(--ease-emphasized) both;
+}
+::view-transition-new(.axis-x-forward),
+::view-transition-new(.axis-x-back) {
+  animation: m3-shared-axis-x-enter var(--duration-long1) var(--ease-emphasized) both;
+}
+::view-transition-old(.axis-x-back),
+::view-transition-new(.axis-x-back) {
+  --m3-axis-distance: -30px;
+}
+
+/* Container transform (blog card → article): the shared elements move and resize while the old
+   and new snapshots crossfade */
+::view-transition-group(.morph) {
+  animation-duration: var(--duration-long2);
+  animation-timing-function: var(--ease-emphasized);
+}
+
+/* Conference photo ⇄ full-screen gallery: the same container transform, above the gallery's
+   scrim */
+::view-transition-group(.photo-morph) {
+  z-index: var(--z-raised);
+  animation-duration: var(--duration-long2);
+  animation-timing-function: var(--ease-emphasized);
+}
+/* Only the full-screen photo is shown while the box moves: covering the box, it is the thumbnail's
+   centre crop at the card end, so the thumbnail snapshot would only add a double exposure. By
+   transition type, not class: the thumbnail's snapshot doesn't carry the class in Chrome. The photo
+   is the only named element in these transitions (React hides the root's). */
+:root:active-view-transition-type(gallery)::view-transition-old(*),
+:root:active-view-transition-type(gallery)::view-transition-new(*) {
+  height: 100%;
+  object-fit: cover;
+}
+:root:active-view-transition-type(gallery-open)::view-transition-old(*),
+:root:active-view-transition-type(gallery-close)::view-transition-new(*) {
+  display: none;
+}
+:root:active-view-transition-type(gallery-open)::view-transition-new(*),
+:root:active-view-transition-type(gallery-close)::view-transition-old(*) {
+  animation: none;
+}
+
+/* Card → article: the rest of the article comes in once the morph has landed, top to bottom
+   (--reveal-order steps of 50ms). Only the first style of an element rendered during that
+   transition starts hidden, so a direct page load shows the article at once. */
+[data-article-reveal] {
+  transition-property: opacity, translate;
+  transition-duration: var(--duration-medium3);
+  transition-timing-function: var(--ease-emphasized-decelerate);
+  transition-delay: calc(var(--duration-medium4) + var(--reveal-order, 0) * 50ms);
+}
+@starting-style {
+  :root:active-view-transition-type(article-open) [data-article-reveal] {
+    opacity: 0;
+    translate: 0 -16px;
+  }
+}
+
+/* Reduced motion: the keyframes above lose their movement (see the keyframe overrides), the
+   shared elements crossfade in their new place instead of travelling there, and the article
+   reveal only fades */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.morph),
+  ::view-transition-group(.photo-morph) {
+    animation-name: none;
+  }
+  [data-article-reveal] {
+    transition-property: opacity;
+  }
+}
+
 /* Swiper's CSS is imported by the gallery components and loads after this file. It positions the
    arrows with .swiper-horizontal selectors, so matching both classes keeps these overrides ahead of
    it whatever the stylesheet order. The arrows are full-height click areas 10px from the edges. */
 .swiper.swiper-horizontal .swiper-button-prev,
 .swiper.swiper-horizontal .swiper-button-next {
   --swiper-navigation-sides-offset: 10px;
-  @apply text-background dark:text-primary top-0 bottom-0 m-0 h-full w-16 max-sm:w-8;
+  /* A fixed role keeps the same light tone in both themes, readable over the photos */
+  @apply text-primary-fixed-dim top-0 bottom-0 m-0 h-full w-16 max-sm:w-12;
 }
 
 /* Inline SVG chevron (Swiper 12+), sized like the former icon font glyph */
@@ -182,7 +777,108 @@
   @apply h-7.25 w-auto shrink-0 sm:h-8.5;
 }
 
-/* rocket cursor */
+/* Article typography (@tailwindcss/typography) on the M3 roles. Unlayered, so it wins over the
+   plugin's .prose and .prose-invert colours; the roles already switch with .dark. */
+.prose {
+  --tw-prose-body: var(--m3-on-surface-variant);
+  --tw-prose-headings: var(--m3-on-surface);
+  --tw-prose-lead: var(--m3-on-surface-variant);
+  --tw-prose-links: var(--m3-primary);
+  --tw-prose-bold: var(--m3-on-surface);
+  --tw-prose-counters: var(--m3-on-surface-variant);
+  --tw-prose-bullets: var(--m3-outline);
+  --tw-prose-hr: var(--m3-outline-variant);
+  --tw-prose-quotes: var(--m3-on-surface);
+  --tw-prose-quote-borders: var(--m3-outline-variant);
+  --tw-prose-captions: var(--m3-on-surface-variant);
+  --tw-prose-kbd: var(--m3-on-surface);
+  --tw-prose-code: var(--m3-on-surface);
+  --tw-prose-pre-code: var(--m3-on-surface);
+  --tw-prose-pre-bg: var(--m3-surface-container);
+  --tw-prose-th-borders: var(--m3-outline);
+  --tw-prose-td-borders: var(--m3-outline-variant);
+}
+
+/* Article type on the M3 roles, spacing in 4dp steps. Unlayered like the colours above, so it also
+   replaces the plugin's prose-sm/base/lg sizes, and wins over utilities on elements inside .prose:
+   put .not-prose on a custom block that needs its own type classes. */
+.prose {
+  @apply type-body-large;
+}
+.prose :where(p, ul, ol):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 1.25rem;
+}
+.prose :where(ul, ol):not(:where(.not-prose, .not-prose *)) {
+  padding-inline-start: 1.5rem;
+}
+.prose :where(li):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 0.5rem;
+  padding-inline-start: 0.25rem;
+}
+.prose :where(li p):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 0.5rem;
+}
+.prose :where(h1):not(:where(.not-prose, .not-prose *)) {
+  @apply type-headline-medium;
+  margin-block: 0 1.5rem;
+}
+/* The article's section headings: Medium's large / small headings, rendered as h2 / h3 under the
+   <h1> title (medium-renderer.tsx), so they keep the title-large / title-medium roles */
+.prose :where(h2):not(:where(.not-prose, .not-prose *)) {
+  @apply type-title-large;
+  margin-block: 2rem 0.75rem;
+}
+.prose :where(h3, h4):not(:where(.not-prose, .not-prose *)) {
+  @apply type-title-medium;
+  margin-block: 1.5rem 0.5rem;
+}
+.prose :where(h1 + *, h2 + *, h3 + *, h4 + *):not(:where(.not-prose, .not-prose *)) {
+  margin-top: 0;
+}
+.prose :where(blockquote):not(:where(.not-prose, .not-prose *)) {
+  @apply type-body-large;
+  margin-block: 1.5rem;
+  padding-inline-start: 1rem;
+}
+.prose :where(figure, img, video, picture):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 2rem;
+}
+.prose :where(figure > *):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 0;
+}
+.prose :where(figcaption):not(:where(.not-prose, .not-prose *)) {
+  @apply type-body-small;
+  margin-top: 0.5rem;
+}
+.prose :where(code):not(:where(.not-prose, .not-prose *)) {
+  @apply type-body-medium;
+  font-family: var(--font-mono);
+}
+.prose :where(pre):not(:where(.not-prose, .not-prose *)) {
+  @apply type-body-medium;
+  margin-block: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+}
+.prose :where(hr):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 3rem;
+}
+.prose :where(table):not(:where(.not-prose, .not-prose *)) {
+  @apply type-body-medium;
+  margin-block: 2rem;
+}
+.prose :where(thead th):not(:where(.not-prose, .not-prose *)) {
+  @apply type-title-small;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+/* Rocket cursor: colours come from the palette (RocketGlyph and rocket-cursor.tsx) */
 .rocket {
   position: fixed;
   top: 0;
@@ -190,20 +886,10 @@
   z-index: var(--z-cursor);
 
   & svg {
-    fill: #ff8811;
     stroke: transparent;
     height: 44px;
     width: 32px;
   }
-}
-
-.glow {
-  width: 0;
-  height: 0;
-  box-shadow: 0 0 100px 20px #f6ae2d;
-  position: absolute;
-  top: 0;
-  left: 50%;
 }
 
 .heart {
@@ -211,7 +897,7 @@
   top: -24px;
   right: 50%;
   transform: rotate(-65deg);
-  color: red;
+  color: var(--m3-primary);
   opacity: 0;
   transition: opacity 0.5s;
 }

@@ -1,33 +1,13 @@
 import * as React from "react";
-import { DEFAULT_THEME_COLORS } from "@/config/site";
-
-// Site dark theme tokens (see globals.css); the primary color comes from the Strapi theme
-const COLORS = {
-  background: "#121212",
-  card: "#242630",
-  border: "#2b2a2a",
-  foreground: "#ffffff",
-  mutedForeground: "#bfbfbf",
-};
+import { DEFAULT_PALETTE, type Scheme } from "@/lib/palette-css";
 
 interface EmailTemplateProps {
   name: string;
   email: string;
   subject: string;
   message: string;
-  primaryColor?: string;
-}
-
-// Picks dark or light text so the button stays readable whatever primary color is set in Strapi
-function getOnPrimaryColor(hex: string) {
-  if (!/^#[0-9a-f]{6}$/i.test(hex)) return COLORS.foreground;
-  // Linearised sRGB channel starting at hex[i]
-  const channel = (i: number) => {
-    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  };
-  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
-  return luminance > 0.179 ? COLORS.background : COLORS.foreground;
+  // The light scheme of the site palette: mail clients handle dark mode too unevenly to target it
+  colors?: Scheme;
 }
 
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
@@ -35,7 +15,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
   email,
   subject,
   message,
-  primaryColor = DEFAULT_THEME_COLORS.primaryDark,
+  colors = DEFAULT_PALETTE.schemes.light,
 }) => (
   <div
     style={{
@@ -43,13 +23,13 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
       maxWidth: "600px",
       margin: "0 auto",
       padding: "30px",
-      backgroundColor: COLORS.card,
+      backgroundColor: colors.surfaceContainerLow,
       borderRadius: "8px",
     }}
   >
     <div
       style={{
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.surface,
         padding: "30px",
         borderRadius: "8px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -63,7 +43,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
       >
         <h1
           style={{
-            color: COLORS.foreground,
+            color: colors.onSurface,
             fontSize: "28px",
             margin: "0",
             fontWeight: "600",
@@ -76,7 +56,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
           style={{
             width: "50px",
             height: "4px",
-            backgroundColor: primaryColor,
+            backgroundColor: colors.primary,
             margin: "15px auto",
             borderRadius: "2px",
           }}
@@ -87,33 +67,33 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
         style={{
           marginBottom: "25px",
           padding: "20px",
-          backgroundColor: COLORS.card,
+          backgroundColor: colors.surfaceContainerLow,
           borderRadius: "8px",
         }}
       >
-        <p style={{ margin: "0 0 10px 0", color: COLORS.foreground, fontSize: "16px" }}>
-          <strong style={{ color: COLORS.mutedForeground }}>From:</strong> {name}
+        <p style={{ margin: "0 0 10px 0", color: colors.onSurface, fontSize: "16px" }}>
+          <strong style={{ color: colors.onSurfaceVariant }}>From:</strong> {name}
         </p>
-        <p style={{ margin: "0 0 10px 0", color: COLORS.foreground, fontSize: "16px" }}>
-          <strong style={{ color: COLORS.mutedForeground }}>Email:</strong> {email}
+        <p style={{ margin: "0 0 10px 0", color: colors.onSurface, fontSize: "16px" }}>
+          <strong style={{ color: colors.onSurfaceVariant }}>Email:</strong> {email}
         </p>
-        <p style={{ margin: "0", color: COLORS.foreground, fontSize: "16px" }}>
-          <strong style={{ color: COLORS.mutedForeground }}>Subject:</strong> {subject}
+        <p style={{ margin: "0", color: colors.onSurface, fontSize: "16px" }}>
+          <strong style={{ color: colors.onSurfaceVariant }}>Subject:</strong> {subject}
         </p>
       </div>
 
       <div
         style={{
-          backgroundColor: COLORS.card,
+          backgroundColor: colors.surfaceContainerLow,
           padding: "25px",
           borderRadius: "8px",
-          border: `1px solid ${COLORS.border}`,
+          border: `1px solid ${colors.outlineVariant}`,
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
         }}
       >
         <h2
           style={{
-            color: COLORS.foreground,
+            color: colors.onSurface,
             marginTop: "0",
             fontSize: "22px",
             fontWeight: "600",
@@ -123,7 +103,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
         </h2>
         <p
           style={{
-            color: COLORS.foreground,
+            color: colors.onSurface,
             lineHeight: "1.6",
             fontSize: "16px",
             whiteSpace: "pre-wrap",
@@ -137,7 +117,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
         style={{
           marginTop: "30px",
           padding: "20px",
-          backgroundColor: primaryColor,
+          backgroundColor: colors.primary,
           borderRadius: "8px",
           textAlign: "center",
         }}
@@ -145,7 +125,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
         <a
           href={`mailto:${email}`}
           style={{
-            color: getOnPrimaryColor(primaryColor),
+            color: colors.onPrimary,
             textDecoration: "none",
             fontWeight: "600",
             fontSize: "16px",
