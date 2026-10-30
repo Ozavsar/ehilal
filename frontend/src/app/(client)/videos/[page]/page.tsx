@@ -1,38 +1,51 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import VideosContainer from "@/containers/videos";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllVideos, withVideoPlaceholders } from "@/lib/services/videos";
+import { buildMeta } from "@/lib/metadata";
+import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const dynamicParams = true;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 
 // Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
-const parsePageNumber = (page: string | undefined) =>
-  page && /^[1-9]\d*$/.test(page) ? Number(page) : NaN;
+const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
+
+/**
+ * The requested page, or notFound() for invalid and out-of-range pages.
+ * A Strapi failure propagates to error.tsx, so ISR keeps the last good version instead of caching a 404.
+ */
+async function getPageOrNotFound(page: string) {
+  if (!PAGE_PARAM_PATTERN.test(page)) {
+    notFound();
+  }
+
+  const pageNum = Number(page);
+  // Cached per request, so generateMetadata and the page share one result
+  const { videos, isComplete } = await getAllVideos();
+  const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
+
+  if (pageNum > totalPages) {
+    // Without the YouTube videos the list is shorter, so a page that normally exists would 404 (and be cached)
+    if (!isComplete) {
+      throw new Error(`Videos page ${pageNum} is unavailable while YouTube videos can't be loaded`);
+    }
+    notFound();
+  }
+
+  return {
+    videos: videos.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE),
+    pageNum,
+    totalPages,
+  };
+}
 
 export default async function VideosPage(props: { params: Promise<{ page: string }> }) {
-  const params = await props.params;
-  const pageNum = parsePageNumber(params.page);
-
-  if (isNaN(pageNum)) {
-    return notFound();
-  }
-
-  const videos = await getAllVideos();
-  if (!videos || videos.length === 0) {
-    return notFound();
-  }
-
-  const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
-  if (pageNum > totalPages) {
-    return notFound();
-  }
+  const { page } = await props.params;
+  const { videos, pageNum, totalPages } = await getPageOrNotFound(page);
 
   // Placeholders only for the videos on this page
-  const pageVideos = await withVideoPlaceholders(
-    videos.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE),
-  );
+  const pageVideos = await withVideoPlaceholders(videos);
 
   return (
     <VideosContainer videos={pageVideos} pageNumber={pageNum.toString()} totalPages={totalPages} />
@@ -40,25 +53,31 @@ export default async function VideosPage(props: { params: Promise<{ page: string
 }
 
 export async function generateStaticParams() {
-  const videos = await getAllVideos();
-  const pageCount = Math.ceil((videos?.length || 0) / ITEMS_PER_PAGE);
+  const { videos } = await getAllVideos();
+  const pageCount = Math.ceil(videos.length / ITEMS_PER_PAGE);
 
-  return Array.from({ length: pageCount || 1 }, (_, i) => ({
+  return Array.from({ length: pageCount }, (_, i) => ({
     page: (i + 1).toString(),
   }));
 }
 
-export async function generateMetadata(props: { params: Promise<{ page: string }> }) {
-  const params = await props.params;
-  const pageNum = parseInt(params.page ?? "1", 10);
+export async function generateMetadata(props: {
+  params: Promise<{ page: string }>;
+}): Promise<Metadata> {
+  const { page } = await props.params;
+  const { pageNum } = await getPageOrNotFound(page);
 
-  return {
-    title: `Videos - Page ${pageNum}`,
-    description: `Explore ${SITE_NAME}'s collection of insightful videos on web development, programming, and more - Page ${pageNum}.`,
+  const title = pageNum > 1 ? `Videos – Page ${pageNum}` : "Videos";
+  const description = `Explore ${SITE_NAME}'s collection of insightful videos on web development, programming, and more${pageNum > 1 ? ` — page ${pageNum}` : ""}.`;
+
+  return buildMeta({
+    title,
+    description,
+    path: `/videos${pageNum > 1 ? `/${pageNum}` : ""}`,
     type: "website",
     image: {
-      url: `${SITE_URL}/api/og?title=${encodeURIComponent(`Videos - Page ${pageNum}`)}`,
+      url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
       alt: `Videos by ${SITE_NAME}`,
     },
-  };
+  });
 }

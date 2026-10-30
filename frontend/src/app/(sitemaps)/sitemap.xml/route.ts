@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { SITE_URL } from "@/config/site";
 import fs from "fs";
 import path from "path";
 
@@ -6,7 +7,6 @@ export const runtime = "nodejs";
 export const revalidate = 0;
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const appDir = path.join(process.cwd(), "src/app/(sitemaps)");
   const files = fs.readdirSync(appDir, { withFileTypes: true });
 
@@ -23,7 +23,7 @@ export async function GET() {
     const stats = fs.statSync(routeFile);
     const lastmod = stats.mtime.toISOString();
     return {
-      loc: `${baseUrl}/${dir.name}`,
+      loc: `${SITE_URL}/${dir.name}`,
       lastmod,
     };
   });

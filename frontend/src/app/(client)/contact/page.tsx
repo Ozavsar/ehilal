@@ -1,54 +1,35 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import ContactContainer from "@/containers/contact";
 import { getContactPageContent } from "@/lib/services/pages";
 import { getSocialMediaLinks } from "@/lib/services";
-import { Metadata } from "next";
+import { orNotFound } from "@/lib/api/fetchAPI";
 import { buildMeta } from "@/lib/metadata";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
+import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export default async function ContactPage() {
-  try {
-    const [content, socialMediaLinks] = await Promise.all([
-      getContactPageContent(),
-      getSocialMediaLinks(),
-    ]);
+  // Missing CMS entries → 404; Strapi being down → error.tsx
+  const [content, socialMediaLinks] = await Promise.all([
+    orNotFound(getContactPageContent()),
+    orNotFound(getSocialMediaLinks()),
+  ]);
 
-    if (!content) {
-      return notFound();
-    }
-
-    return <ContactContainer content={content} socialMediaLinks={socialMediaLinks} />;
-  } catch (error) {
-    console.error("Error in Contact page:", error);
-    return notFound();
+  if (!content || !socialMediaLinks) {
+    notFound();
   }
+
+  return <ContactContainer content={content} socialMediaLinks={socialMediaLinks} />;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  try {
-    return buildMeta({
-      title: "Contact",
-      description: `Get in touch with ${SITE_NAME} — reach out for collaborations, speaking invitations, or professional inquiries.`,
-      path: "/contact",
-      type: "website",
-      image: {
-        url: `${SITE_URL}/api/og?title=contact`,
-        alt: `Contact ${SITE_NAME}`,
-      },
-    });
-  } catch (error) {
-    console.error("Error generating metadata for Contact page:", error);
-    return buildMeta({
-      title: "Contact",
-      description: `Connect with ${SITE_NAME} — for collaborations, inquiries, or networking.`,
-      path: "/contact",
-      type: "website",
-      image: {
-        url: `${SITE_URL}/api/og?title=contact`,
-        alt: `Contact ${SITE_NAME}`,
-      },
-    });
-  }
+  return buildMeta({
+    title: "Contact",
+    description: `Get in touch with ${SITE_NAME} — reach out for collaborations, speaking invitations, or professional inquiries.`,
+    path: "/contact",
+    type: "website",
+    image: {
+      url: `${SITE_URL}/api/og?title=contact`,
+      alt: `Contact ${SITE_NAME}`,
+    },
+  });
 }

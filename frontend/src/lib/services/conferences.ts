@@ -1,5 +1,5 @@
 import { fetchAPI } from "../api/fetchAPI";
-import type { IStrapiConference, IStrapiResponse } from "@/types";
+import type { IStrapiCollectionResponse, IStrapiConference } from "@/types";
 import { getImage } from "../getImage";
 
 /**
@@ -16,9 +16,13 @@ export async function getAllConferences(start?: number, limit?: number) {
       ? { ...baseQuery, pagination: { start, limit } }
       : baseQuery;
 
-  const response = await fetchAPI<IStrapiResponse<IStrapiConference[]>>("/conferences", query, {
-    tags: ["conferences"],
-  });
+  const response = await fetchAPI<IStrapiCollectionResponse<IStrapiConference>>(
+    "/conferences",
+    query,
+    {
+      tags: ["conferences"],
+    },
+  );
 
   const dataWithPlaceholders = await Promise.all(
     response.data.map(async (conference) => {

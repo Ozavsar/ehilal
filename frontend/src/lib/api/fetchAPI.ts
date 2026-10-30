@@ -1,7 +1,43 @@
 import qs from "qs";
+import { notFound, unstable_rethrow } from "next/navigation";
+import { env } from "@/config/env";
+
+const DEFAULT_REVALIDATE = 60 * 60 * 24; // 24 hours
+
+/**
+ * A failed Strapi request. `status` is the HTTP status, or undefined when Strapi couldn't be reached.
+ */
+class ApiError extends Error {
+  readonly status: number | undefined;
+  readonly path: string;
+
+  constructor(message: string, options: { path: string; status?: number; cause?: unknown }) {
+    super(message, { cause: options.cause });
+    this.name = "ApiError";
+    this.path = options.path;
+    this.status = options.status;
+  }
+}
+
+// "The content doesn't exist" (Strapi answers 404 for missing or unpublished single types),
+// as opposed to Strapi being down or failing
+const isNotFoundError = (error: unknown) => error instanceof ApiError && error.status === 404;
+
+/**
+ * Turns a Strapi 404 into the not-found page. Any other failure propagates to error.tsx, so ISR keeps
+ * serving the last good version instead of caching a 404.
+ */
+export async function orNotFound<T>(request: Promise<T>): Promise<T> {
+  try {
+    return await request;
+  } catch (error) {
+    if (isNotFoundError(error)) notFound();
+    throw error;
+  }
+}
 
 export function getStrapiURL(path = ""): string {
-  return `${process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://127.0.0.1:1337"}${path}`;
+  return `${env.NEXT_PUBLIC_STRAPI_API_URL}${path}`;
 }
 
 export async function fetchAPI<T>(
@@ -14,38 +50,48 @@ export async function fetchAPI<T>(
     revalidate?: number;
   } = {},
 ): Promise<T> {
+  // `cache: "no-store"` together with a revalidate time is a conflict Next.js ignores, so only cached requests get one
+  const cache = options.cache ?? "force-cache";
+  const mergedOptions: RequestInit = {
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+      Authorization: `Bearer ${env.BEARER_TOKEN}`,
+    },
+    cache,
+    next: {
+      tags: options.tags ?? [],
+      ...(cache !== "no-store" && { revalidate: options.revalidate ?? DEFAULT_REVALIDATE }),
+    },
+  };
+
+  const queryString = qs.stringify(urlParamsObject, { encode: false });
+  const requestUrl = getStrapiURL(`/api${path}${queryString ? `?${queryString}` : ""}`);
+
+  let response: Response;
   try {
-    const token = process.env.BEARER_TOKEN;
-    const mergedOptions = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        ...options?.headers,
-      },
-      cache: options.cache || ("default" as RequestCache),
-      next: {
-        tags: options.tags || [],
-        revalidate: options.revalidate || 3600 * 24, // 24 hours
-      },
-      ...options,
-    };
+    response = await fetch(requestUrl, mergedOptions);
+  } catch (error) {
+    // Let Next.js handle its own control-flow errors (e.g. dynamic rendering bailouts)
+    unstable_rethrow(error);
+    throw new ApiError(`Strapi is unreachable: GET ${path}`, { path, cause: error });
+  }
 
-    const queryString = qs.stringify(urlParamsObject, { encode: false });
-    const requestUrl = `${getStrapiURL(`/api${path}${queryString ? `?${queryString}` : ""}`)}`;
-
-    const response = await fetch(requestUrl, mergedOptions);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Failed to fetch ${path}: ${response.status} ${response.statusText}\n${errorText}`,
-      );
-    }
-
-    return await response.json();
-  } catch (error: any) {
-    throw new Error(
-      `Something went wrong. Please check your API server and parameters.\nError: ${error.message}`,
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new ApiError(
+      `Strapi request failed: GET ${path} → ${response.status} ${response.statusText} ${body.slice(0, 300)}`.trim(),
+      { path, status: response.status },
     );
+  }
+
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    throw new ApiError(`Strapi returned invalid JSON: GET ${path}`, {
+      path,
+      status: response.status,
+      cause: error,
+    });
   }
 }

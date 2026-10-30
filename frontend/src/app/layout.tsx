@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import hextohsl from "hex-to-hsl";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import RocketCursor from "@/components/rocket-cursor";
@@ -8,14 +7,14 @@ import "swiper/css/navigation";
 import "./globals.css";
 import "swiper/css";
 import Providers from "@/context/providers";
-import { getTheme } from "@/lib/services";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
-const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
-const TWITTER_USER_ID = process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
-
-// updated
+import { getThemeColors } from "@/lib/services";
+import {
+  SITE_NAME,
+  SITE_URL,
+  TWITTER_HANDLE,
+  TWITTER_USER_ID,
+  themeColorVariables,
+} from "@/config/site";
 
 export const metadata: Metadata = {
   title: {
@@ -87,19 +86,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { primaryDark, primaryLight } = await getTheme();
-  const hslDark = hextohsl(primaryDark);
-  const hslLight = hextohsl(primaryLight);
+  // Falls back to default colours, so a Strapi outage can't take the whole site down from here
+  const themeColors = await getThemeColors();
   return (
     <html
       lang="en"
       className="dark"
-      style={
-        {
-          "--primary-dark": `${hslDark[0]}, ${hslDark[1]}%, ${hslDark[2]}%`,
-          "--primary-light": `${hslLight[0]}, ${hslLight[1]}%, ${hslLight[2]}%`,
-        } as React.CSSProperties
-      }
+      style={themeColorVariables(themeColors)}
       suppressHydrationWarning
     >
       <body

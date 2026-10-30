@@ -1,12 +1,13 @@
 import TitleSection from "@/components/title-section";
 import { getPageTitle } from "@/lib/services/pages";
+import { orNotFound } from "@/lib/api/fetchAPI";
 
 interface VideosLayoutProps {
   children: React.ReactNode;
 }
 
 export default async function VideosLayout({ children }: VideosLayoutProps) {
-  const content = await getPageTitle("videos-page", ["videos-title"]);
+  const content = await orNotFound(getPageTitle("videos-page", ["videos-title"]));
   return (
     <>
       <TitleSection text={content.page_title} backgroundText={content.page_title_background} />

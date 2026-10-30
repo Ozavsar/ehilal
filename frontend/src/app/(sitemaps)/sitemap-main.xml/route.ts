@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+import { SITE_URL } from "@/config/site";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const now = new Date().toISOString();
 
   const staticRoutes = [INTERNAL_ROUTES.HOME.path, INTERNAL_ROUTES.CONTACT.path];
@@ -13,7 +13,7 @@ export async function GET() {
       .map(
         (path) => `
       <url>
-        <loc>${baseUrl}${path}</loc>
+        <loc>${SITE_URL}${path}</loc>
         <lastmod>${now}</lastmod>
       </url>`,
       )

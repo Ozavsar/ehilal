@@ -4,50 +4,60 @@ import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllCourses } from "@/lib/services/udemy";
 import { Metadata } from "next";
 import { buildMeta } from "@/lib/metadata";
+import { SITE_NAME, SITE_URL } from "@/config/site";
 
 export const dynamicParams = true;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
-
 // Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
-const parsePageNumber = (page: string | undefined) =>
-  page && /^[1-9]\d*$/.test(page) ? Number(page) : NaN;
+const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
+
+/**
+ * The requested page, or notFound() for invalid and out-of-range pages.
+ * A Udemy failure propagates to error.tsx, so ISR keeps the last good version instead of caching a 404.
+ */
+async function getPageOrNotFound(page: string) {
+  if (!PAGE_PARAM_PATTERN.test(page)) {
+    notFound();
+  }
+
+  const pageNum = Number(page);
+  // Cached per request, so generateMetadata and the page share one fetch and one set of placeholders
+  const courses = await getAllCourses();
+  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
+
+  if (pageNum > totalPages) {
+    notFound();
+  }
+
+  return {
+    courses: courses.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE),
+    pageNum,
+    totalPages,
+  };
+}
 
 export default async function CoursesPage(props: { params: Promise<{ page: string }> }) {
-  const params = await props.params;
-  const pageNum = parsePageNumber(params.page);
-
-  if (isNaN(pageNum)) {
-    return notFound();
-  }
-
-  const courses = await getAllCourses();
-  if (!courses || courses.length === 0) {
-    return notFound();
-  }
-
-  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
-  if (pageNum > totalPages) {
-    return notFound();
-  }
+  const { page } = await props.params;
+  const { courses, pageNum, totalPages } = await getPageOrNotFound(page);
 
   return (
-    <CourseContainer
-      courses={courses.slice((pageNum - 1) * ITEMS_PER_PAGE, pageNum * ITEMS_PER_PAGE)}
-      pageNumber={pageNum.toString()}
-      totalPages={totalPages}
-    />
+    <CourseContainer courses={courses} pageNumber={pageNum.toString()} totalPages={totalPages} />
   );
 }
 
 export async function generateStaticParams() {
-  const courses = await getAllCourses();
-  const pageCount = Math.ceil((courses?.length || 0) / ITEMS_PER_PAGE);
+  try {
+    const courses = await getAllCourses();
+    const pageCount = Math.ceil(courses.length / ITEMS_PER_PAGE);
 
-  return Array.from({ length: pageCount || 1 }, (_, i) => ({
-    page: (i + 1).toString(),
-  }));
+    return Array.from({ length: pageCount }, (_, i) => ({
+      page: (i + 1).toString(),
+    }));
+  } catch (error) {
+    // Don't fail the build when Udemy is down: pages are rendered on demand instead (dynamicParams)
+    console.error("Course pages could not be listed for prerendering:", error);
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -55,62 +65,23 @@ export async function generateMetadata({
 }: {
   params: Promise<{ page: string }>;
 }): Promise<Metadata> {
-  try {
-    const { page } = await params;
-    const pageNum = parsePageNumber(page);
+  const { page } = await params;
+  const { pageNum } = await getPageOrNotFound(page);
 
-    if (isNaN(pageNum)) {
-      return buildMeta({
-        title: "Page Not Found",
-        description: "Invalid courses page number.",
-        path: "/courses",
-      });
-    }
+  const title = pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
+  const description =
+    pageNum > 1
+      ? `Discover ${SITE_NAME}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`
+      : `Browse all courses and workshops by ${SITE_NAME} — from full-stack development to creative coding and professional growth.`;
 
-    const courses = await getAllCourses();
-    if (!courses || courses.length === 0) {
-      return buildMeta({
-        title: "Courses",
-        description: `Explore online courses and workshops by ${SITE_NAME} on modern web development, design, and productivity.`,
-        path: "/courses",
-        image: {
-          url: `${SITE_URL}/api/og?title=courses`,
-          alt: `Courses and Workshops by ${SITE_NAME}`,
-        },
-      });
-    }
-
-    const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
-    if (pageNum > totalPages) {
-      return buildMeta({
-        title: "Page Not Found",
-        description: "Requested page exceeds available course listings.",
-        path: "/courses",
-      });
-    }
-
-    const title = pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
-    const description =
-      pageNum > 1
-        ? `Discover ${SITE_NAME}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`
-        : `Browse all courses and workshops by ${SITE_NAME} — from full-stack development to creative coding and professional growth.`;
-
-    return buildMeta({
-      title,
-      description,
-      path: `/courses${pageNum > 1 ? `/${pageNum}` : ""}`,
-      type: "website",
-      image: {
-        url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-        alt: `Courses and Workshops by ${SITE_NAME}`,
-      },
-    });
-  } catch (error) {
-    console.error("Error generating metadata for Courses:", error);
-    return buildMeta({
-      title: "Courses",
-      description: `Explore online courses and workshops by ${SITE_NAME} on modern web development and design.`,
-      path: "/courses",
-    });
-  }
+  return buildMeta({
+    title,
+    description,
+    path: `/courses${pageNum > 1 ? `/${pageNum}` : ""}`,
+    type: "website",
+    image: {
+      url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
+      alt: `Courses and Workshops by ${SITE_NAME}`,
+    },
+  });
 }

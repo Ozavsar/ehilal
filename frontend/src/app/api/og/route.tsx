@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import Logo from "@/components/logo";
-import { getTheme } from "@/lib/services";
+import { getThemeColors } from "@/lib/services";
 
 export const runtime = "edge";
 
@@ -28,9 +28,11 @@ export async function GET(request: Request) {
     const source = url.searchParams.get("source") || "og";
     const title = truncateTitle(url.searchParams.get("title"));
 
-    const themeResponse = await getTheme();
-    const themeColor = theme === "dark" ? themeResponse.primaryDark : themeResponse.primaryLight;
-    const bgColor = theme === "dark" ? "hsl(0, 0%, 7%)" : "hsl(0, 0%, 96%)";
+    // Falls back to the default colours when Strapi is unreachable
+    const themeColors = await getThemeColors();
+    const themeColor = theme === "dark" ? themeColors.primaryDark : themeColors.primaryLight;
+    // --background in globals.css
+    const bgColor = theme === "dark" ? "#121212" : "#f5f5f5";
 
     if (source === "favicon") {
       return new ImageResponse(<Logo fill={bgColor} color={themeColor} />, {
@@ -102,8 +104,8 @@ export async function GET(request: Request) {
         headers,
       },
     );
-  } catch (error: any) {
-    console.error("❌ Error generating image:", error);
+  } catch (error) {
+    console.error("Error generating image:", error);
     return new Response("Failed to generate image", { status: 500 });
   }
 }

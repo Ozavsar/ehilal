@@ -11,20 +11,20 @@ export interface IImageFormat {
   sizeInBytes: number;
 }
 
+export type ImageFormatName = "large" | "medium" | "small" | "thumbnail";
+
+// Strapi media file (plugin::upload.file)
 export interface IImage {
   id: number;
   documentId: string;
   name: string;
   alternativeText: string | null;
   caption: string | null;
-  width: number;
-  height: number;
-  formats: {
-    large: IImageFormat;
-    small: IImageFormat;
-    medium: IImageFormat;
-    thumbnail: IImageFormat;
-  };
+  // null for files Strapi can't measure (e.g. PDFs)
+  width: number | null;
+  height: number | null;
+  // Strapi only generates formats smaller than the original, and none for SVGs, GIFs or non-image files
+  formats: Partial<Record<ImageFormatName, IImageFormat>> | null;
   hash: string;
   ext: string;
   mime: string;
@@ -32,50 +32,39 @@ export interface IImage {
   url: string;
   previewUrl: string | null;
   provider: string;
-  provider_metadata: any | null;
+  provider_metadata: unknown;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
   blurDataURL?: string;
 }
 
+// A YouTube upload as returned by lib/services/youtube.ts
 export interface IVideoPreview {
-  id: string | null | undefined;
-  thumbnailURL: string | null | undefined;
-  title: string | null | undefined;
-  description: string | null | undefined;
+  id: string;
+  thumbnailURL: string; // "" if the video has no thumbnail
+  title: string;
+  description: string;
   publishedAt: string; // ISO 8601, "" if unknown
-  views?: string | null | undefined;
 }
 
+// Fields of a Medium body paragraph that the article renderer uses
 export interface IMediumParagraph {
   name: string;
   text: string;
   type: string;
-  markups: { type: string; href: string | null }[];
-  mixtapeMetadata: { href: string } | null;
   metadata: { id: string } | null;
-  iframe: { mediaResource: { iframeSrc: string; title: string } } | null;
+  iframe: { mediaResource: { iframeSrc: string; title: string | null } } | null;
 }
 
-// Subset of the raw Medium `postResult` (PostPageQuery) returned by getSingleArticle
+// Medium article rendered on /blog/<slug>, returned by getSingleArticle
 export interface IBlog {
   id: string;
+  slug: string; // canonical /blog/<slug> segment
   title: string;
-  uniqueSlug: string;
+  subtitle: string; // "" if none
   mediumUrl: string;
-  firstPublishedAt: number;
-  latestPublishedAt: number;
-  readingTime: number;
-  isLocked: boolean;
-  previewImage: {
-    id: string;
-    alt: string | null;
-    originalWidth: number;
-    originalHeight: number;
-  } | null;
-  previewContent: { subtitle: string | null } | null;
-  tags: { displayTitle: string; normalizedTagSlug: string }[];
+  previewImage: { id: string; alt: string | null } | null;
   paragraphs: IMediumParagraph[];
 }
 
@@ -90,12 +79,14 @@ export interface ICourse {
   thumbnailURL: string | null;
   blurDataURL?: string;
 }
+// Strapi content types (backend/src/api/*/content-types/*/schema.json). Strapi returns every attribute,
+// with null for optional ones that are empty.
 export interface IStrapiSocialLinks extends IStrapiBasePage {
   email: string;
   linkedin: string;
   twitter_x: string;
   youtube: string;
-  instagram?: string | null;
+  instagram: string | null;
 }
 
 export interface IStrapiBasePage {
@@ -106,55 +97,65 @@ export interface IStrapiBasePage {
   publishedAt: string;
 }
 
-export interface IPageTitle {
-  page_title: string;
-  page_title_background: string;
-  SEO_title: string;
-  SEO_description: string;
+export interface ISEOFields {
+  SEO_title: string | null;
+  SEO_description: string | null;
 }
 
-export interface INotFoundPage
-  extends IStrapiBasePage,
-    Omit<IPageTitle, "page_title" | "page_title_background"> {
+// blog-page, conferences-page, courses-page and videos-page
+export interface IPageTitle extends ISEOFields {
+  page_title: string;
+  page_title_background: string;
+}
+
+export interface INotFoundPage extends IStrapiBasePage, ISEOFields {
   image: IImage;
 }
 
-export interface IStrapiHomePage extends IStrapiBasePage, IPageTitle {
-  greeting: string;
-  introduction: string;
+export interface IStrapiHomePage extends IStrapiBasePage, ISEOFields {
+  // Optional in Strapi (null when empty)
+  greeting: string | null;
+  introduction: string | null;
   hero_image: IImage;
 }
 
 export interface IStrapiContactPage extends IStrapiBasePage, IPageTitle {
   title: string;
   description: string;
-  // Server-only: never pass to client components
-  form_recipient_email?: string | null;
+  // Server-only: never pass to client components. Required in the schema, but null on entries saved before it existed
+  form_recipient_email: string | null;
 }
 
 export interface IStrapiConference extends IStrapiBasePage {
   title: string;
   location: string;
-  date: string;
+  date: string; // YYYY-MM-DD
   images: IImage[];
 }
 
 export interface IStrapiVideo extends IStrapiBasePage {
   title: string;
-  description: string;
-  publish_date: string;
+  description: string | null;
+  publish_date: string; // YYYY-MM-DD
   url: string;
-  thumbnail: IImage;
-  isFeatured: boolean;
+  thumbnail: IImage | null;
+  isFeatured: boolean | null;
 }
 
 export interface IStrapiTheme extends IStrapiBasePage {
-  primaryDark: string;
-  primaryLight: string;
+  // Hex colours; optional in Strapi
+  primaryDark: string | null;
+  primaryLight: string | null;
 }
 
+// Single types answer with an empty `meta`
 export interface IStrapiResponse<T> {
   data: T;
+  meta: Record<string, never>;
+}
+
+export interface IStrapiCollectionResponse<T> {
+  data: T[];
   meta: {
     pagination: {
       start?: number;
@@ -183,10 +184,11 @@ export interface IBlogPreview {
   externalURL: string;
   externalBlogSource: BlogSource;
   description: string;
-  thumbnailURL: string;
-  blurDataURL?: string | undefined;
-  pubDate: string;
-  isReadable?: boolean;
+  thumbnailURL: string; // "" if the post has no cover image
+  blurDataURL?: string;
+  publishedAt: string; // ISO 8601, "" if unknown; format only when displaying
+  // /blog/<slug> segment for articles readable on this site (Medium); null for ones that only link out (Substack)
+  slug: string | null;
 }
 
 export enum BlogSource {

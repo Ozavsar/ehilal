@@ -1,8 +1,9 @@
+import { cache } from "react";
 import { UDEMY_USER_ID } from "@/config/constants";
 import { getImage } from "../getImage";
 import type { ICourse } from "@/types";
 
-export const REVALIDATE = 60 * 60 * 24; // 24 hours
+const REVALIDATE = 60 * 60 * 24; // 24 hours
 
 const UDEMY_PAGE_SIZE = 100; // Udemy API max
 const MAX_UDEMY_PAGES = 10; // safety cap while following `next` links
@@ -24,7 +25,8 @@ interface IUdemyResponse {
   results: IUdemyCourse[];
 }
 
-export const getAllCourses = async (): Promise<ICourse[]> => {
+// cache(): generateMetadata and the page share one fetch and one set of blur placeholders per request
+export const getAllCourses = cache(async (): Promise<ICourse[]> => {
   const fields = [
     "@default",
     "headline",
@@ -71,8 +73,8 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
       if (thumbnailURL) {
         try {
           blurDataURL = (await getImage(thumbnailURL)).base64;
-        } catch {
-          console.warn("Udemy placeholder alınamadı:", thumbnailURL);
+        } catch (error) {
+          console.error(`Failed to get placeholder for ${thumbnailURL}`, error);
         }
       }
 
@@ -91,4 +93,4 @@ export const getAllCourses = async (): Promise<ICourse[]> => {
   );
 
   return courses;
-};
+});

@@ -1,4 +1,11 @@
 import type { Metadata } from "next";
+import {
+  DEFAULT_BANNER,
+  SITE_NAME,
+  SITE_URL,
+  TWITTER_HANDLE,
+  TWITTER_USER_ID,
+} from "@/config/site";
 
 interface BuildMetaOptions {
   title: string;
@@ -13,12 +20,6 @@ interface BuildMetaOptions {
   };
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const DEFAULT_OG = `${SITE_URL}/api/og`;
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
-const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
-const DEFAULT_BANNER = process.env.NEXT_PUBLIC_DEFAULT_BANNER || `${SITE_URL}/api/og`;
-const TWITTER_USER_ID = process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
 export function buildMeta({
   title,
   description,
@@ -38,7 +39,7 @@ export function buildMeta({
       type,
       url,
       siteName: SITE_NAME,
-      images: [image || DEFAULT_OG],
+      images: [image || DEFAULT_BANNER],
       locale: "en_US",
       alternateLocale: ["tr_TR"],
     },

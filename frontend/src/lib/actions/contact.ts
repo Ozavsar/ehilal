@@ -2,7 +2,9 @@
 
 import { headers } from "next/headers";
 import { Resend } from "resend";
+import { z } from "zod";
 import { EmailTemplate } from "@/components/email-template";
+import { env } from "@/config/env";
 import { getTheme } from "@/lib/services";
 import { getContactPageContent } from "@/lib/services/pages";
 import {
@@ -32,7 +34,8 @@ function isRateLimited(ip: string) {
   // Drop idle IPs so the map can't grow without bound
   if (submissions.size > 1000) {
     for (const [key, times] of submissions) {
-      if (now - times[times.length - 1] >= RATE_LIMIT_WINDOW_MS) submissions.delete(key);
+      const last = times.at(-1);
+      if (last === undefined || now - last >= RATE_LIMIT_WINDOW_MS) submissions.delete(key);
     }
   }
   return limited;
@@ -78,7 +81,7 @@ export async function sendContactMessage(
     return {
       status: "error",
       message: "Please check the highlighted fields and try again.",
-      fieldErrors: parsed.error.flatten().fieldErrors,
+      fieldErrors: z.flattenError(parsed.error).fieldErrors,
     };
   }
   const data = parsed.data;
@@ -91,7 +94,7 @@ export async function sendContactMessage(
     ]);
 
     // Recipient is managed in Strapi (Contact Page); CONTACT_TO_EMAIL is only the fallback
-    const to = contactPage?.form_recipient_email || process.env.CONTACT_TO_EMAIL;
+    const to = contactPage?.form_recipient_email || env.CONTACT_TO_EMAIL;
     if (!to) {
       console.error(
         "Contact form recipient is not configured (Strapi form_recipient_email or CONTACT_TO_EMAIL)",
@@ -99,7 +102,7 @@ export async function sendContactMessage(
       return { status: "error", message: SEND_ERROR_MESSAGE };
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
       from: "hello@ehilal.net",
       to,
