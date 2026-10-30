@@ -1,21 +1,64 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { cn, getCleanSlug } from "@/lib/utils";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { buttonVariants } from "@/components/ui/button";
 import { LuBookOpen, LuExternalLink } from "react-icons/lu";
 import LinkButton from "@/components/link-button";
+import type { IBlogPreview } from "@/types";
 
-interface ArticleCardProps {
-  thumbnailURL: string;
-  title: string;
+// Pin the time zone so the day doesn't depend on the server
+const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "Europe/Istanbul",
+});
+
+function getDateParts(date: Date) {
+  if (isNaN(date.getTime())) return null;
+  const parts = DATE_FORMAT.formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return { month: part("month"), day: part("day"), year: part("year") };
+}
+
+interface ArticleLinkProps {
+  slug: string | null;
   externalURL: string;
-  externalBlogSource: string;
-  description: string;
-  pubDate: string;
-  blurDataURL?: string;
-  isReadable?: boolean;
+  title: string;
+  source: string;
+  className?: string;
+  children: ReactNode;
+}
+
+// Internal article page when the article is readable here, otherwise the source site
+function ArticleLink({ slug, externalURL, title, source, className, children }: ArticleLinkProps) {
+  if (slug) {
+    return (
+      <Link
+        href={INTERNAL_ROUTES.BLOG.href(slug)}
+        title={`Read more about ${title}`}
+        aria-label={`Read more about ${title}`}
+        className={className}
+      >
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a
+      href={externalURL}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`Read the full article on ${source}`}
+      aria-label={`Read the full article on ${source}`}
+      className={className}
+    >
+      {children}
+    </a>
+  );
 }
 
 export default function ArticleCard({
@@ -24,51 +67,22 @@ export default function ArticleCard({
   externalURL,
   externalBlogSource,
   description,
-  pubDate,
+  publishedAt,
   blurDataURL,
-  isReadable,
-}: ArticleCardProps) {
-  const publishedMonth = pubDate.split(" ")[0];
-  const publishedDay = pubDate.split(" ")[1].replace(",", "");
-  const publishedYear = pubDate.split(" ")[2];
-  const showYear = new Date().getFullYear().toString() !== publishedYear;
-
-  // Absolute path with the same slug as generateStaticParams; a relative "blog/..." resolved to /blog/blog/... (404)
-  const internalPath = INTERNAL_ROUTES.BLOG.href(getCleanSlug(externalURL.split("/").pop()!));
-
-  const ConditionalLink = ({
-    children,
-    className,
-  }: {
-    children: React.ReactNode;
-    className?: string;
-  }) =>
-    isReadable ? (
-      <Link
-        href={internalPath}
-        title={`Read more about ${title}`}
-        aria-label={`Read more about ${title}`}
-        className={className}
-      >
-        {children}
-      </Link>
-    ) : (
-      <a
-        href={externalURL}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={`Read the full article on ${externalBlogSource}`}
-        aria-label={`Read the full article on ${externalBlogSource}`}
-        className={className}
-      >
-        {children}
-      </a>
-    );
+  slug,
+}: IBlogPreview) {
+  // publishedAt is ISO 8601 ("" if unknown, then the date ribbon is hidden)
+  const published = getDateParts(new Date(publishedAt));
+  const showYear = published !== null && getDateParts(new Date())?.year !== published.year;
+  const linkProps = { slug, externalURL, title, source: externalBlogSource };
 
   return (
     <Card className="h-full overflow-visible pt-0">
       <CardHeader className="relative overflow-visible px-0">
-        <ConditionalLink className="group relative block overflow-hidden rounded-t-md focus-visible:outline-none">
+        <ArticleLink
+          {...linkProps}
+          className="group relative block overflow-hidden rounded-t-md focus-visible:outline-none"
+        >
           <Image
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={`${title} Thumbnail`}
@@ -86,40 +100,46 @@ export default function ArticleCard({
             className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
           >
             <span className="bg-primary flex size-12 items-center justify-center rounded-full text-white shadow-md">
-              {isReadable ? <LuBookOpen size={22} /> : <LuExternalLink size={20} />}
+              {slug ? <LuBookOpen size={22} /> : <LuExternalLink size={20} />}
             </span>
           </span>
-        </ConditionalLink>
-        <div className="bg-primary text-primary-foreground before:border-b-primary absolute bottom-5 -left-2 isolate flex size-12 flex-col items-center justify-center shadow-md before:absolute before:-top-1.5 before:left-0.5 before:rotate-135 before:border-[6.5px] before:border-transparent before:shadow-md before:content-['']">
-          <span className="text-sm leading-none font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
-            {publishedMonth}
-          </span>
-          <span className="text-lg leading-none font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
-            {publishedDay}
-          </span>
-          {showYear && (
-            <span className="mt-0.5 text-[10px] leading-none font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
-              {publishedYear}
+        </ArticleLink>
+        {published && (
+          <time
+            dateTime={publishedAt}
+            className="bg-primary text-primary-foreground before:border-b-primary absolute bottom-5 -left-2 isolate flex size-12 flex-col items-center justify-center shadow-md before:absolute before:-top-1.5 before:left-0.5 before:rotate-135 before:border-[6.5px] before:border-transparent before:shadow-md before:content-['']"
+          >
+            <span className="text-sm leading-none font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+              {published.month}
             </span>
-          )}
-        </div>
+            <span className="text-lg leading-none font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+              {published.day}
+            </span>
+            {showYear && (
+              <span className="text-2xs mt-0.5 leading-none font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+                {published.year}
+              </span>
+            )}
+          </time>
+        )}
       </CardHeader>
       <CardContent>
-        <ConditionalLink>
+        <ArticleLink {...linkProps}>
           <h3 className="h5 hover:text-primary mb-2 transition-colors duration-300">{title}</h3>
-        </ConditionalLink>
+        </ArticleLink>
         <p className="text-muted-foreground line-clamp-3 text-sm">{description}</p>
       </CardContent>
       <CardFooter className="mt-auto flex gap-4">
-        {isReadable ? (
-          <ConditionalLink
+        {slug ? (
+          <ArticleLink
+            {...linkProps}
             className={buttonVariants({
               size: "sm",
               variant: "default",
             })}
           >
             Read Now!
-          </ConditionalLink>
+          </ArticleLink>
         ) : null}
 
         <LinkButton
@@ -128,7 +148,7 @@ export default function ArticleCard({
           rel="noopener noreferrer"
           title={`Read the full article on ${externalBlogSource}`}
         >
-          {isReadable ? `or read on ${externalBlogSource}` : `Read on ${externalBlogSource}`}
+          {slug ? `or read on ${externalBlogSource}` : `Read on ${externalBlogSource}`}
           <span>
             <LuExternalLink />
           </span>

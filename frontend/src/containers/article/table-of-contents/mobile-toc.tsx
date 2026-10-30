@@ -12,27 +12,27 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import TOC from "./toc";
+import type { IHeadingNode } from "./heading-tree";
 
 export default function MobileTOC({
   tree,
   activeId,
-  containerRef,
 }: {
-  tree: any[];
+  tree: IHeadingNode[];
   activeId: string | null;
-  containerRef?: React.RefObject<HTMLDivElement | null>;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <Drawer open={open} onOpenChange={setOpen} direction="bottom">
       <DrawerTrigger asChild>
-        <Button size="icon" className="fixed right-4 bottom-16 z-50 2xl:hidden">
+        <Button size="icon" className="fixed right-4 bottom-16 z-(--z-floating) 2xl:hidden">
           <LuList className="size-5" />
         </Button>
       </DrawerTrigger>
 
       <DrawerContent
+        aria-describedby={undefined}
         className="bg-background/95 supports-backdrop-filter:bg-background/90 rounded-t-2xl border-t shadow-2xl backdrop-blur-md"
         onScroll={(e) => e.stopPropagation()}
       >
@@ -56,12 +56,7 @@ export default function MobileTOC({
           <div className="bg-border mb-4 h-px w-full" />
 
           <div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted-foreground/20 max-h-[60vh] overflow-y-auto pr-2">
-            <TOC
-              tree={tree}
-              activeId={activeId}
-              containerRef={containerRef}
-              onLinkClick={() => setOpen(false)}
-            />
+            <TOC tree={tree} activeId={activeId} onLinkClick={() => setOpen(false)} />
           </div>
         </div>
       </DrawerContent>

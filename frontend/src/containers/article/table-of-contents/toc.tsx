@@ -1,17 +1,16 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import type { IHeadingNode } from "./heading-tree";
 
 export default function TOC({
   tree,
   activeId,
-  containerRef,
   onLinkClick,
   className,
 }: {
-  tree: any[];
+  tree: IHeadingNode[];
   activeId: string | null;
-  containerRef?: React.RefObject<HTMLDivElement | null>;
   onLinkClick?: (id: string) => void;
   className?: string;
 }) {
@@ -39,12 +38,7 @@ export default function TOC({
             </button>
             {node.children.length > 0 && (
               <div className="ml-4 border-l pl-3">
-                <TOC
-                  tree={node.children}
-                  activeId={activeId}
-                  containerRef={containerRef}
-                  onLinkClick={onLinkClick}
-                />
+                <TOC tree={node.children} activeId={activeId} onLinkClick={onLinkClick} />
               </div>
             )}
           </li>

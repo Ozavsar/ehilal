@@ -1,101 +1,57 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Metadata } from "next";
 import ArticleContainer from "@/containers/article";
 import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import {
-  getAllArticlePreviews as getAllMediumArticlePreviews,
-  getSingleArticle,
-} from "@/lib/services/medium";
-import { getAllArticlePreviews as getAllSubstackArticlePreviews } from "@/lib/services/substack";
-import { getCleanSlug } from "@/lib/utils";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { SITE_NAME, SITE_URL } from "@/config/site";
+import { getAllArticles, getArticleBySlug, getArticlesPage } from "@/lib/services/blog";
+import { getMediumPostId } from "@/lib/services/medium";
 import { buildMeta } from "@/lib/metadata";
-import { MEDIUM_USERNAME } from "@/config/constants";
 
 export const dynamicParams = true;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
-
-function getMediumArticleUrl(articleId: string): string {
-  return `https://medium.com/p/${articleId}`;
-}
-
-function getMediumProfileUrl(): string {
-  return `https://medium.com/@${MEDIUM_USERNAME}`;
-}
+// The segment is either a list page number or an article slug ("<title>-<medium post id>").
+// Only canonical page numbers are valid ("01", "1.5", "1e0" etc. would be duplicate pages).
+const parsePageNumber = (segment: string) => (/^[1-9]\d*$/.test(segment) ? Number(segment) : NaN);
 
 export default async function BlogPage(props: { params: Promise<{ page: string }> }) {
-  const params = await props.params;
-  if (isNaN(Number(params.page))) {
-    const articleId = params.page.split("-").pop() || "";
+  const { page } = await props.params;
+  const pageNum = parsePageNumber(page);
 
-    let article;
-    try {
-      article = await getSingleArticle(articleId);
-    } catch (error) {
-      console.error("Error fetching article:", params.page, error);
-      redirect(getMediumArticleUrl(articleId));
-    }
-
+  if (isNaN(pageNum)) {
+    // Unknown ids return null; a Medium network/HTTP failure throws so error.tsx handles it and
+    // ISR keeps serving the last good version instead of caching a redirect or a 404
+    const article = await getArticleBySlug(page);
     if (!article) {
-      redirect(getMediumArticleUrl(articleId));
+      notFound();
     }
-
+    if (article.slug !== page && getMediumPostId(article.slug) === article.id) {
+      permanentRedirect(INTERNAL_ROUTES.BLOG.href(article.slug));
+    }
     return <ArticleContainer article={article} />;
-  } else {
-    const pageNum = parseInt(params.page ?? "1", 10);
-
-    if (pageNum < 1) {
-      return notFound();
-    }
-
-    let articles;
-    try {
-      articles = [
-        ...(await getAllMediumArticlePreviews()),
-        ...(await getAllSubstackArticlePreviews()),
-      ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-      console.log(`Fetched ${articles.length} articles for page ${pageNum}`);
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-      redirect(getMediumProfileUrl());
-    }
-
-    if (!articles || articles.length === 0) {
-      redirect(getMediumProfileUrl());
-    }
-
-    const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
-    if (pageNum > totalPages) {
-      return notFound();
-    }
-
-    return <BlogContainer articles={articles} pageNumber={pageNum.toString()} />;
   }
+
+  const result = await getArticlesPage(pageNum);
+  if (!result) {
+    notFound();
+  }
+
+  return (
+    <BlogContainer articles={result.items} currentPage={pageNum} totalPages={result.totalPages} />
+  );
 }
 
 export async function generateStaticParams() {
   try {
-    const articles = [
-      ...(await getAllMediumArticlePreviews()),
-      ...(await getAllSubstackArticlePreviews()),
-    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-    const pageCount = Math.ceil((articles?.length || 0) / ITEMS_PER_PAGE);
-    const pageNumbers = Array.from({ length: pageCount || 1 }, (_, i) => ({
-      page: (i + 1).toString(),
-    }));
-    const blogSlugs = articles
-      .filter((a) => a.isReadable)
-      .map((article) => {
-        const slug = getCleanSlug(article.externalURL.split("/").pop()!);
-        return { page: slug };
-      });
-
-    return [...pageNumbers, ...blogSlugs];
-  } catch (error) {
-    console.error("Error generating static params:", error);
-    return [{ page: "1" }];
+    const articles = await getAllArticles();
+    const pageCount = Math.max(1, Math.ceil(articles.length / ITEMS_PER_PAGE));
+    const pages = Array.from({ length: pageCount }, (_, i) => ({ page: (i + 1).toString() }));
+    const slugs = articles.flatMap((article) => (article.slug ? [{ page: article.slug }] : []));
+    return [...pages, ...slugs];
+  } catch {
+    // Every source is down (already logged): render the pages on demand instead of failing the build
+    return [];
   }
 }
 
@@ -105,12 +61,21 @@ export async function generateMetadata({
   params: Promise<{ page: string }>;
 }): Promise<Metadata> {
   const { page } = await params;
-  const isArticle = isNaN(Number(page));
+  const pageNum = parsePageNumber(page);
+  const isArticle = isNaN(pageNum);
+
+  // Invalid segments 404 in the page; don't fetch anything for them
+  if (isArticle && !getMediumPostId(page)) {
+    return buildMeta({
+      title: "Article Not Found",
+      description: "The requested article could not be found.",
+      path: `/blog/${page}`,
+    });
+  }
 
   try {
     if (isArticle) {
-      const articleId = page.split("-").pop() || "";
-      const article = await getSingleArticle(articleId);
+      const article = await getArticleBySlug(page);
       if (!article) {
         return buildMeta({
           title: "Article Not Found",
@@ -119,36 +84,28 @@ export async function generateMetadata({
         });
       }
 
-      // getSingleArticle returns the raw Medium post: subtitle + previewImage hold the preview data
-      const description =
-        article.previewContent?.subtitle?.trim() ||
-        `Read the article "${article.title}" by ${SITE_NAME}.`;
-      const imageUrl = article.previewImage?.id
-        ? `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`
-        : `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}`;
-
       return buildMeta({
         title: article.title,
-        description,
-        path: `/blog/${page}`,
+        description: article.subtitle || `Read the article "${article.title}" by ${SITE_NAME}.`,
+        path: INTERNAL_ROUTES.BLOG.href(article.slug),
         type: "article",
         image: {
-          url: imageUrl,
+          url: article.previewImage?.id
+            ? `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`
+            : `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}`,
           alt: article.previewImage?.alt || article.title,
         },
       });
     }
 
-    const pageNum = parseInt(page, 10);
-    if (pageNum < 1) throw new Error("Invalid page number");
-
-    const articles = [
-      ...(await getAllMediumArticlePreviews()),
-      ...(await getAllSubstackArticlePreviews()),
-    ].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-
-    const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
-    if (pageNum > totalPages) throw new Error("Page exceeds total pages");
+    const result = await getArticlesPage(pageNum);
+    if (!result) {
+      return buildMeta({
+        title: "Page Not Found",
+        description: "Requested page exceeds available blog listings.",
+        path: "/blog",
+      });
+    }
 
     const title = pageNum > 1 ? `Blog – Page ${pageNum}` : "Blog";
     const description = `Explore ${SITE_NAME}'s latest articles and insights${
@@ -165,7 +122,8 @@ export async function generateMetadata({
         alt: `Blog Articles by ${SITE_NAME}`,
       },
     });
-  } catch (error) {
+  } catch {
+    // The page throws the same (cached) error and error.tsx shows it
     return buildMeta({
       title: "Blog",
       description: `Read ${SITE_NAME}'s latest articles and insights.`,

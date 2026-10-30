@@ -1,32 +1,43 @@
+import { z } from "zod";
 import { MEDIUM_USER_ID } from "@/config/constants";
+import { getCleanSlug } from "@/lib/utils";
 import { getImage } from "../getImage";
-import { type IBlogPreview, type IBlog, BlogSource } from "@/types";
+import { BlogSource, type IBlog, type IBlogPreview, type IMediumParagraph } from "@/types";
 
 export const REVALIDATE = 60 * 60; // 1 hour
 
-export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
-  const allPreviews: IBlogPreview[] = [];
-  let from: string | null = null;
-  const limit = 10;
+const GRAPHQL_URL = "https://medium.com/_/graphql";
+const MEDIUM_IMAGE_URL = "https://miro.medium.com/v2";
+const PAGE_SIZE = 10;
+// Guards the paging loop against a cursor that never ends
+const MAX_LIST_PAGES = 20;
+// Medium post ids are lowercase hex: 12 characters, fewer when they start with zeros (e.g. 958f3fd6de6)
+const POST_ID_PATTERN = /^[0-9a-f]{8,12}$/;
 
-  const query = `
-    query UserProfileQuery(
-      $id: ID
-      $username: ID
-      $limit: PaginationLimit = 10
-      $from: String = null
-    ) {
-    userResult(id: $id, username: $username) {
+const HEADERS = {
+  "Content-Type": "application/json",
+  Accept: "application/json, text/plain, */*",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+  Referer: "https://medium.com/",
+  Origin: "https://medium.com",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Accept-Encoding": "gzip, deflate, br",
+  "Sec-Fetch-Site": "same-origin",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Ch-Ua-Platform": '"Windows"',
+  DNT: "1",
+  "Cache-Control": "no-cache",
+  Pragma: "no-cache",
+};
+
+const LIST_QUERY = `
+  query UserProfileQuery($id: ID, $limit: PaginationLimit = 10, $from: String = null) {
+    userResult(id: $id) {
       ... on User {
-        id
-        name
-        username
-        bio
-        imageId
-        socialStats {
-          followerCount
-          followingCount
-        }
         homepagePostsConnection(
           paging: { limit: $limit, from: $from }
           includeDistributedResponses: true
@@ -34,239 +45,258 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
           posts {
             id
             title
-            uniqueSlug
             mediumUrl
             previewImage {
               id
-              alt
             }
             extendedPreviewContent {
-                subtitle
+              subtitle
             }
             firstPublishedAt
-            readingTime
           }
           pagingInfo {
             next {
               from
-              limit
             }
           }
         }
       }
     }
   }
-  `;
+`;
 
-  while (true) {
-    const res = await fetch("https://medium.com/_/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json, text/plain, */*",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-        Referer: "https://medium.com/",
-        Origin: "https://medium.com",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Sec-Fetch-Site": "same-origin",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
-        "Sec-Ch-Ua-Mobile": "?0",
-        "Sec-Ch-Ua-Platform": '"Windows"',
-        DNT: "1",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
-      body: JSON.stringify({
-        query,
-        variables: { id: MEDIUM_USER_ID, limit, from },
-      }),
-      cache: "force-cache",
-      next: {
-        tags: ["articles"],
-        revalidate: REVALIDATE,
-      },
-    });
-
-    const json: any = await res.json();
-    const posts = json.data?.userResult?.homepagePostsConnection?.posts ?? [];
-    const next = json.data?.userResult?.homepagePostsConnection?.pagingInfo?.next;
-
-    const currentYear = new Date().getFullYear();
-
-    const formattedPromises = posts.map(async (post: any) => {
-      const date = new Date(post.firstPublishedAt);
-
-      const imageUrl = post.previewImage
-        ? `https://miro.medium.com/v2/da:true/${post.previewImage.id}`
-        : null;
-
-      let blurDataURL = "";
-      if (imageUrl) {
-        try {
-          const placeholder = await getImage(imageUrl);
-          blurDataURL = placeholder.base64;
-        } catch (err) {
-          console.warn("Placeholder alınamadı:", imageUrl);
+const POST_QUERY = `
+  query PostPageQuery($postId: ID!) {
+    postResult(id: $postId) {
+      __typename
+      ... on Post {
+        id
+        title
+        mediumUrl
+        creator {
+          id
         }
-      }
-
-      const formattedDate = date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-
-      return {
-        title: post.title,
-        externalURL: post.mediumUrl,
-        externalBlogSource: BlogSource.MEDIUM,
-        description: post.extendedPreviewContent?.subtitle || "",
-        thumbnailURL: imageUrl ?? "",
-        blurDataURL,
-        pubDate: formattedDate,
-        isReadable: true,
-      };
-    });
-
-    const formatted = await Promise.all(formattedPromises);
-    allPreviews.push(...formatted);
-
-    if (!next?.from) break;
-    from = next.from;
-
-    await new Promise((r) => setTimeout(r, 2000));
-  }
-
-  return allPreviews;
-}
-
-export async function getSingleArticle(postId: string): Promise<IBlog | null> {
-  const query = `
-query PostPageQuery(
-  $postId: ID!,
-  $postMeteringOptions: PostMeteringOptions,
-  $includeShouldFollowPost: Boolean = false
-) {
-  postResult(id: $postId) {
-    ... on Post {
-      id
-      title
-      uniqueSlug
-      mediumUrl
-      firstPublishedAt
-      latestPublishedAt
-      readingTime
-      isLocked
-      content(postMeteringOptions: $postMeteringOptions) {
-        isLockedPreviewOnly
-        bodyModel {
-          paragraphs {
-            name
-            text
-            type
-            markups {
+        content {
+          bodyModel {
+            paragraphs {
+              name
+              text
               type
-              href
-            }
-            mixtapeMetadata {
-              href
-            }
-            metadata {
+              metadata {
                 id
-            }
-            iframe {
+              }
+              iframe {
                 mediaResource {
-                    iframeSrc
-                    title
+                  iframeSrc
+                  title
                 }
+              }
             }
           }
         }
-      }
-      previewImage {
-        id
-        alt
-        originalHeight
-        originalWidth
-        focusPercentX
-        focusPercentY
-      }
-      previewContent {
-        subtitle
-      }
-      tags {
-        displayTitle
-        normalizedTagSlug
-      }
-      creator {
-        id
-        name
-        username
-        imageId
-        bio
-        socialStats {
-          followerCount
+        previewImage {
+          id
+          alt
         }
-      }
-      collection {
-        id
-        name
-        slug
-        domain
-        description
-      }
-      viewerEdge @include(if: $includeShouldFollowPost) {
-        shouldFollowPostForExternalSearch
+        previewContent {
+          subtitle
+        }
       }
     }
   }
-}
-  `;
+`;
 
-  const res = await fetch("https://medium.com/_/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json, text/plain, */*",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-      Referer: "https://medium.com/",
-      Origin: "https://medium.com",
-      "Accept-Language": "en-US,en;q=0.9",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Sec-Fetch-Site": "same-origin",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Ch-Ua": '"Chromium";v="143", "Not.A/Brand";v="24", "Google Chrome";v="143"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      DNT: "1",
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-    },
-    body: JSON.stringify({
-      query,
-      variables: { postId, includeShouldFollowPost: false },
+// Only the fields we use: a schema change fails loudly instead of rendering undefined
+const listResponseSchema = z.object({
+  data: z.object({
+    userResult: z.object({
+      homepagePostsConnection: z.object({
+        posts: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            mediumUrl: z.string(),
+            previewImage: z.object({ id: z.string() }).nullish(),
+            extendedPreviewContent: z.object({ subtitle: z.string().nullish() }).nullish(),
+            firstPublishedAt: z.number(),
+          }),
+        ),
+        pagingInfo: z.object({
+          next: z.object({ from: z.string().nullish() }).nullish(),
+        }),
+      }),
     }),
+  }),
+});
+
+// Unknown ids come back as { __typename: "NotFound" }
+const postEnvelopeSchema = z.object({
+  data: z.object({
+    postResult: z.object({ __typename: z.string() }).nullish(),
+  }),
+});
+
+const paragraphSchema = z.object({
+  name: z.string(),
+  text: z.string().nullish(),
+  type: z.string(),
+  metadata: z.object({ id: z.string() }).nullish(),
+  iframe: z
+    .object({
+      mediaResource: z.object({ iframeSrc: z.string(), title: z.string().nullish() }),
+    })
+    .nullish(),
+});
+
+// Parsed from the raw response once the envelope says it is a Post
+const postResponseSchema = z.object({
+  data: z.object({
+    postResult: z.object({
+      id: z.string(),
+      title: z.string(),
+      mediumUrl: z.string(),
+      creator: z.object({ id: z.string() }).nullish(),
+      content: z
+        .object({
+          bodyModel: z.object({ paragraphs: z.array(paragraphSchema) }).nullish(),
+        })
+        .nullish(),
+      previewImage: z.object({ id: z.string(), alt: z.string().nullish() }).nullish(),
+      previewContent: z.object({ subtitle: z.string().nullish() }).nullish(),
+    }),
+  }),
+});
+
+function parseResponse<T>(schema: z.ZodType<T>, data: unknown, label: string): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    throw new Error(`Unexpected Medium ${label} response: ${z.prettifyError(result.error)}`);
+  }
+  return result.data;
+}
+
+async function queryMedium(
+  query: string,
+  variables: Record<string, unknown>,
+  tags: string[],
+): Promise<unknown> {
+  const res = await fetch(GRAPHQL_URL, {
+    method: "POST",
+    headers: HEADERS,
+    body: JSON.stringify({ query, variables }),
     cache: "force-cache",
-    next: {
-      tags: ["articles", `article-${postId}`],
-      revalidate: REVALIDATE,
-    },
+    next: { tags, revalidate: REVALIDATE },
   });
+  if (!res.ok) {
+    throw new Error(`Medium request failed: ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
 
-  const json: any = await res.json();
+// /blog/<slug> segment: the cleaned last part of the Medium URL, which ends with the post id
+function getMediumArticleSlug(mediumUrl: string): string {
+  const path = mediumUrl.split(/[?#]/)[0] ?? "";
+  const lastPart = path.split("/").filter(Boolean).pop() ?? "";
+  return getCleanSlug(lastPart);
+}
 
-  if (!json.data?.postResult) {
+// Post id at the end of a /blog/<slug> segment, or null if it can't be a Medium id
+export function getMediumPostId(slug: string): string | null {
+  const postId = slug.slice(slug.lastIndexOf("-") + 1);
+  return POST_ID_PATTERN.test(postId) ? postId : null;
+}
+
+export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
+  const previews: IBlogPreview[] = [];
+  let from: string | null = null;
+
+  for (let page = 0; page < MAX_LIST_PAGES; page++) {
+    const json = await queryMedium(LIST_QUERY, { id: MEDIUM_USER_ID, limit: PAGE_SIZE, from }, [
+      "articles",
+    ]);
+    const { posts, pagingInfo } = parseResponse(listResponseSchema, json, "post list").data
+      .userResult.homepagePostsConnection;
+
+    const pagePreviews = await Promise.all(
+      posts.map(async (post): Promise<IBlogPreview> => {
+        const imageUrl = post.previewImage?.id
+          ? `${MEDIUM_IMAGE_URL}/da:true/${post.previewImage.id}`
+          : "";
+
+        let blurDataURL = "";
+        if (imageUrl) {
+          try {
+            blurDataURL = (await getImage(imageUrl)).base64;
+          } catch {
+            console.warn("Could not create placeholder:", imageUrl);
+          }
+        }
+
+        return {
+          title: post.title,
+          externalURL: post.mediumUrl,
+          externalBlogSource: BlogSource.MEDIUM,
+          description: post.extendedPreviewContent?.subtitle || "",
+          thumbnailURL: imageUrl,
+          blurDataURL,
+          publishedAt: new Date(post.firstPublishedAt).toISOString(),
+          slug: getMediumArticleSlug(post.mediumUrl),
+        };
+      }),
+    );
+    previews.push(...pagePreviews);
+
+    const next = pagingInfo.next?.from;
+    if (!next) break;
+    from = next;
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+
+  return previews;
+}
+
+// Returns null for unknown ids, posts without a body and posts by other authors.
+// Throws on network/HTTP failures and unexpected response shapes.
+export async function getSingleArticle(postId: string): Promise<IBlog | null> {
+  const json = await queryMedium(POST_QUERY, { postId }, ["articles", `article-${postId}`]);
+
+  const { postResult } = parseResponse(postEnvelopeSchema, json, "post").data;
+  if (postResult?.__typename !== "Post") {
+    return null;
+  }
+
+  const post = parseResponse(postResponseSchema, json, "post").data.postResult;
+  const paragraphs = post.content?.bodyModel?.paragraphs;
+  // Any public Medium post id would resolve; only render the site owner's posts
+  if (!paragraphs || post.creator?.id !== MEDIUM_USER_ID) {
     return null;
   }
 
   return {
-    ...json.data.postResult,
-    paragraphs: json.data.postResult.content.bodyModel.paragraphs || [],
+    id: post.id,
+    slug: getMediumArticleSlug(post.mediumUrl),
+    title: post.title,
+    subtitle: post.previewContent?.subtitle?.trim() || "",
+    mediumUrl: post.mediumUrl,
+    previewImage: post.previewImage
+      ? { id: post.previewImage.id, alt: post.previewImage.alt ?? null }
+      : null,
+    paragraphs: paragraphs.map(
+      (p): IMediumParagraph => ({
+        name: p.name,
+        text: p.text ?? "",
+        type: p.type,
+        metadata: p.metadata ?? null,
+        iframe: p.iframe
+          ? {
+              mediaResource: {
+                iframeSrc: p.iframe.mediaResource.iframeSrc,
+                title: p.iframe.mediaResource.title ?? null,
+              },
+            }
+          : null,
+      }),
+    ),
   };
 }

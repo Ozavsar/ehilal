@@ -1,45 +1,35 @@
 import { NextResponse } from "next/server";
-import { getAllArticlePreviews as getAllMediumArticlePreviews } from "@/lib/services/medium";
-import { getAllArticlePreviews as getAllSubstackArticlePreviews } from "@/lib/services/substack";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
-import { getCleanSlug } from "@/lib/utils";
+import { SITE_URL } from "@/config/site";
+import { getAllArticles } from "@/lib/services/blog";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const now = new Date().toISOString();
 
-  // Same sources as /blog/[page], so the page count matches the listing
-  const [mediumArticles, substackArticles] = await Promise.all([
-    getAllMediumArticlePreviews(),
-    getAllSubstackArticlePreviews().catch(() => []),
-  ]);
-  const articles = [...mediumArticles, ...substackArticles];
-  const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
+  // Same merged list as /blog/[page], so the page count matches the listing
+  const articles = await getAllArticles();
+  const totalPages = Math.max(1, Math.ceil(articles.length / ITEMS_PER_PAGE));
 
   const pagesXml = Array.from({ length: totalPages }, (_, i) => {
     const url = INTERNAL_ROUTES.BLOG.href(i + 1);
     return `
     <url>
-      <loc>${baseUrl}${url}</loc>
+      <loc>${SITE_URL}${url}</loc>
       <lastmod>${now}</lastmod>
     </url>`;
   }).join("\n");
 
   // Only readable (Medium) articles have an internal page; Substack ones link out
   const articlesXml = articles
-    .filter((article) => article.isReadable)
-    .map((article) => {
-      const slug = getCleanSlug(article.externalURL.split("/").pop()!);
-      if (!slug) return "";
-      const pubTime = new Date(article.pubDate).getTime();
-      const date = Number.isNaN(pubTime) ? now : new Date(pubTime).toISOString();
-      return `
+    .flatMap((article) => (article.slug ? [{ slug: article.slug, date: article.publishedAt }] : []))
+    .map(
+      ({ slug, date }) => `
       <url>
-        <loc>${baseUrl}${INTERNAL_ROUTES.BLOG.href(slug)}</loc>
-        <lastmod>${date}</lastmod>
-      </url>`;
-    })
+        <loc>${SITE_URL}${INTERNAL_ROUTES.BLOG.href(slug)}</loc>
+        <lastmod>${date || now}</lastmod>
+      </url>`,
+    )
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

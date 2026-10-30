@@ -5,9 +5,9 @@ interface IArticleContainerProps {
   article: IBlog;
 }
 
-export default async function ArticleContainer({ article }: IArticleContainerProps) {
+export default function ArticleContainer({ article }: IArticleContainerProps) {
   return (
-    <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
+    <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <MediumRenderer paragraphs={article.paragraphs} />
     </main>
   );
