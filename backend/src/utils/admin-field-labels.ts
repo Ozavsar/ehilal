@@ -266,9 +266,9 @@ export const ADMIN_FIELD_LABELS: LabelMap = {
         "Paletin ana renkten nasıl türetileceği (Material 3); her varyantın açıklaması önizlemede.",
     },
     palette: {
-      label: "Renk paleti (önizleme)",
+      label: "Renk paleti",
       description:
-        "Kaydedince otomatik üretilir; yayınlanınca sitenin bütün renkleri buradan gelir.",
+        "Kaydedince otomatik üretilir; yayınlanınca sitenin bütün renkleri buradan gelir. Renkleri Önizleme'de deneyin.",
     },
     image_candidates: {
       label: "Fotoğraftan çıkan renkler",

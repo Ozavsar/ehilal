@@ -1,19 +1,18 @@
-// Custom field input for `theme.palette`: a live preview instead of the raw JSON.
-// It only reads the form; the only value it writes is `seed_color` (when a photo candidate is picked).
+// Custom field input for `theme.palette`: the variant, the photo's candidate colours and the state of
+// the stored palette. Colours are tried on the website itself (Strapi Preview → theme preview bar).
+// It writes `seed_color` (a candidate, or the colour sent from the preview) and `variant` (from the preview).
 import * as React from "react";
-import { Box, Button, Field, Flex, Grid, Typography } from "@strapi/design-system";
+import { Box, Button, Field, Flex, Typography } from "@strapi/design-system";
 import { useForm } from "@strapi/strapi/admin";
 import {
   DEFAULT_VARIANT,
-  ROLES,
-  generatePreviewSchemes,
+  THEME_CHOICE_EVENT,
+  clearStoredChoice,
   isVariant,
   normalizeHex,
-  parseStoredPalette,
-  readableTextOn,
-  type PreviewSchemes,
-  type Role,
-  type Scheme,
+  parseStoredSource,
+  readStoredChoice,
+  type ThemeChoice,
 } from "./palette";
 import { TEXT, VARIANT_INFO } from "./texts";
 
@@ -37,23 +36,6 @@ const FIELDS = {
   candidates: "image_candidates",
 } as const;
 
-const KEY_PAIRS: [Role, Role][] = [
-  ["primary", "onPrimary"],
-  ["primaryContainer", "onPrimaryContainer"],
-  ["secondary", "onSecondary"],
-  ["secondaryContainer", "onSecondaryContainer"],
-  ["tertiary", "onTertiary"],
-  ["tertiaryContainer", "onTertiaryContainer"],
-  ["error", "onError"],
-  ["errorContainer", "onErrorContainer"],
-  ["surface", "onSurface"],
-  ["surfaceContainerLow", "onSurface"],
-  ["surfaceContainerHighest", "onSurfaceVariant"],
-  ["inverseSurface", "inverseOnSurface"],
-  ["outline", "surface"],
-  ["outlineVariant", "onSurface"],
-];
-
 const getValue = (values: object, path: string): unknown =>
   (values as Record<string, unknown>)[path];
 
@@ -74,8 +56,13 @@ const PaletteInput = React.forwardRef<HTMLDivElement, PaletteInputProps>(
     );
     const onChange = useForm("M3PaletteInput", (s) => s.onChange);
 
-    const [highContrast, setHighContrast] = React.useState(false);
-    const [allRoles, setAllRoles] = React.useState(false);
+    // The colour last sent from the preview bar (kept by app.tsx), until applied or dismissed
+    const [choice, setChoice] = React.useState<ThemeChoice | null>(readStoredChoice);
+    React.useEffect(() => {
+      const update = () => setChoice(readStoredChoice());
+      window.addEventListener(THEME_CHOICE_EVENT, update);
+      return () => window.removeEventListener(THEME_CHOICE_EVENT, update);
+    }, []);
 
     const isImageSource = sourceType === "image";
     const candidates = React.useMemo(
@@ -88,25 +75,63 @@ const PaletteInput = React.forwardRef<HTMLDivElement, PaletteInputProps>(
     const variant = isVariant(variantValue) ? variantValue : DEFAULT_VARIANT;
     // Like the server: an image source without a seed falls back to the first candidate.
     const seed = normalizeHex(seedValue) ?? (isImageSource ? (candidates[0] ?? null) : null);
-    // Keeps the colour picker responsive while the preview recomputes.
-    const deferredSeed = React.useDeferredValue(seed);
-
-    const stored = React.useMemo(() => parseStoredPalette(value), [value]);
-    const live = React.useMemo(
-      () => (deferredSeed ? generatePreviewSchemes(deferredSeed, variant) : null),
-      [deferredSeed, variant],
-    );
-    const schemes = live ?? stored?.schemes ?? null;
+    const stored = React.useMemo(() => parseStoredSource(value), [value]);
 
     let status: string | null = null;
-    if (!live) status = stored ? TEXT.showingStored : TEXT.noSeed;
+    if (!seed) status = TEXT.noSeed;
     else if (!stored) status = TEXT.notGenerated;
     else if (stored.seed !== seed || stored.variant !== variant) status = TEXT.unsaved;
+
+    const pendingChoice =
+      choice && (choice.seed !== seed || choice.variant !== variant) ? choice : null;
+    const closeChoice = () => {
+      clearStoredChoice();
+      setChoice(null);
+    };
 
     return (
       <Field.Root ref={ref} name={name} id={name} error={error} hint={hint} required={required}>
         <Flex direction="column" alignItems="stretch" gap={3}>
           <Field.Label action={labelAction}>{label}</Field.Label>
+
+          {pendingChoice && (
+            <Box background="primary100" padding={3} hasRadius>
+              <Flex gap={3} wrap="wrap" alignItems="center">
+                <span
+                  aria-hidden
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    background: pendingChoice.seed,
+                    border: "1px solid rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Typography variant="omega">
+                  {TEXT.choiceTitle}:{" "}
+                  <span style={{ fontFamily: "monospace", textTransform: "uppercase" }}>
+                    {pendingChoice.seed}
+                  </span>{" "}
+                  · {VARIANT_INFO[pendingChoice.variant].name}
+                </Typography>
+                <Button
+                  type="button"
+                  size="S"
+                  disabled={disabled}
+                  onClick={() => {
+                    onChange(FIELDS.seed, pendingChoice.seed);
+                    onChange(FIELDS.variant, pendingChoice.variant);
+                    closeChoice();
+                  }}
+                >
+                  {TEXT.choiceApply}
+                </Button>
+                <Button type="button" size="S" variant="tertiary" onClick={closeChoice}>
+                  {TEXT.choiceDismiss}
+                </Button>
+              </Flex>
+            </Box>
+          )}
 
           <Box background="neutral100" padding={3} hasRadius>
             <Typography variant="omega" fontWeight="bold">
@@ -133,43 +158,8 @@ const PaletteInput = React.forwardRef<HTMLDivElement, PaletteInputProps>(
             </Typography>
           )}
 
-          {schemes && (
-            <>
-              <Flex gap={2} wrap="wrap">
-                <Button
-                  type="button"
-                  size="S"
-                  variant={highContrast ? "tertiary" : "secondary"}
-                  aria-pressed={!highContrast}
-                  onClick={() => setHighContrast(false)}
-                >
-                  {TEXT.standardContrast}
-                </Button>
-                <Button
-                  type="button"
-                  size="S"
-                  variant={highContrast ? "secondary" : "tertiary"}
-                  aria-pressed={highContrast}
-                  onClick={() => setHighContrast(true)}
-                >
-                  {TEXT.highContrast}
-                </Button>
-                <Button
-                  type="button"
-                  size="S"
-                  variant="ghost"
-                  aria-pressed={allRoles}
-                  onClick={() => setAllRoles((v) => !v)}
-                >
-                  {allRoles ? TEXT.showKeyRoles : TEXT.showAllRoles}
-                </Button>
-              </Flex>
-              <SchemeColumns schemes={schemes} highContrast={highContrast} allRoles={allRoles} />
-            </>
-          )}
-
           <Typography variant="pi" textColor="neutral600">
-            {TEXT.saveNote}
+            {TEXT.previewNote} {TEXT.saveNote}
           </Typography>
           <Field.Hint />
           <Field.Error />
@@ -256,147 +246,5 @@ const CandidatePicker = ({
     )}
   </Flex>
 );
-
-interface SchemeColumnsProps {
-  schemes: PreviewSchemes;
-  highContrast: boolean;
-  allRoles: boolean;
-}
-
-const SchemeColumns = ({ schemes, highContrast, allRoles }: SchemeColumnsProps) => {
-  const columns = [
-    { title: TEXT.light, scheme: highContrast ? schemes["light-high-contrast"] : schemes.light },
-    { title: TEXT.dark, scheme: highContrast ? schemes["dark-high-contrast"] : schemes.dark },
-  ];
-  return (
-    <Grid.Root gap={4}>
-      {columns.map(({ title, scheme }) => (
-        <Grid.Item key={title} col={6} s={12} direction="column" alignItems="stretch" gap={3}>
-          <Typography variant="sigma" textColor="neutral600">
-            {title}
-          </Typography>
-          <SampleUi scheme={scheme} />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-              gap: 6,
-            }}
-          >
-            {allRoles
-              ? ROLES.map((role) => (
-                  <RoleTile
-                    key={role}
-                    name={role}
-                    bg={scheme[role]}
-                    fg={readableTextOn(scheme[role])}
-                  />
-                ))
-              : KEY_PAIRS.map(([bg, fg]) => (
-                  <RoleTile key={bg} name={bg} bg={scheme[bg]} fg={scheme[fg]} />
-                ))}
-          </div>
-        </Grid.Item>
-      ))}
-    </Grid.Root>
-  );
-};
-
-const RoleTile = ({ name, bg, fg }: { name: string; bg: string; fg: string }) => (
-  <div
-    style={{
-      background: bg,
-      color: fg,
-      padding: 8,
-      borderRadius: 8,
-      minHeight: 52,
-      border: "1px solid rgba(0, 0, 0, 0.08)",
-      fontSize: 12,
-      lineHeight: 1.4,
-      overflowWrap: "anywhere",
-    }}
-  >
-    <div style={{ fontWeight: 600 }}>{name}</div>
-    <div style={{ fontFamily: "monospace", textTransform: "uppercase" }}>{bg}</div>
-  </div>
-);
-
-// A few site-like components drawn with the scheme's roles. Decorative, so hidden from assistive tech.
-const SampleUi = ({ scheme: c }: { scheme: Scheme }) => {
-  const pill: React.CSSProperties = {
-    display: "inline-block",
-    padding: "8px 16px",
-    borderRadius: 20,
-    fontSize: 13,
-    fontWeight: 600,
-  };
-  return (
-    <div
-      aria-hidden
-      style={{
-        background: c.surface,
-        color: c.onSurface,
-        border: `1px solid ${c.outlineVariant}`,
-        borderRadius: 12,
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-        fontSize: 14,
-      }}
-    >
-      <div style={{ fontSize: 18, fontWeight: 700 }}>{TEXT.sample.title}</div>
-      <div style={{ color: c.onSurfaceVariant }}>
-        {TEXT.sample.body}{" "}
-        <span style={{ color: c.primary, textDecoration: "underline" }}>{TEXT.sample.link}</span>.
-      </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <span style={{ ...pill, background: c.primary, color: c.onPrimary }}>
-          {TEXT.sample.filled}
-        </span>
-        <span style={{ ...pill, background: c.secondaryContainer, color: c.onSecondaryContainer }}>
-          {TEXT.sample.tonal}
-        </span>
-        <span style={{ ...pill, border: `1px solid ${c.outline}`, color: c.primary }}>
-          {TEXT.sample.outlined}
-        </span>
-      </div>
-      <div
-        style={{
-          background: c.surfaceContainerLow,
-          border: `1px solid ${c.outlineVariant}`,
-          borderRadius: 12,
-          padding: 12,
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-        }}
-      >
-        <span
-          style={{
-            alignSelf: "flex-start",
-            background: c.tertiaryContainer,
-            color: c.onTertiaryContainer,
-            borderRadius: 8,
-            padding: "2px 8px",
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          {TEXT.sample.chip}
-        </span>
-        <div style={{ fontWeight: 600 }}>{TEXT.sample.cardTitle}</div>
-        <div style={{ color: c.onSurfaceVariant }}>{TEXT.sample.cardBody}</div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <span style={{ fontSize: 12, color: c.error }}>{TEXT.sample.fieldLabel}</span>
-        <div style={{ border: `2px solid ${c.error}`, borderRadius: 4, padding: "8px 12px" }}>
-          {TEXT.sample.fieldValue}
-        </div>
-        <span style={{ fontSize: 12, color: c.error }}>{TEXT.sample.fieldError}</span>
-      </div>
-    </div>
-  );
-};
 
 export { PaletteInput };

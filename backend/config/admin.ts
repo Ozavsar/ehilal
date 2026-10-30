@@ -27,7 +27,8 @@ export default ({ env }) => {
       nps: env.bool('FLAG_NPS', true),
       promoteEE: env.bool('FLAG_PROMOTE_EE', true),
     },
-    // "Open preview" on the Theme: the website in draft mode, showing the draft palette.
+    // "Open preview" on the Theme: the website in draft mode with the draft palette and a toolbar to
+    // try other colours live (frontend components/theme-preview-bar.tsx).
     // Off without FRONTEND_URL and PREVIEW_SECRET.
     preview: {
       enabled: Boolean(frontendUrl && previewSecret),
@@ -38,7 +39,7 @@ export default ({ env }) => {
           const query = new URLSearchParams({
             secret: previewSecret,
             status: status === "published" ? "published" : "draft",
-            url: "/theme-preview",
+            url: "/",
           });
           return `${frontendUrl}/api/preview?${query}`;
         },
