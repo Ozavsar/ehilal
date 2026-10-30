@@ -61,17 +61,39 @@ export async function getBlurDataURL(src: string): Promise<string | undefined> {
   }
 }
 
+// Base64 only: the placeholder ends up in a CSS url(), so nothing may break out of it
+const STORED_BLUR_PATTERN = /^data:image\/[a-z]+;base64,[A-Za-z0-9+/]+=*$/;
+
 /**
- * Blur placeholder for a Strapi image, built from its smallest generated format. Strapi only
- * generates formats smaller than the original (none for small images, SVGs and GIFs).
+ * Blur placeholder that Strapi computed when the image was uploaded (stored in provider_metadata
+ * by backend/src/utils/upload-blur.ts), or undefined when there is none. No network request.
  */
-export function getStrapiBlurDataURL(image: Pick<IImage, "url" | "formats">) {
-  return getBlurDataURL(image.formats?.thumbnail?.url ?? image.formats?.small?.url ?? image.url);
+export function getStoredBlurDataURL(image: Pick<IImage, "provider_metadata">): string | undefined {
+  // Provider JSON: don't trust its shape
+  const blurDataURL: unknown = image.provider_metadata?.blurDataURL;
+  return typeof blurDataURL === "string" && STORED_BLUR_PATTERN.test(blurDataURL)
+    ? blurDataURL
+    : undefined;
 }
 
 /**
- * Adds a blur placeholder to each item with an image. Call it on the items that are rendered
- * (after pagination), never on whole lists, sitemaps or generateStaticParams.
+ * Blur placeholder for a Strapi image: the one stored by Strapi, otherwise built from its smallest
+ * generated format. Strapi only generates formats smaller than the original (none for small images
+ * and SVGs).
+ */
+export async function getStrapiBlurDataURL(
+  image: Pick<IImage, "url" | "formats" | "provider_metadata">,
+) {
+  return (
+    getStoredBlurDataURL(image) ??
+    getBlurDataURL(image.formats?.thumbnail?.url ?? image.formats?.small?.url ?? image.url)
+  );
+}
+
+/**
+ * Adds a blur placeholder to each item with an image (items that already have one keep it). Call it
+ * on the items that are rendered (after pagination), never on whole lists, sitemaps or
+ * generateStaticParams.
  */
 export function withBlurDataURLs<T extends { blurDataURL?: string }>(
   items: T[],
@@ -79,6 +101,7 @@ export function withBlurDataURLs<T extends { blurDataURL?: string }>(
 ): Promise<T[]> {
   return Promise.all(
     items.map(async (item) => {
+      if (item.blurDataURL) return item;
       const src = getSrc(item);
       const blurDataURL = src ? await getBlurDataURL(src) : undefined;
       return blurDataURL ? { ...item, blurDataURL } : item;

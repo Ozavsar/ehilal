@@ -3,6 +3,7 @@ import { unstable_rethrow } from "next/navigation";
 import { fetchAPI } from "../api/fetchAPI";
 import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos, getYoutubeThumbnails } from "@/lib/services/youtube";
+import { getStoredBlurDataURL } from "@/lib/getImage";
 import type {
   IStrapiCollectionResponse,
   IStrapiVideo,
@@ -29,8 +30,8 @@ async function getAllStrapiVideos() {
 }
 
 /**
- * get all videos (YouTube channel + Strapi), sorted, without blur placeholders.
- * Use `withBlurDataURLs` on the slice that is actually rendered.
+ * get all videos (YouTube channel + Strapi), sorted. Only Strapi thumbnails with a placeholder
+ * stored by Strapi come with one: use `withBlurDataURLs` on the slice that is actually rendered.
  * Strapi is required (a failure throws); YouTube is best effort.
  * cache(): generateMetadata and the page share one result per request.
  */
@@ -82,17 +83,23 @@ export const getAllVideos = cache(async (): Promise<IVideoList> => {
     }
   }
 
-  const processedStrapiVideos = strapiVideos.map(({ video, youtubeId }) => ({
-    id: video.id.toString(),
-    title: video.title,
-    description: video.description ?? "",
-    url: video.url,
-    thumbnailURL:
-      video.thumbnail?.url || (youtubeId ? (youtubeThumbnails.get(youtubeId) ?? "") : ""),
-    publish_date: new Date(video.publish_date).toISOString(),
-    source: youtubeId ? ("youtube" as const) : ("strapi" as const),
-    isFeatured: video.isFeatured || false,
-  }));
+  const processedStrapiVideos = strapiVideos.map(({ video, youtubeId }) => {
+    // The placeholder Strapi stored for the thumbnail is free (no request), so it is added here,
+    // and withBlurDataURLs keeps it instead of blurring the original file
+    const blurDataURL = video.thumbnail?.url ? getStoredBlurDataURL(video.thumbnail) : undefined;
+    return {
+      id: video.id.toString(),
+      title: video.title,
+      description: video.description ?? "",
+      url: video.url,
+      thumbnailURL:
+        video.thumbnail?.url || (youtubeId ? (youtubeThumbnails.get(youtubeId) ?? "") : ""),
+      publish_date: new Date(video.publish_date).toISOString(),
+      source: youtubeId ? ("youtube" as const) : ("strapi" as const),
+      isFeatured: video.isFeatured || false,
+      ...(blurDataURL ? { blurDataURL } : {}),
+    };
+  });
 
   // 3. Filter out YouTube videos from Strapi that are already in the YouTube list
   const strapiUrls = new Set(processedStrapiVideos.map((video) => video.url));
