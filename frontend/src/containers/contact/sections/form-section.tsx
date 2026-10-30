@@ -26,7 +26,6 @@ import {
   type ContactFormValues,
 } from "@/lib/validations/contact";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
 
 const defaultValues: ContactFormValues = { name: "", email: "", subject: "", message: "" };
 const initialState: ContactFormState = { status: "idle", message: "" };
@@ -93,11 +92,12 @@ export default function FormSection({ className = "" }: { className?: string }) 
   };
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`${className}`}
+    // @starting-style fade-up (Tailwind `starting:`): visible without JS, still for reduced motion
+    <section
+      className={cn(
+        "transition-[opacity,translate] duration-500 ease-out motion-reduce:transition-none starting:translate-y-5 starting:opacity-0",
+        className,
+      )}
     >
       <Form {...form}>
         <form action={formAction} onSubmit={onSubmit} noValidate className="space-y-8">
@@ -192,6 +192,6 @@ export default function FormSection({ className = "" }: { className?: string }) 
       <div inert>
         <Toaster />
       </div>
-    </motion.section>
+    </section>
   );
 }

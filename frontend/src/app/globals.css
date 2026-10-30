@@ -30,12 +30,13 @@
      Most layers share the root stacking context with third-party ones (swiper containers sit
      at 1, sonner at --z-toast), so the gaps between the values matter, not just their order. */
   --z-behind: -10; /* decorative backdrops: home stripe, page-title word, button hover fill */
-  --z-cursor-trail: 7; /* rocket cursor fumes */
-  --z-cursor: 8; /* rocket cursor */
   --z-pagination: 9;
   --z-raised: 10; /* content lifted over a sibling backdrop (badges, card content, 404 content) */
   --z-title-bar: 20; /* fixed mobile page-title bar */
   --z-header: 21; /* fixed header: theme toggle, side nav, mobile bottom nav */
+  /* Decorative rocket cursor: over content and the header, under floating controls and overlays */
+  --z-cursor-trail: 30; /* rocket cursor fumes */
+  --z-cursor: 31; /* rocket cursor */
   --z-floating: 50; /* floating controls: article TOC button, mobile bottom nav, gallery close */
   --z-overlay: 50; /* vaul drawer overlay and panel (portaled after the TOC button) */
   --z-modal: 60; /* full-screen gallery: above the header, the drawer and the TOC button */
@@ -62,6 +63,10 @@
 }
 
 @theme inline {
+  /* Fonts: next/font (geist) defines the variables on <html> in the root layout */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
   /* Colors */
   --color-primary: var(--primary);
   --color-muted: var(--muted);
@@ -93,7 +98,7 @@
   --breakpoint-2xl: 1320px;
 
   /* Animations */
-  --animate-fade-in-elif: fade-in-elif 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
+  --animate-hero-in: hero-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 /* Layout and type tokens. Register new names in the twMerge config in lib/utils.ts too, otherwise
@@ -121,7 +126,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply bg-background text-foreground scroll-smooth;
+    @apply bg-background text-foreground;
   }
   main {
     @apply max-sm:py-bar-offset;
@@ -151,24 +156,26 @@
   }
 }
 
-@keyframes fade-in-elif {
+/* Home hero entrance. Transform only: the image is visible from its first frame, so the
+   animation doesn't delay LCP (opacity 0 would) */
+@keyframes hero-in {
   from {
-    opacity: 0;
     transform: rotate(-6deg) translateX(-40px);
   }
   to {
-    opacity: 1;
     transform: rotate(0deg) translateX(0px);
   }
 }
 
-.swiper-button-prev,
-.swiper-button-next {
+/* Swiper's CSS is imported by the gallery components and loads after this file; the .swiper
+   prefix keeps these overrides ahead of it whatever the stylesheet order */
+.swiper .swiper-button-prev,
+.swiper .swiper-button-next {
   @apply text-background dark:text-primary top-0 bottom-0 m-0 h-full px-8 max-sm:px-4;
 }
 
-.swiper-button-prev:after,
-.swiper-button-next:after {
+.swiper .swiper-button-prev:after,
+.swiper .swiper-button-next:after {
   @apply text-3xl sm:text-4xl;
 }
 
@@ -204,11 +211,4 @@
   color: red;
   opacity: 0;
   transition: opacity 0.5s;
-}
-
-@keyframes fadeout {
-  to {
-    opacity: 0;
-    transform: translateY(10px);
-  }
 }

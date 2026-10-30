@@ -3,9 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import RocketCursor from "@/components/rocket-cursor";
 import Header from "@/components/header";
-import "swiper/css/navigation";
 import "./globals.css";
-import "swiper/css";
 import Providers from "@/context/providers";
 import { getThemeColors } from "@/lib/services";
 import {
@@ -91,12 +89,13 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className="dark"
+      // The Geist variables sit on <html> because the base font-family (Tailwind preflight) is set there
+      className={`${GeistSans.variable} ${GeistMono.variable} dark`}
       style={themeColorVariables(themeColors)}
       suppressHydrationWarning
     >
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} selection:bg-primary relative grid min-h-screen grid-rows-[auto_1fr_auto] antialiased transition-colors duration-300 selection:text-white`}
+        className="selection:bg-primary relative grid min-h-screen grid-rows-[auto_1fr_auto] antialiased selection:text-white"
         suppressHydrationWarning
       >
         <Providers>

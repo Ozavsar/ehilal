@@ -36,6 +36,8 @@ const nextConfig = {
     }));
   },
   images: {
+    // AVIF first (smallest), WebP for browsers without AVIF support
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -69,7 +71,6 @@ const nextConfig = {
       },
     ],
   },
-  staticPageGenerationTimeout: 300,
 };
 
 export default function config(phase) {
