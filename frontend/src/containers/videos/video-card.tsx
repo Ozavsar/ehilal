@@ -1,9 +1,11 @@
 import Image from "next/image";
-import { LuFlame, LuPlay } from "react-icons/lu";
+import { Icon } from "@/components/icon";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { IUnifiedVideo } from "@/types";
 import LinkButton from "@/components/link-button";
+import { LIST_CARD_IMAGE_SIZES } from "@/containers/list-layout";
+import { detectLanguage } from "@/lib/language";
+import type { IUnifiedVideo } from "@/types";
 
 export default function VideoCard({
   blurDataURL,
@@ -16,7 +18,8 @@ export default function VideoCard({
   isFeatured,
   priority = false,
 }: IUnifiedVideo & { priority?: boolean }) {
-  const videoUrl = url || "#";
+  // Turkish or English, for screen reader pronunciation
+  const lang = detectLanguage(`${title} ${description ?? ""}`);
   // publish_date is an ISO string; pin the time zone so the day doesn't depend on the server
   const publishDate = new Date(publish_date);
   const formattedDate = isNaN(publishDate.getTime())
@@ -28,66 +31,106 @@ export default function VideoCard({
         timeZone: "Europe/Istanbul",
       });
 
+  // The title is the card's one link for keyboard and screen reader users; the thumbnail and the
+  // footer button are pointer-only copies of it. Without a URL nothing links.
+  const thumbnail = (
+    <>
+      <Image
+        src={thumbnailURL || "/images/blog/default-blog.jpg"}
+        // Decorative: the title right below names the card
+        alt=""
+        blurDataURL={blurDataURL}
+        placeholder={blurDataURL ? "blur" : "empty"}
+        className="ease-standard object-cover duration-300 select-none group-hover:scale-105 motion-safe:transition-transform"
+        fill
+        // The first card is the LCP candidate on the list page
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        sizes={LIST_CARD_IMAGE_SIZES}
+        draggable={false}
+      />
+      {/* Hover cue */}
+      <span
+        aria-hidden="true"
+        className="bg-scrim/40 ease-standard absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      >
+        <span className="bg-primary text-on-primary flex size-12 items-center justify-center rounded-full">
+          <Icon name="play_arrow" filled />
+        </span>
+      </span>
+    </>
+  );
+
   return (
-    <Card className="border-muted flex h-full flex-col gap-0 overflow-hidden border">
-      <CardHeader className="relative overflow-hidden p-0">
-        <div className="group relative aspect-video object-cover">
+    <Card interactive className="h-full gap-0 p-0">
+      <CardHeader className="relative p-0">
+        <div className="group relative aspect-video overflow-hidden">
           {isFeatured && (
-            <Badge className="bg-muted hover:bg-primary/50 absolute top-2 left-4 z-(--z-raised) w-fit border-red-600 text-red-600 backdrop-blur-sm select-none dark:border-red-300 dark:text-red-300">
-              <LuFlame className="mr-1 size-4" />
+            <Badge
+              variant="tertiary"
+              className="absolute top-3 left-3 z-(--z-raised) w-fit gap-1 select-none"
+            >
+              <Icon name="local_fire_department" filled />
               Featured
             </Badge>
           )}
-          <a
-            href={videoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute inset-0 block focus-visible:outline-none"
-          >
-            <Image
-              src={thumbnailURL || "/images/blog/default-blog.jpg"}
-              alt={title || ""}
-              blurDataURL={blurDataURL}
-              placeholder={blurDataURL ? "blur" : "empty"}
-              className="object-cover transition-transform duration-500 group-hover:scale-105 group-has-[a:focus-visible]:scale-105"
-              fill
-              // The first card is the LCP candidate on the list page
-              loading={priority ? "eager" : "lazy"}
-              fetchPriority={priority ? "high" : "auto"}
-              // Card width: one grid column (1 below md, 2 up to xl, 3 from xl) in the container
-              sizes="(min-width: 1140px) 360px, (min-width: 720px) 372px, (min-width: 540px) 508px, calc(100vw - 32px)"
-            />
-            {/* Hover cue and keyboard focus indicator; the card's overflow-hidden clips a regular outline */}
-            <span
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              tabIndex={-1}
               aria-hidden="true"
-              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100"
+              className="absolute inset-0 block"
             >
-              <span className="bg-primary flex size-12 items-center justify-center rounded-full text-white shadow-md">
-                <LuPlay size={22} fill="currentColor" className="ml-0.5" />
-              </span>
-            </span>
-          </a>
+              {thumbnail}
+            </a>
+          ) : (
+            thumbnail
+          )}
         </div>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-2 p-4 pb-2">
-        <a href={videoUrl} target="_blank" rel="noopener noreferrer">
-          <h2 className="text-foreground line-clamp-2 text-lg font-bold">{title}</h2>
-        </a>
-        <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
-      </CardContent>
-      <CardFooter className="mt-auto flex justify-between p-4 pt-1">
-        {source === "youtube" ? (
-          <LinkButton href={videoUrl} target="_blank" rel="noopener noreferrer">
-            Watch on <span className="font-bold text-[#ff0033]">&nbsp;YouTube</span>
-          </LinkButton>
-        ) : (
-          <LinkButton href={videoUrl} target="_blank" rel="noopener noreferrer">
-            Watch the <span className="text-primary">&nbsp;Video</span>
-          </LinkButton>
+      <CardContent className="flex flex-1 flex-col gap-2 p-4 pb-0">
+        {formattedDate && (
+          <time dateTime={publish_date} className="type-label-medium text-on-surface-variant">
+            {formattedDate}
+          </time>
         )}
-
-        {formattedDate && <p className="text-muted-foreground text-xs">{formattedDate}</p>}
-      </CardFooter>
+        {url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary ease-standard transition-colors duration-200"
+          >
+            <h2 lang={lang} className="type-title-large line-clamp-2">
+              {title}
+            </h2>
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        ) : (
+          <h2 lang={lang} className="type-title-large line-clamp-2">
+            {title}
+          </h2>
+        )}
+        <p lang={lang} className="type-body-medium text-on-surface-variant line-clamp-2">
+          {description}
+        </p>
+      </CardContent>
+      {url && (
+        <CardFooter className="mt-auto flex items-center justify-end p-4">
+          <LinkButton
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={-1}
+            aria-hidden
+          >
+            {source === "youtube" ? "Watch on YouTube" : "Watch the video"}
+            <Icon name="open_in_new" />
+          </LinkButton>
+        </CardFooter>
+      )}
     </Card>
   );
 }

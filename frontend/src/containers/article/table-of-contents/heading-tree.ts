@@ -54,3 +54,8 @@ export function buildHeadingTree(headings: IHeading[]): IHeadingNode[] {
 
   return root;
 }
+
+// Heading ids in document order
+export function flattenHeadingTree(tree: IHeadingNode[]): string[] {
+  return tree.flatMap((node) => [node.id, ...flattenHeadingTree(node.children)]);
+}

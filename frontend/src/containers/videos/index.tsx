@@ -1,5 +1,7 @@
 import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
+import { SharedAxisXTransition } from "@/components/view-transitions";
+import { LIST_GRID_CLASS_NAME, LIST_PAGE_CLASS_NAME } from "@/containers/list-layout";
 import VideoCard from "./video-card";
 import type { IUnifiedVideo } from "@/types";
 
@@ -11,15 +13,15 @@ interface IVideosContainerProps {
 
 export default function VideosContainer({ videos, pageNumber, totalPages }: IVideosContainerProps) {
   return (
-    <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
-      <div className="flex flex-col">
-        <MotionGrid>
+    <div className={LIST_PAGE_CLASS_NAME}>
+      <SharedAxisXTransition>
+        <MotionGrid className={LIST_GRID_CLASS_NAME}>
           {videos.map((video, index) => (
             <VideoCard key={video.id} {...video} priority={index === 0} />
           ))}
         </MotionGrid>
-      </div>
+      </SharedAxisXTransition>
       <Pagination route="VIDEOS" totalPages={totalPages} currentPage={+pageNumber} />
-    </main>
+    </div>
   );
 }

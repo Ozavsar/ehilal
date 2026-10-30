@@ -7,9 +7,10 @@ import {
   getConferenceCount,
   withCoverPlaceholders,
 } from "@/lib/services/conferences";
-import { buildMeta } from "@/lib/metadata";
-import { SITE_URL } from "@/config/site";
-import { getSiteSettings } from "@/lib/services";
+import { buildPageMeta, jsonLdGraph, listBreadcrumbJsonLd } from "@/lib/metadata";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { LIST_SEO, listPageSeo } from "@/config/seo";
+import JsonLd from "@/components/json-ld";
 import { Metadata } from "next";
 
 export const dynamicParams = true;
@@ -50,11 +51,14 @@ export default async function ConferencesPage(props: { params: Promise<{ page: s
   const pageConferences = await withCoverPlaceholders(conferences);
 
   return (
-    <ConferencesContainer
-      conferences={pageConferences}
-      pageNumber={pageNum.toString()}
-      totalPages={totalPages}
-    />
+    <>
+      <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.CONFERENCES, pageNum))} />
+      <ConferencesContainer
+        conferences={pageConferences}
+        pageNumber={pageNum.toString()}
+        totalPages={totalPages}
+      />
+    </>
   );
 }
 
@@ -79,22 +83,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { page } = await params;
   const { pageNum } = await getPageOrNotFound(page);
-  const { siteName } = await getSiteSettings();
-
-  const title = pageNum > 1 ? `Conferences – Page ${pageNum}` : "Conferences & Talks";
-  const description =
-    pageNum > 1
-      ? `Explore the conferences and talks attended by ${siteName} — page ${pageNum}.`
-      : `Explore all conferences, panels, and events where ${siteName} has spoken or participated.`;
-
-  return buildMeta({
-    title,
-    description,
-    path: `/conferences${pageNum > 1 ? `/${pageNum}` : ""}`,
-    type: "website",
-    image: {
-      url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Conferences and Talks by ${siteName}`,
-    },
-  });
+  return buildPageMeta(
+    listPageSeo(LIST_SEO.CONFERENCES, pageNum),
+    INTERNAL_ROUTES.CONFERENCES.href(pageNum),
+  );
 }

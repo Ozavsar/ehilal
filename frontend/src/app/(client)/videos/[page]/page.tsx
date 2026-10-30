@@ -4,9 +4,10 @@ import VideosContainer from "@/containers/videos";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllVideos } from "@/lib/services/videos";
 import { withBlurDataURLs } from "@/lib/getImage";
-import { buildMeta } from "@/lib/metadata";
-import { SITE_URL } from "@/config/site";
-import { getSiteSettings } from "@/lib/services";
+import { buildPageMeta, jsonLdGraph, listBreadcrumbJsonLd } from "@/lib/metadata";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { LIST_SEO, listPageSeo } from "@/config/seo";
+import JsonLd from "@/components/json-ld";
 
 export const dynamicParams = true;
 
@@ -50,7 +51,14 @@ export default async function VideosPage(props: { params: Promise<{ page: string
   const pageVideos = await withBlurDataURLs(videos, (video) => video.thumbnailURL);
 
   return (
-    <VideosContainer videos={pageVideos} pageNumber={pageNum.toString()} totalPages={totalPages} />
+    <>
+      <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.VIDEOS, pageNum))} />
+      <VideosContainer
+        videos={pageVideos}
+        pageNumber={pageNum.toString()}
+        totalPages={totalPages}
+      />
+    </>
   );
 }
 
@@ -68,19 +76,5 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { page } = await props.params;
   const { pageNum } = await getPageOrNotFound(page);
-  const { siteName } = await getSiteSettings();
-
-  const title = pageNum > 1 ? `Videos – Page ${pageNum}` : "Videos";
-  const description = `Explore ${siteName}'s collection of insightful videos on web development, programming, and more${pageNum > 1 ? ` — page ${pageNum}` : ""}.`;
-
-  return buildMeta({
-    title,
-    description,
-    path: `/videos${pageNum > 1 ? `/${pageNum}` : ""}`,
-    type: "website",
-    image: {
-      url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Videos by ${siteName}`,
-    },
-  });
+  return buildPageMeta(listPageSeo(LIST_SEO.VIDEOS, pageNum), INTERNAL_ROUTES.VIDEOS.href(pageNum));
 }

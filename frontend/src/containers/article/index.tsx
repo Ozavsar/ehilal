@@ -7,8 +7,16 @@ interface IArticleContainerProps {
 
 export default function ArticleContainer({ article }: IArticleContainerProps) {
   return (
-    <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
-      <MediumRenderer paragraphs={article.paragraphs} />
-    </main>
+    // M3 top margin: below the theme toggle row on compact screens, 32dp from the window edge above.
+    // <main> is the (client) template's.
+    <div className="px-4 pt-4 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
+      <MediumRenderer
+        postId={article.id}
+        title={article.title}
+        subtitle={article.subtitle}
+        previewImage={article.previewImage}
+        paragraphs={article.paragraphs}
+      />
+    </div>
   );
 }

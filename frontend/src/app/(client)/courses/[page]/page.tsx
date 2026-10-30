@@ -4,9 +4,10 @@ import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllCourses } from "@/lib/services/udemy";
 import { withBlurDataURLs } from "@/lib/getImage";
 import { Metadata } from "next";
-import { buildMeta } from "@/lib/metadata";
-import { SITE_URL } from "@/config/site";
-import { getSiteSettings } from "@/lib/services";
+import { buildPageMeta, jsonLdGraph, listBreadcrumbJsonLd } from "@/lib/metadata";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { LIST_SEO, listPageSeo } from "@/config/seo";
+import JsonLd from "@/components/json-ld";
 
 export const dynamicParams = true;
 
@@ -46,11 +47,14 @@ export default async function CoursesPage(props: { params: Promise<{ page: strin
   const pageCourses = await withBlurDataURLs(courses, (course) => course.thumbnailURL);
 
   return (
-    <CourseContainer
-      courses={pageCourses}
-      pageNumber={pageNum.toString()}
-      totalPages={totalPages}
-    />
+    <>
+      <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.COURSES, pageNum))} />
+      <CourseContainer
+        courses={pageCourses}
+        pageNumber={pageNum.toString()}
+        totalPages={totalPages}
+      />
+    </>
   );
 }
 
@@ -76,22 +80,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { page } = await params;
   const { pageNum } = await getPageOrNotFound(page);
-  const { siteName } = await getSiteSettings();
-
-  const title = pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
-  const description =
-    pageNum > 1
-      ? `Discover ${siteName}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`
-      : `Browse all courses and workshops by ${siteName} — from full-stack development to creative coding and professional growth.`;
-
-  return buildMeta({
-    title,
-    description,
-    path: `/courses${pageNum > 1 ? `/${pageNum}` : ""}`,
-    type: "website",
-    image: {
-      url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Courses and Workshops by ${siteName}`,
-    },
-  });
+  return buildPageMeta(
+    listPageSeo(LIST_SEO.COURSES, pageNum),
+    INTERNAL_ROUTES.COURSES.href(pageNum),
+  );
 }

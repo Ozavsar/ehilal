@@ -1,38 +1,46 @@
 import Image from "next/image";
-import Link from "next/link";
 import CustomButton from "@/components/custom-button";
 import SocialLinks from "@/components/social-links";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
+import { getSiteSettings } from "@/lib/services";
 import type { IStrapiHomePage } from "@/types";
 
 interface IHomeContainerProps {
   content: IStrapiHomePage;
 }
 
-// Rendered width of the portrait: the 208px round avatar below xl, the fixed hero from xl (w-1/3,
-// viewport height minus 2 x --spacing-hero-inset, object-cover). A wider image than the box is
-// scaled to the box height, so it renders max(box width, box height x aspect ratio) wide.
+// Portrait box ratio from expanded (840px) up, width / height
+const PORTRAIT_RATIO = 4 / 5;
+
+// Rendered width of the portrait: the 208px round avatar below 840px, from there the first column
+// of the hero grid (2fr of 5) beside the 96px rail, 2 x 24px margins and the column gap (48px, 64px
+// from 1200px), until the 1200px content column is full at 1344px. object-cover scales an image
+// wider than the box to the box height, so it renders max(1, image ratio / box ratio) times wider.
 function getPortraitSizes({ width, height }: IStrapiHomePage["hero_image"]) {
-  const heroWidth =
-    width && height
-      ? `max(34vw, calc((100vh - 2 * 2.5rem) * ${(width / height).toFixed(3)}))`
-      : "34vw";
-  return `(min-width: 1140px) ${heroWidth}, 208px`;
+  const scale = width && height ? Math.max(1, width / height / PORTRAIT_RATIO) : 1;
+  const column = (expression: string) => `calc((${expression}) * ${(0.4 * scale).toFixed(3)})`;
+  return [
+    `(min-width: 1344px) ${column("1200px - 64px")}`,
+    `(min-width: 1200px) ${column("100vw - 208px")}`,
+    `(min-width: 840px) ${column("100vw - 192px")}`,
+    "208px",
+  ].join(", ");
 }
 
-export default function HomeContainer({ content }: IHomeContainerProps) {
+export default async function HomeContainer({ content }: IHomeContainerProps) {
   const { hero_image: heroImage } = content;
+  // Never throws: falls back to the defaults in config/site.ts
+  const { siteName, jobTitle } = await getSiteSettings();
 
   return (
-    <main className="container flex min-h-screen items-center justify-center max-sm:py-0 max-sm:pb-4">
-      <div className="bg-primary fixed -top-1/2 -left-[83%] z-(--z-behind) hidden h-[200%] w-full -rotate-15 lg:block" />
-
-      <div className="flex max-w-md flex-col gap-8 max-sm:gap-4 md:max-w-150 md:gap-12 lg:ml-[10%] xl:ml-[35%]">
-        {/* One image for both layouts, so each viewport downloads it once: a round avatar in the
-            column below xl, the fixed hero on the left from xl. It is the LCP element, load it first. */}
+    <main id="main" className="flex md:min-h-svh md:items-center">
+      <div className="container grid items-center gap-8 py-8 md:grid-cols-[2fr_3fr] md:gap-12 lg:gap-16">
+        {/* One image for both layouts, so each viewport downloads it once: a round avatar on compact
+            and medium windows, a portrait in the first column from 840px. It is the LCP element, load
+            it first. */}
         <Image
           src={heroImage.url}
-          alt="Elif Hilal's Hero Image"
+          alt={`Portrait of ${siteName}`}
           width={700}
           height={700}
           sizes={getPortraitSizes(heroImage)}
@@ -40,31 +48,30 @@ export default function HomeContainer({ content }: IHomeContainerProps) {
           fetchPriority="high"
           blurDataURL={heroImage.blurDataURL}
           placeholder={heroImage.blurDataURL ? "blur" : "empty"}
-          className="border-primary xl:top-hero-inset xl:left-hero-inset xl:motion-safe:animate-hero-in size-52 shrink-0 self-center rounded-full border-4 object-cover xl:fixed xl:h-[calc(100vh-2*var(--spacing-hero-inset))] xl:w-1/3 xl:rounded-3xl xl:border-0 xl:shadow-2xl"
+          draggable={false}
+          className="ring-primary-container md:motion-safe:animate-hero-in size-52 justify-self-center rounded-full object-cover ring-4 select-none md:aspect-4/5 md:h-auto md:w-full md:rounded-xl md:ring-0"
         />
 
-        <div className="flex w-full flex-col items-start sm:gap-6 md:items-center md:gap-10">
+        <div className="flex flex-col gap-6">
+          {/* The page's <h1> comes from the Site Settings, so it is there even when the optional
+              CMS greeting is empty; visually the greeting leads, as before */}
+          <h1 className="sr-only">
+            {siteName} — {jobTitle}
+          </h1>
           {content.greeting && (
-            <div className="flex gap-4 md:justify-center">
-              <span className="bg-primary mt-4 h-1 w-6 rounded-md sm:mt-6 sm:w-10" />
-              <h1 className="text-primary text-2xl font-bold sm:text-4xl md:text-5xl">
-                {content.greeting}
-              </h1>
-            </div>
+            <p className="type-display-small sm:type-display-medium lg:type-display-large text-primary">
+              {content.greeting}
+            </p>
           )}
 
-          <div className="flex flex-col sm:gap-2">
-            {/* @starting-style fade-up: plain text in the HTML, no client JS, still for reduced motion */}
-            <p className="mt-4 mb-7 text-sm leading-6 transition-[opacity,translate] duration-700 ease-out motion-reduce:transition-none md:text-lg lg:mt-[2.5px] lg:mb-6 lg:leading-7 starting:translate-y-2 starting:opacity-0">
-              {content.introduction}
-            </p>
+          {/* @starting-style fade-in: plain text in the HTML, no client JS, still for reduced motion */}
+          <p className="type-body-large lg:type-title-large text-on-surface-variant ease-emphasized-decelerate transition-[opacity,translate] duration-500 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0">
+            {content.introduction}
+          </p>
 
-            <div className="flex gap-4 max-sm:flex-col">
-              <Link href={INTERNAL_ROUTES.CONFERENCES.path} className="max-sm:self-center">
-                <CustomButton text="MORE ABOUT ME" />
-              </Link>
-              <SocialLinks />
-            </div>
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <CustomButton href={INTERNAL_ROUTES.CONTACT.path} text="Get in touch" />
+            <SocialLinks />
           </div>
         </div>
       </div>

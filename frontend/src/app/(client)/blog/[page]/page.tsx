@@ -1,21 +1,87 @@
-import { notFound, permanentRedirect } from "next/navigation";
+import { cache } from "react";
+import { notFound, permanentRedirect, unstable_rethrow } from "next/navigation";
 import { Metadata } from "next";
 import ArticleContainer from "@/containers/article";
 import BlogContainer from "@/containers/blog";
+import JsonLd from "@/components/json-ld";
+import TitleSection from "@/components/title-section";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
-import { SITE_URL } from "@/config/site";
+import { LIST_SEO, PAGE_SEO, articleFallbackDescription, listPageSeo } from "@/config/seo";
 import { getSiteSettings } from "@/lib/services";
 import { getAllArticles, getArticleBySlug, getArticlesPage } from "@/lib/services/blog";
 import { getMediumPostId } from "@/lib/services/medium";
+import { getPageTitle } from "@/lib/services/pages";
+import { orNotFound } from "@/lib/api/fetchAPI";
 import { withBlurDataURLs } from "@/lib/getImage";
-import { buildMeta } from "@/lib/metadata";
+import { detectArticleLanguage } from "@/lib/language";
+import {
+  blogPostingJsonLd,
+  breadcrumbJsonLd,
+  buildMeta,
+  buildPageMeta,
+  jsonLdGraph,
+  listBreadcrumbJsonLd,
+  ogCardImage,
+} from "@/lib/metadata";
+import type { IBlog } from "@/types";
 
 export const dynamicParams = true;
 
 // The segment is either a list page number or an article slug ("<title>-<medium post id>").
 // Only canonical page numbers are valid ("01", "1.5", "1e0" etc. would be duplicate pages).
 const parsePageNumber = (segment: string) => (/^[1-9]\d*$/.test(segment) ? Number(segment) : NaN);
+
+// The cover at 1200px wide, or the generated card for posts without one
+const getArticleImage = (article: IBlog) =>
+  article.previewImage?.id
+    ? {
+        url: `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`,
+        alt: article.previewImage.alt || article.title,
+      }
+    : ogCardImage(article.title, article.title);
+
+// The post query has no dates, the (cached) article list does. Empty when the list can't load.
+const getArticleDates = cache(
+  async (slug: string): Promise<{ publishedAt?: string; updatedAt?: string }> => {
+    try {
+      const preview = (await getAllArticles()).find((article) => article.slug === slug);
+      return { publishedAt: preview?.publishedAt || undefined, updatedAt: preview?.updatedAt };
+    } catch (error) {
+      // Every source failed (already logged): the article renders without dates
+      unstable_rethrow(error);
+      return {};
+    }
+  },
+);
+
+async function ArticlePage({ article }: { article: IBlog }) {
+  const [site, dates] = await Promise.all([getSiteSettings(), getArticleDates(article.slug)]);
+  const path = INTERNAL_ROUTES.BLOG.href(article.slug);
+  const structuredData = jsonLdGraph(
+    blogPostingJsonLd({
+      path,
+      headline: article.title,
+      description: article.subtitle || articleFallbackDescription(article.title, site.siteName),
+      imageUrl: getArticleImage(article).url,
+      datePublished: dates.publishedAt,
+      dateModified: dates.updatedAt,
+      language: detectArticleLanguage(article),
+      site,
+    }),
+    breadcrumbJsonLd([
+      { name: INTERNAL_ROUTES.BLOG.label, path: INTERNAL_ROUTES.BLOG.href() },
+      { name: article.title, path },
+    ]),
+  );
+
+  return (
+    <>
+      <JsonLd data={structuredData} />
+      <ArticleContainer article={article} />
+    </>
+  );
+}
 
 export default async function BlogPage(props: { params: Promise<{ page: string }> }) {
   const { page } = await props.params;
@@ -31,7 +97,7 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
     if (article.slug !== page && getMediumPostId(article.slug) === article.id) {
       permanentRedirect(INTERNAL_ROUTES.BLOG.href(article.slug));
     }
-    return <ArticleContainer article={article} />;
+    return <ArticlePage article={article} />;
   }
 
   const result = await getArticlesPage(pageNum);
@@ -40,9 +106,19 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
   }
 
   // Placeholders only for the articles on this page
-  const articles = await withBlurDataURLs(result.items, (article) => article.thumbnailURL);
+  const [articles, title] = await Promise.all([
+    withBlurDataURLs(result.items, (article) => article.thumbnailURL),
+    orNotFound(getPageTitle("blog-page", ["blog-title"])),
+  ]);
 
-  return <BlogContainer articles={articles} currentPage={pageNum} totalPages={result.totalPages} />;
+  // The list page title lives here, not in a blog layout: an article page has its own <h1>
+  return (
+    <>
+      <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.BLOG, pageNum))} />
+      <TitleSection as="h1" text={title.page_title} backgroundText={title.page_title_background} />
+      <BlogContainer articles={articles} currentPage={pageNum} totalPages={result.totalPages} />
+    </>
+  );
 }
 
 export async function generateStaticParams() {
@@ -58,6 +134,18 @@ export async function generateStaticParams() {
   }
 }
 
+// Pages that 404 get no canonical or social tags (Next.js marks them noindex)
+const notFoundMeta = ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}): Metadata => ({
+  title,
+  description,
+});
+
 export async function generateMetadata({
   params,
 }: {
@@ -66,76 +154,43 @@ export async function generateMetadata({
   const { page } = await params;
   const pageNum = parsePageNumber(page);
   const isArticle = isNaN(pageNum);
-  const { siteName } = await getSiteSettings();
 
   // Invalid segments 404 in the page; don't fetch anything for them
   if (isArticle && !getMediumPostId(page)) {
-    return buildMeta({
-      title: "Article Not Found",
-      description: "The requested article could not be found.",
-      path: `/blog/${page}`,
-    });
+    return notFoundMeta(PAGE_SEO.ARTICLE_NOT_FOUND);
   }
 
   try {
     if (isArticle) {
       const article = await getArticleBySlug(page);
       if (!article) {
-        return buildMeta({
-          title: "Article Not Found",
-          description: "The requested article could not be found.",
-          path: `/blog/${page}`,
-        });
+        return notFoundMeta(PAGE_SEO.ARTICLE_NOT_FOUND);
       }
 
+      const [{ siteName }, dates] = await Promise.all([
+        getSiteSettings(),
+        getArticleDates(article.slug),
+      ]);
+      // Self-canonical: the site's copy is the one to rank (the Medium original isn't linked as canonical)
       return buildMeta({
         title: article.title,
-        description: article.subtitle || `Read the article "${article.title}" by ${siteName}.`,
+        description: article.subtitle || articleFallbackDescription(article.title, siteName),
         path: INTERNAL_ROUTES.BLOG.href(article.slug),
         type: "article",
-        image: {
-          url: article.previewImage?.id
-            ? `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`
-            : `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}`,
-          alt: article.previewImage?.alt || article.title,
-        },
+        image: getArticleImage(article),
+        language: detectArticleLanguage(article),
+        article: { publishedTime: dates.publishedAt, modifiedTime: dates.updatedAt },
       });
     }
 
     const result = await getArticlesPage(pageNum);
     if (!result) {
-      return buildMeta({
-        title: "Page Not Found",
-        description: "Requested page exceeds available blog listings.",
-        path: "/blog",
-      });
+      return notFoundMeta(PAGE_SEO.NOT_FOUND);
     }
 
-    const title = pageNum > 1 ? `Blog – Page ${pageNum}` : "Blog";
-    const description = `Explore ${siteName}'s latest articles and insights${
-      pageNum > 1 ? ` on page ${pageNum}` : ""
-    }.`;
-
-    return buildMeta({
-      title,
-      description,
-      path: `/blog${pageNum > 1 ? `/${pageNum}` : ""}`,
-      type: "website",
-      image: {
-        url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-        alt: `Blog Articles by ${siteName}`,
-      },
-    });
+    return buildPageMeta(listPageSeo(LIST_SEO.BLOG, pageNum), INTERNAL_ROUTES.BLOG.href(pageNum));
   } catch {
     // The page throws the same (cached) error and error.tsx shows it
-    return buildMeta({
-      title: "Blog",
-      description: `Read ${siteName}'s latest articles and insights.`,
-      path: "/blog",
-      image: {
-        url: `${SITE_URL}/api/og?title=blog`,
-        alt: `Blog Articles by ${siteName}`,
-      },
-    });
+    return buildPageMeta(LIST_SEO.BLOG, INTERNAL_ROUTES.BLOG.href());
   }
 }

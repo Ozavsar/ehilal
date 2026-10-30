@@ -1,16 +1,14 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
-import { LuLinkedin, LuMail, LuYoutube } from "react-icons/lu";
-import { BsInstagram, BsTwitterX } from "react-icons/bs";
+import { BrandIcon } from "@/components/brand-icon";
+import { Icon } from "@/components/icon";
 import MotionGrid from "@/components/motion-grid";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface IInfoSectionProps {
   className?: string;
-  content: {
-    title: string;
-    description: string;
-  };
   socialMediaLinks: {
     email: string;
     twitter_x: string;
@@ -35,8 +33,9 @@ function getPathSegments(url: string | null | undefined): string[] {
 const toHandle = (segment: string | undefined) =>
   segment ? `@${segment.replace(/^@/, "")}` : undefined;
 
+// The contact channels as an M3 list in a card. It stretches to the form's height beside it, and
+// the items share the extra space so the two panes end on one line.
 export default function InfoSection({
-  content,
   socialMediaLinks,
   companyLinkedinUrl,
   className,
@@ -44,24 +43,30 @@ export default function InfoSection({
   const youtubeHandle = getPathSegments(socialMediaLinks.youtube).find((s) => s.startsWith("@"));
 
   // Links not filled in Strapi (e.g. the optional Instagram) are skipped
-  const links = [
+  const links: {
+    href: string;
+    icon: ReactNode;
+    title: string;
+    label: string;
+    lowercase: boolean;
+  }[] = [
     {
       href: socialMediaLinks.email && `mailto:${socialMediaLinks.email}`,
-      icon: LuMail,
+      icon: <Icon name="mail" size={20} />,
       title: "Mail Me",
       label: socialMediaLinks.email,
       lowercase: true,
     },
     {
       href: socialMediaLinks.twitter_x,
-      icon: BsTwitterX,
+      icon: <BrandIcon brand="x" size={20} />,
       title: "Follow Me",
       label: toHandle(getPathSegments(socialMediaLinks.twitter_x)[0]) ?? "X (Twitter)",
       lowercase: true,
     },
     {
       href: socialMediaLinks.linkedin,
-      icon: LuLinkedin,
+      icon: <BrandIcon brand="linkedin" size={20} />,
       title: "Connect with Me",
       // linkedin.com/in/<name>
       label: getPathSegments(socialMediaLinks.linkedin).at(-1)?.replace(/-/g, " ") ?? "LinkedIn",
@@ -69,58 +74,55 @@ export default function InfoSection({
     },
     {
       href: socialMediaLinks.youtube || `https://www.youtube.com/${YOUTUBE_CHANNEL_HANDLE}`,
-      icon: LuYoutube,
+      icon: <BrandIcon brand="youtube" size={20} />,
       title: "Subscribe",
       label: youtubeHandle ?? YOUTUBE_CHANNEL_HANDLE,
       lowercase: true,
     },
     {
-      href: socialMediaLinks.instagram,
-      icon: BsInstagram,
+      href: socialMediaLinks.instagram ?? "",
+      icon: <BrandIcon brand="instagram" size={20} />,
       title: "Follow on Instagram",
       label: toHandle(getPathSegments(socialMediaLinks.instagram)[0]) ?? "Instagram",
       lowercase: true,
     },
     {
       href: companyLinkedinUrl,
-      icon: LuLinkedin,
+      icon: <BrandIcon brand="linkedin" size={20} />,
       title: "Connect with Us",
       // linkedin.com/company/<name>
       label: getPathSegments(companyLinkedinUrl).at(-1) ?? "Karakod",
       lowercase: false,
     },
-  ].flatMap(({ href, ...link }) => (href ? [{ href, ...link }] : []));
+  ].filter((link) => link.href);
 
   return (
-    <div className={cn("max-md:mb-8", className)}>
-      <h1 className="mb-4 text-2xl font-bold uppercase transition-[opacity,translate] duration-500 motion-reduce:transition-none sm:text-3xl starting:-translate-y-5 starting:opacity-0">
-        {content.title}
-      </h1>
-      <p className="transition-[opacity,translate] duration-500 motion-reduce:transition-none max-sm:text-sm starting:-translate-y-5 starting:opacity-0">
-        {content.description}
-      </p>
-      <MotionGrid className="mt-4 flex flex-col gap-4 text-sm">
-        {links.map(({ href, icon: Icon, title, label, lowercase }) => (
-          <Link key={title} href={href} aria-label={title} className="w-full">
-            <div className="group border-border/50 bg-background/50 hover:border-primary/50 hover:bg-primary/5 dark:bg-card/40 relative flex w-full items-center gap-5 overflow-hidden rounded-2xl border p-5 shadow-sm transition-[color,background-color,border-color,box-shadow,translate,scale] duration-300 hover:shadow-md motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]">
-              <div className="relative z-(--z-raised) flex items-center gap-5">
-                <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:shadow-primary/20 flex size-12 items-center justify-center rounded-xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:text-white group-hover:shadow-lg">
-                  <Icon className="size-5" />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-muted-foreground group-hover:text-primary text-xs font-bold tracking-widest uppercase transition-colors">
-                    {title}
-                  </h3>
-                  <p className="text-foreground group-hover:text-foreground/90 font-medium transition-colors">
-                    {lowercase ? label.toLowerCase() : label}
-                  </p>
-                </div>
-              </div>
-            </div>
+    // A container card: each item has its own state layer, so the card-wide one stays off
+    <Card className={cn("gap-0 p-2", className)}>
+      <MotionGrid className="flex flex-1 flex-col gap-0 *:flex-1 sm:gap-0">
+        {links.map(({ href, icon, title, label, lowercase }) => (
+          <Link
+            key={title}
+            href={href}
+            className="state-layer group text-on-surface flex h-full min-h-18 items-center gap-4 rounded-sm px-4 py-2 focus-visible:outline-none"
+          >
+            <span className="bg-secondary-container text-on-secondary-container flex size-10 shrink-0 items-center justify-center rounded-full">
+              {icon}
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="type-label-medium text-on-surface-variant">{title}</span>
+              <span className="type-body-large truncate">
+                {lowercase ? label.toLowerCase() : label}
+              </span>
+            </span>
+            <Icon
+              name="arrow_outward"
+              size={20}
+              className="text-on-surface-variant group-hover:text-primary ease-standard shrink-0 transition-colors duration-200"
+            />
           </Link>
         ))}
       </MotionGrid>
-    </div>
+    </Card>
   );
 }

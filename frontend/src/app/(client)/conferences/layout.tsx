@@ -10,7 +10,11 @@ export default async function ConferencesLayout({ children }: ConferencesLayoutP
   const content = await orNotFound(getPageTitle("conferences-page", ["conferences-title"]));
   return (
     <>
-      <TitleSection text={content.page_title} backgroundText={content.page_title_background} />
+      <TitleSection
+        as="h1"
+        text={content.page_title}
+        backgroundText={content.page_title_background}
+      />
       {children}
     </>
   );
