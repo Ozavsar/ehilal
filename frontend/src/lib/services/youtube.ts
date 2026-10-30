@@ -1,13 +1,61 @@
-import { google, type youtube_v3 } from "googleapis";
+import { z } from "zod";
+import { env } from "@/config/env";
 import type { IVideoPreview } from "@/types";
 
-const youtube = google.youtube({
-  version: "v3",
-  auth: process.env.YOUTUBE_API_KEY,
+// YouTube Data API v3 over plain fetch, so responses go through the Next.js data cache
+const API_URL = "https://www.googleapis.com/youtube/v3";
+const REVALIDATE = 60 * 60; // 1 hour
+// Same tag as the Strapi videos, so the Strapi webhook refreshes the whole list
+const CACHE_TAGS = ["videos"];
+const PAGE_SIZE = 50; // API maximum for playlistItems and videos
+// Uploads are followed through nextPageToken up to this many pages (200 videos)
+const MAX_UPLOAD_PAGES = 4;
+
+const thumbnailSchema = z.object({ url: z.string() }).nullish();
+// Not every size exists for every video
+const thumbnailsSchema = z
+  .object({
+    maxres: thumbnailSchema,
+    standard: thumbnailSchema,
+    high: thumbnailSchema,
+    medium: thumbnailSchema,
+    default: thumbnailSchema,
+  })
+  .nullish();
+
+const channelsSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        contentDetails: z.object({ relatedPlaylists: z.object({ uploads: z.string() }) }),
+      }),
+    )
+    .nullish(),
 });
 
-// Not every size exists for every video, so fall back from the largest down
-const pickThumbnailURL = (thumbnails?: youtube_v3.Schema$ThumbnailDetails): string =>
+const playlistItemsSchema = z.object({
+  nextPageToken: z.string().nullish(),
+  items: z.array(
+    z.object({
+      snippet: z.object({
+        title: z.string().nullish(),
+        description: z.string().nullish(),
+        publishedAt: z.string().nullish(),
+        thumbnails: thumbnailsSchema,
+        resourceId: z.object({ videoId: z.string().nullish() }),
+      }),
+    }),
+  ),
+});
+
+const videosSchema = z.object({
+  items: z.array(z.object({ id: z.string(), snippet: z.object({ thumbnails: thumbnailsSchema }) })),
+});
+
+type Thumbnails = z.infer<typeof thumbnailsSchema>;
+
+// Falls back from the largest size down
+const pickThumbnailURL = (thumbnails: Thumbnails): string =>
   thumbnails?.maxres?.url ??
   thumbnails?.standard?.url ??
   thumbnails?.high?.url ??
@@ -15,127 +63,102 @@ const pickThumbnailURL = (thumbnails?: youtube_v3.Schema$ThumbnailDetails): stri
   thumbnails?.default?.url ??
   "";
 
-export async function getUploadedVideos(channelIds: string[]): Promise<IVideoPreview[]> {
-  try {
-    const channelResponse = await youtube.channels.list({
-      part: ["contentDetails"],
-      id: channelIds,
-    });
+async function youtubeGet<T>(
+  endpoint: string,
+  params: Record<string, string>,
+  schema: z.ZodType<T>,
+): Promise<T> {
+  if (!env.YOUTUBE_API_KEY) throw new Error("YOUTUBE_API_KEY is not set");
 
-    const uploadsPlaylistId =
-      channelResponse.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+  const url = new URL(`${API_URL}/${endpoint}`);
+  for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
+  url.searchParams.set("key", env.YOUTUBE_API_KEY);
 
-    if (!uploadsPlaylistId) throw new Error("Uploads playlist ID not found");
-
-    const videoResponse = await youtube.playlistItems.list({
-      part: ["snippet"],
-      playlistId: uploadsPlaylistId,
-      maxResults: 50,
-    });
-
-    const videos = videoResponse.data.items?.map((item) => ({
-      id: item.snippet?.resourceId?.videoId,
-      title: item.snippet?.title || "",
-      description: item.snippet?.description || "",
-      thumbnailURL: pickThumbnailURL(item.snippet?.thumbnails),
-      // Keep the ISO string; formatting happens where the date is displayed
-      publishedAt: item.snippet?.publishedAt ?? "",
-    }));
-
-    // @todo: Remove limit before the final product
-    const limitedVideos = videos;
-
-    return limitedVideos || [];
-  } catch (err) {
-    console.error("Error fetching videos:", err);
-    return [];
-  }
-}
-
-export async function getYoutubeVideoById(id: string): Promise<IVideoPreview | null> {
-  const response = await youtube.videos.list({
-    part: ["snippet", "statistics"],
-    id: [id],
+  const res = await fetch(url, {
+    cache: "force-cache",
+    next: { tags: CACHE_TAGS, revalidate: REVALIDATE },
   });
 
-  const video = response.data.items?.[0];
-  if (!video) return null;
+  // The URL carries the API key, so errors name the endpoint only
+  if (!res.ok) {
+    const body: unknown = await res.json().catch(() => null);
+    const reason = z.object({ error: z.object({ message: z.string() }) }).safeParse(body);
+    throw new Error(
+      `YouTube ${endpoint} request failed: ${res.status} ${res.statusText}${reason.success ? ` (${reason.data.error.message})` : ""}`,
+    );
+  }
 
-  return {
-    id: video.id,
-    title: video.snippet?.title,
-    description: video.snippet?.description,
-    thumbnailURL: pickThumbnailURL(video.snippet?.thumbnails),
-    publishedAt: video.snippet?.publishedAt ?? "",
-    views: video.statistics?.viewCount,
-  };
+  const parsed = schema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new Error(`Unexpected YouTube ${endpoint} response: ${z.prettifyError(parsed.error)}`);
+  }
+  return parsed.data;
 }
 
-export async function getVideoCaptions(videoId: string): Promise<any[]> {
-  if (process.env.NODE_ENV === "development") {
-    try {
-      // Dummy captions data
-      const captions = [
-        {
-          id: `${videoId}-caption-1`,
-          name: "Dummy Caption 1",
-          file: null,
-        },
-        {
-          id: `${videoId}-caption-2`,
-          name: "Dummy Caption 2",
-          file: null,
-        },
-      ];
+/**
+ * The channel's uploads, newest first (up to MAX_UPLOAD_PAGES pages). Throws when YouTube can't be read.
+ */
+export async function getUploadedVideos(channelId: string): Promise<IVideoPreview[]> {
+  const channels = await youtubeGet(
+    "channels",
+    { part: "contentDetails", id: channelId },
+    channelsSchema,
+  );
+  const uploadsPlaylistId = channels.items?.[0]?.contentDetails.relatedPlaylists.uploads;
+  if (!uploadsPlaylistId) throw new Error(`Uploads playlist not found for channel ${channelId}`);
 
-      return captions || [];
-    } catch (err) {
-      console.error("Error fetching video captions:", err);
-      return [];
+  const videos: IVideoPreview[] = [];
+  // Pages are cached separately, so a refresh between two of them could repeat a video
+  const seen = new Set<string>();
+  let pageToken: string | null | undefined;
+  for (let page = 0; page < MAX_UPLOAD_PAGES; page++) {
+    const playlist = await youtubeGet(
+      "playlistItems",
+      {
+        part: "snippet",
+        playlistId: uploadsPlaylistId,
+        maxResults: String(PAGE_SIZE),
+        ...(pageToken ? { pageToken } : {}),
+      },
+      playlistItemsSchema,
+    );
+
+    for (const { snippet } of playlist.items) {
+      const id = snippet.resourceId.videoId;
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      videos.push({
+        id,
+        title: snippet.title ?? "",
+        description: snippet.description ?? "",
+        thumbnailURL: pickThumbnailURL(snippet.thumbnails),
+        // Keep the ISO string; formatting happens where the date is displayed
+        publishedAt: snippet.publishedAt ?? "",
+      });
     }
-  } else {
-    const response = await youtube.captions.list({
-      part: ["snippet"],
-      videoId,
-    });
 
-    const captions = response.data.items?.map((item) => ({
-      id: item.id,
-      name: item.snippet?.name,
-
-      // Get the caption file
-      file: item.id
-        ? youtube.captions.download({
-            id: item.id,
-            tfmt: "srt",
-          })
-        : null,
-    }));
-
-    return captions || [];
+    pageToken = playlist.nextPageToken;
+    if (!pageToken) break;
   }
+
+  return videos;
 }
 
-// Blur placeholders are added later for the visible page only (see lib/services/videos.ts)
-export async function getYoutubeVideoDetails(id: string): Promise<{
-  thumbnailURL: string;
-  publishedAt: string;
-} | null> {
-  try {
-    const response = await youtube.videos.list({
-      part: ["snippet", "statistics"],
-      id: [id],
-    });
+/**
+ * Thumbnail URL per video id, fetched in batches of 50 ids per request. Unknown ids are left out.
+ */
+export async function getYoutubeThumbnails(videoIds: string[]): Promise<Map<string, string>> {
+  const ids = [...new Set(videoIds)];
+  const thumbnails = new Map<string, string>();
 
-    const video = response.data.items?.[0];
-    if (!video) return null;
-
-    return {
-      thumbnailURL: pickThumbnailURL(video.snippet?.thumbnails),
-      publishedAt: video.snippet?.publishedAt ?? "",
-    };
-  } catch (err) {
-    console.error("YouTube API error:", err);
-    return null;
+  for (let i = 0; i < ids.length; i += PAGE_SIZE) {
+    const { items } = await youtubeGet(
+      "videos",
+      { part: "snippet", id: ids.slice(i, i + PAGE_SIZE).join(",") },
+      videosSchema,
+    );
+    for (const video of items) thumbnails.set(video.id, pickThumbnailURL(video.snippet.thumbnails));
   }
+
+  return thumbnails;
 }

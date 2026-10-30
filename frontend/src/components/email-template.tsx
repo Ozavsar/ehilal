@@ -1,4 +1,5 @@
 import * as React from "react";
+import { DEFAULT_THEME_COLORS } from "@/config/site";
 
 // Site dark theme tokens (see globals.css); the primary color comes from the Strapi theme
 const COLORS = {
@@ -8,7 +9,6 @@ const COLORS = {
   foreground: "#ffffff",
   mutedForeground: "#bfbfbf",
 };
-const FALLBACK_PRIMARY = "#607304";
 
 interface EmailTemplateProps {
   name: string;
@@ -21,11 +21,12 @@ interface EmailTemplateProps {
 // Picks dark or light text so the button stays readable whatever primary color is set in Strapi
 function getOnPrimaryColor(hex: string) {
   if (!/^#[0-9a-f]{6}$/i.test(hex)) return COLORS.foreground;
-  const [r, g, b] = [1, 3, 5].map((i) => {
+  // Linearised sRGB channel starting at hex[i]
+  const channel = (i: number) => {
     const c = parseInt(hex.slice(i, i + 2), 16) / 255;
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
   return luminance > 0.179 ? COLORS.background : COLORS.foreground;
 }
 
@@ -34,7 +35,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
   email,
   subject,
   message,
-  primaryColor = FALLBACK_PRIMARY,
+  primaryColor = DEFAULT_THEME_COLORS.primaryDark,
 }) => (
   <div
     style={{

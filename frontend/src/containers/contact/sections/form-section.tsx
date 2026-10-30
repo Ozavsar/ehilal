@@ -1,13 +1,13 @@
 "use client";
 
 import { startTransition, useActionState, type FormEvent } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import CustomButton from "@/components/custom-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/sonner";
 import {
   Form,
   FormControl,
@@ -26,7 +26,7 @@ import {
   type ContactFormValues,
 } from "@/lib/validations/contact";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const defaultValues: ContactFormValues = { name: "", email: "", subject: "", message: "" };
 const initialState: ContactFormState = { status: "idle", message: "" };
@@ -181,12 +181,17 @@ export default function FormSection({ className = "" }: { className?: string }) 
                 state.status === "error" ? "text-destructive" : "text-muted-foreground",
               )}
             >
-              {state.message}
+              {/* Cleared while sending, so a repeated message is announced again */}
+              {!isPending && state.message}
             </p>
           </div>
         </form>
       </Form>
-      <ToastContainer />
+      {/* Visual only: the status line above is what screen readers announce. inert keeps the toast out of
+          the accessibility tree and focus order (aria-hidden alone would leave the focusable toast reachable) */}
+      <div inert>
+        <Toaster />
+      </div>
     </motion.section>
   );
 }
