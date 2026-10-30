@@ -15,6 +15,7 @@ yarn dev          # Start dev server (uses --webpack flag)
 yarn build        # Production build (uses --webpack flag)
 yarn start        # Start production server
 yarn lint         # ESLint (flat config, eslint.config.mjs)
+yarn analyze      # Production build + bundle treemaps in .next/analyze/
 npx tsc --noEmit  # Type check
 ```
 
@@ -35,23 +36,23 @@ Package manager: **Yarn** for both frontend and backend.
 - **App Router** with route groups: `(client)` for pages, `(sitemaps)` for XML sitemaps
 - **`lib/api/fetchAPI.ts`** — Central API client for all Strapi requests. Bearer token auth, `qs` for query building, Next.js data cache (`force-cache`, 24h default revalidation, cache tags). Failures throw a typed `ApiError` that keeps the HTTP status; `orNotFound()` turns a Strapi 404 into `notFound()`.
 - **`lib/services/`** — Service layer wrapping fetchAPI and external sources:
-  - `pages.ts`, `index.ts` — Strapi CMS content (`getThemeColors()` falls back to `DEFAULT_THEME_COLORS`)
+  - `pages.ts`, `index.ts` — Strapi CMS content (`getThemeColors()` falls back to `DEFAULT_THEME_COLORS`; `getSiteSettings()` reads the `site-setting` single type, never throws and falls back field by field to `DEFAULT_SITE_SETTINGS`)
   - `conferences.ts`, `videos.ts` — Strapi collections; `videos.ts` merges Strapi + YouTube videos
   - `youtube.ts` — YouTube Data API v3 via plain `fetch` (no googleapis)
   - `medium.ts`, `substack.ts` — Medium (internal GraphQL endpoint) and Substack (feed API) via `fetch`, responses parsed with Zod
   - `blog.ts` — Merges Medium + Substack (`Promise.allSettled`, one source may fail), paginates, looks up single articles
   - `udemy.ts` — Udemy courses via the public API with `fetch`
 - **`lib/actions/contact.ts`** — Contact form server action: Zod validation (`lib/validations/contact.ts`, shared with the client form), honeypot, in-memory per-IP rate limit, email via Resend. Recipient is Strapi Contact Page `form_recipient_email`, falling back to `CONTACT_TO_EMAIL`.
-- **`lib/getImage.ts`** — Blur placeholders with plaiceholder (`getBlurDataURL`, `getStrapiBlurDataURL`, `withBlurDataURLs`), cached per source URL with `unstable_cache` and generated from small image variants. Pages add them only to the items they render (after pagination); services, sitemaps and `generateStaticParams` never compute blur.
-- **`lib/metadata.ts`** — `buildMeta()` helper for page metadata (canonical, OG, Twitter)
-- **`config/site.ts`** — Public site constants (`SITE_URL`, `SITE_NAME`, Twitter, default banner, default theme colours). **`config/env.ts`** — Zod-validated server env; never import it from a Client Component.
+- **`lib/getImage.ts`** — Blur placeholders (`getBlurDataURL`, `getStrapiBlurDataURL`, `withBlurDataURLs`). Strapi images use the blur Strapi stored in `provider_metadata.blurDataURL` (`getStoredBlurDataURL`); otherwise plaiceholder computes one from a small image variant, cached per source URL with `unstable_cache`. Pages add them only to the items they render (after pagination); services, sitemaps and `generateStaticParams` never compute blur.
+- **`lib/metadata.ts`** — async `buildMeta()` helper for page metadata (canonical, OG, Twitter), filled from `getSiteSettings()`
+- **`config/site.ts`** — Public site constants (`SITE_URL`, `SITE_NAME`, Twitter, default banner, default theme colours, `DEFAULT_SITE_SETTINGS`). The env-based name/Twitter/banner values are only fallbacks for Strapi Site Settings. **`config/env.ts`** — Zod-validated server env; never import it from a Client Component.
 - **`config/constants/`** — Route definitions (`app-routes.ts`) and external service IDs
 - **`containers/`** — Page-level components (home, blog, article, videos, conferences, courses, contact)
 - **`components/`** — Shared components; `components/ui/` are shadcn/ui components (Radix UI + Tailwind CSS 4), `components/full-screen-gallery.tsx` is the shared image lightbox (conference gallery and article images)
-- **`context/providers.tsx`** — next-themes (dark/light, class based) + Lenis smooth scroll
+- **`context/providers.tsx`** — next-themes (dark/light, class based); Lenis smooth scroll and the rocket cursor are loaded once the page is idle (`hooks/use-idle-after-load.ts`)
 - **`types.ts`** — TypeScript types for Strapi content models and external sources
 - **Styling** — Tailwind 4 tokens live in `app/globals.css`: `@theme` spacing/text/radius tokens (e.g. `px-page-gutter`, `text-backdrop`, `rounded-card`) and a `--z-*` z-index scale used as `z-(--z-header)`. `cn()` in `lib/utils.ts` registers the custom token names with tailwind-merge; add new ones there too. Dark mode is class based (`@custom-variant dark`).
-- **Performance conventions** — Every `next/image` gets a `sizes` that matches its rendered width; only the LCP image (home hero, first list card) is eager with `fetchPriority="high"`. Entrance animations are CSS (`starting:` + `motion-reduce:`), never content hidden until hydration; `motion` is left only in the 404 page (`LazyMotion`). Swiper CSS is imported by the gallery components, not globally. The rocket cursor, theme-toggle animations and Lenis turn off under `prefers-reduced-motion`.
+- **Performance conventions** — Every `next/image` gets a `sizes` that matches its rendered width; only the LCP image (home hero, first list card) is eager with `fetchPriority="high"`. Entrance animations are CSS (`starting:` + `motion-reduce:`), never content hidden until hydration; `motion` is left only in the 404 scene (`components/not-found-scene.tsx`, `LazyMotion`), which `not-found-client.tsx` loads with `next/dynamic` so it stays out of the shared bundle. Keep decorative or on-demand code out of the first load: `next/dynamic` or `whenIdleAfterLoad` (Lenis, rocket cursor, mobile TOC drawer, full-screen gallery, sonner on first toast). Header links (`components/header/nav-link.tsx`) prefetch 2 s after load or on hover/focus/touch, not at render. Swiper CSS is imported by the gallery components, not globally. Geist Sans is preloaded; Geist Mono (`next/font/local`, `preload: false`) downloads only where code blocks render. The rocket cursor, theme-toggle animations and Lenis turn off under `prefers-reduced-motion`. Measure on Linux or PSI: on Windows, Next 16.2.7 writes an empty font manifest, so local builds preload no fonts.
 - **Conventions** — TypeScript is strict (`noImplicitAny`, `noUncheckedIndexedAccess`). Comments and logs in English. No `console.log`; production builds strip it anyway (`compiler.removeConsole` keeps `error`/`warn`).
 
 ### Routing
@@ -67,8 +68,10 @@ Package manager: **Yarn** for both frontend and backend.
 ### Backend (`backend/`)
 
 - Standard Strapi 5 structure with factory-based controllers/routes/services
-- Content types: `home-page`, `blog-page`, `conference`, `conferences-page`, `contact-page`, `courses-page`, `not-found-page`, `social-media-link`, `theme`, `video`, `videos-page`
+- Content types: `home-page`, `blog-page`, `conference`, `conferences-page`, `contact-page`, `courses-page`, `not-found-page`, `site-setting` (site name, job title, description, default OG image, Twitter, Karakod/Legalifi links), `social-media-link`, `theme`, `video`, `videos-page`
 - PostgreSQL database, AWS S3 for media uploads
+- `src/utils/upload-blur.ts` (registered in `src/index.ts` bootstrap) stores a blur placeholder in each image's `provider_metadata.blurDataURL` on upload/replace (sharp, `src/utils/blur.ts`) and backfills existing images ~10 s after start
+- `backend/.env` may point at the production database and S3: don't start Strapi locally against it
 - CORS configured for `ehilal.com`, `admin.ehilal.com`, `localhost:3169`
 
 ### Data Flow
@@ -96,7 +99,7 @@ The contact form uses a server action, not an API route.
 
 ### Key Environment Variables
 
-- **Frontend**: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_STRAPI_API_URL`, `BEARER_TOKEN` (required), `YOUTUBE_API_KEY`, `RESEND_API_KEY`, `REVALIDATE_KEY`, `CONTACT_TO_EMAIL`. See `frontend/.env.example`.
+- **Frontend**: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_STRAPI_API_URL`, `BEARER_TOKEN` (required; a custom token needs `find` on every content type, including Site-setting), `YOUTUBE_API_KEY`, `RESEND_API_KEY`, `REVALIDATE_KEY`, `CONTACT_TO_EMAIL`. See `frontend/.env.example`.
 - **Backend**: `DATABASE_*` (PostgreSQL), `AWS_*` (S3), `APP_KEYS`, `JWT_SECRET`
 
 You can read @frontend\AGENTS.md for frontend updates
