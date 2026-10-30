@@ -33,7 +33,7 @@ export default function MobileTOC({
 
       <DrawerContent
         aria-describedby={undefined}
-        className="bg-background/95 supports-backdrop-filter:bg-background/90 rounded-t-2xl border-t shadow-2xl backdrop-blur-md"
+        className="bg-background rounded-t-2xl border-t shadow-2xl"
         onScroll={(e) => e.stopPropagation()}
       >
         <div className="mx-auto w-full max-w-md px-6 pt-4 pb-8">

@@ -5,6 +5,16 @@ import { ImageGalleryProvider, ZoomableImage } from "./image-gallery";
 import { buildHeadingTree, getHeadings } from "./table-of-contents/heading-tree";
 
 const MEDIUM_IMAGE_URL = "https://miro.medium.com/v2";
+// Inline article images are requested at this width (Medium never upscales)
+const INLINE_IMAGE_WIDTH = 700;
+
+// Pixel size of the resized inline image, from the source size Medium reports (when it does)
+function getInlineImageSize(metadata: IMediumParagraph["metadata"]) {
+  const { originalWidth, originalHeight } = metadata ?? {};
+  if (!originalWidth || !originalHeight) return {};
+  const width = Math.min(originalWidth, INLINE_IMAGE_WIDTH);
+  return { width, height: Math.round((originalHeight * width) / originalWidth) };
+}
 
 // Medium embeds GIFs through embedly: ...?src=https%3A%2F%2Fgiphy.com%2Fembed%2F<id>%2Ftwitter%2Fiframe
 function getGiphyId(iframeSrc: string) {
@@ -25,8 +35,8 @@ export default function MediumRenderer({ paragraphs }: { paragraphs: IMediumPara
   return (
     <ImageGalleryProvider images={images} title="Article images">
       <ArticleLayout headingTree={buildHeadingTree(headings)}>
-        <article className="prose-sm dark:prose-invert sm:prose md:prose-lg *:scroll-mt-bar-offset max-w-xs flex-1 snap-y snap-mandatory scroll-smooth *:snap-start *:2xl:scroll-mt-8">
-          {paragraphs.map((p) => {
+        <article className="prose-sm dark:prose-invert sm:prose md:prose-lg *:scroll-mt-bar-offset max-w-xs flex-1 snap-y snap-mandatory *:snap-start *:2xl:scroll-mt-8">
+          {paragraphs.map((p, paragraphIndex) => {
             switch (p.type) {
               case "H1":
               case "H2":
@@ -50,8 +60,11 @@ export default function MediumRenderer({ paragraphs }: { paragraphs: IMediumPara
                   <ZoomableImage
                     key={p.name}
                     index={index}
-                    src={`${MEDIUM_IMAGE_URL}/resize:fit:700/${p.metadata.id}`}
+                    src={`${MEDIUM_IMAGE_URL}/resize:fit:${INLINE_IMAGE_WIDTH}/${p.metadata.id}`}
                     alt={p.text}
+                    {...getInlineImageSize(p.metadata)}
+                    // Medium articles usually open with the title and a cover image
+                    lead={index === 0 && paragraphIndex < 3}
                     // The caption names the image; fall back to its position when there is none
                     label={
                       p.text

@@ -14,7 +14,8 @@ export default function CourseCard({
   contentInfo,
   instructionalLevel,
   numReviews,
-}: ICourse) {
+  priority = false,
+}: ICourse & { priority?: boolean }) {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
@@ -23,10 +24,15 @@ export default function CourseCard({
             // No course-specific placeholder exists, share the blog one
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title || ""}
-            width={800}
-            height={800}
-            blurDataURL={blurDataURL ? blurDataURL : undefined}
+            // 16:9 like the rendered box; the card is one grid column (1 below md, 2 from md)
+            width={640}
+            height={360}
+            sizes="(min-width: 1320px) 552px, (min-width: 1140px) 462px, (min-width: 720px) 372px, (min-width: 540px) 508px, calc(100vw - 32px)"
+            blurDataURL={blurDataURL}
             placeholder={blurDataURL ? "blur" : "empty"}
+            // The first card is the LCP candidate on the list page
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             className="aspect-video object-cover transition-transform duration-500 hover:scale-105"
           />
         </a>

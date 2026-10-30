@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { LuFlame, LuPlay } from "react-icons/lu";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { IUnifiedVideo } from "@/types";
 import LinkButton from "@/components/link-button";
@@ -15,7 +14,8 @@ export default function VideoCard({
   publish_date,
   source,
   isFeatured,
-}: IUnifiedVideo) {
+  priority = false,
+}: IUnifiedVideo & { priority?: boolean }) {
   const videoUrl = url || "#";
   // publish_date is an ISO string; pin the time zone so the day doesn't depend on the server
   const publishDate = new Date(publish_date);
@@ -47,10 +47,15 @@ export default function VideoCard({
             <Image
               src={thumbnailURL || "/images/blog/default-blog.jpg"}
               alt={title || ""}
-              blurDataURL={blurDataURL ? blurDataURL : undefined}
+              blurDataURL={blurDataURL}
               placeholder={blurDataURL ? "blur" : "empty"}
               className="object-cover transition-transform duration-500 group-hover:scale-105 group-has-[a:focus-visible]:scale-105"
               fill
+              // The first card is the LCP candidate on the list page
+              loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
+              // Card width: one grid column (1 below md, 2 up to xl, 3 from xl) in the container
+              sizes="(min-width: 1140px) 360px, (min-width: 720px) 372px, (min-width: 540px) 508px, calc(100vw - 32px)"
             />
             {/* Hover cue and keyboard focus indicator; the card's overflow-hidden clips a regular outline */}
             <span

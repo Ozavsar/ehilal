@@ -4,6 +4,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y, Keyboard, Navigation } from "swiper/modules";
 import { LuX } from "react-icons/lu";
+import "swiper/css";
+import "swiper/css/navigation";
 import "swiper/css/a11y";
 
 export interface IGalleryImage {
@@ -65,11 +67,12 @@ export default function FullScreenGallery({
                 <Image
                   src={image.src}
                   alt={image.alt}
-                  width={1920}
-                  height={1920}
-                  blurDataURL={image.blurDataURL ? image.blurDataURL : ""}
+                  // Each slide fills the viewport: pick the srcset entry by viewport width and DPR
+                  fill
+                  sizes="100vw"
+                  blurDataURL={image.blurDataURL}
                   placeholder={image.blurDataURL ? "blur" : "empty"}
-                  className="h-full w-full object-contain object-center"
+                  className="object-contain object-center"
                 />
               </SwiperSlide>
             ))}

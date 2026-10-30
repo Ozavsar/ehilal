@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ArticleCard from "./article-card";
@@ -15,14 +14,12 @@ export default function BlogContainer({ articles, currentPage, totalPages }: IBl
     <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <MotionGrid>
-          {articles.map((article) => (
-            <ArticleCard key={article.externalURL} {...article} />
+          {articles.map((article, index) => (
+            <ArticleCard key={article.externalURL} {...article} priority={index === 0} />
           ))}
         </MotionGrid>
       </div>
-      <Suspense fallback={null}>
-        <Pagination totalPages={totalPages} currentPage={currentPage} />
-      </Suspense>
+      <Pagination route="BLOG" totalPages={totalPages} currentPage={currentPage} />
     </main>
   );
 }

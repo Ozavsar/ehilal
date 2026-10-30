@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import VideoCard from "./video-card";
@@ -15,14 +14,12 @@ export default function VideosContainer({ videos, pageNumber, totalPages }: IVid
     <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <MotionGrid>
-          {videos.map((video) => (
-            <VideoCard key={video.id} {...video} />
+          {videos.map((video, index) => (
+            <VideoCard key={video.id} {...video} priority={index === 0} />
           ))}
         </MotionGrid>
       </div>
-      <Suspense fallback={null}>
-        <Pagination totalPages={totalPages} currentPage={+pageNumber} />
-      </Suspense>
+      <Pagination route="VIDEOS" totalPages={totalPages} currentPage={+pageNumber} />
     </main>
   );
 }

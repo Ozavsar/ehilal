@@ -70,7 +70,8 @@ export default function ArticleCard({
   publishedAt,
   blurDataURL,
   slug,
-}: IBlogPreview) {
+  priority = false,
+}: IBlogPreview & { priority?: boolean }) {
   // publishedAt is ISO 8601 ("" if unknown, then the date ribbon is hidden)
   const published = getDateParts(new Date(publishedAt));
   const showYear = published !== null && getDateParts(new Date())?.year !== published.year;
@@ -87,11 +88,16 @@ export default function ArticleCard({
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={`${title} Thumbnail`}
             title={`${title} Thumbnail`}
-            width={800}
-            height={800}
+            // 16:9 like the rendered box; the card is one grid column (1 below md, 2 up to xl, 3 from xl)
+            width={640}
+            height={360}
+            sizes="(min-width: 1140px) 360px, (min-width: 720px) 372px, (min-width: 540px) 508px, calc(100vw - 32px)"
             blurDataURL={blurDataURL}
             placeholder={blurDataURL ? "blur" : "empty"}
             draggable={false}
+            // The first card is the LCP candidate on the list page
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             className="aspect-video object-cover transition-transform duration-500 select-none group-hover:scale-105 group-focus-visible:scale-105"
           />
           {/* Hover cue and keyboard focus indicator, same as the video and conference cards */}

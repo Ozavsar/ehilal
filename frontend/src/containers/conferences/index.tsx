@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import MotionGrid from "@/components/motion-grid";
 import Pagination from "@/components/pagination";
 import ConferenceCard from "./conference-card";
@@ -24,9 +23,7 @@ export default function ConferencesContainer({
           ))}
         </MotionGrid>
       </div>
-      <Suspense fallback={null}>
-        <Pagination totalPages={totalPages} currentPage={+pageNumber} />
-      </Suspense>
+      <Pagination route="CONFERENCES" totalPages={totalPages} currentPage={+pageNumber} />
     </main>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
 import { createContext, useContext, useRef, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { LuZoomIn } from "react-icons/lu";
-import FullScreenGallery, { type IGalleryImage } from "@/components/full-screen-gallery";
+import type { IGalleryImage } from "@/components/full-screen-gallery";
+
+// Swiper's JS and CSS load when a reader first opens an image, not with the article
+const FullScreenGallery = dynamic(() => import("@/components/full-screen-gallery"));
 
 // Opens the shared gallery at an image; focus returns to the trigger button on close
 type OpenGallery = (index: number, trigger: HTMLButtonElement) => void;
@@ -48,9 +52,14 @@ interface ZoomableImageProps {
   src: string;
   alt: string;
   label: string;
+  // Rendered pixel size, reserves the image's box before it loads (no layout shift)
+  width?: number;
+  height?: number;
+  // Lead image at the top of the article: load it eagerly at high priority, the rest lazily
+  lead?: boolean;
 }
 
-export function ZoomableImage({ index, src, alt, label }: ZoomableImageProps) {
+export function ZoomableImage({ index, src, alt, label, width, height, lead }: ZoomableImageProps) {
   const openGallery = useContext(GalleryContext);
 
   return (
@@ -64,6 +73,11 @@ export function ZoomableImage({ index, src, alt, label }: ZoomableImageProps) {
       <img
         src={src}
         alt={alt}
+        width={width}
+        height={height}
+        loading={lead ? "eager" : "lazy"}
+        fetchPriority={lead ? "high" : undefined}
+        decoding="async"
         className="transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105"
       />
       {/* Hover cue and keyboard focus indicator, same as the card thumbnails */}

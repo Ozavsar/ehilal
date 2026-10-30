@@ -1,24 +1,27 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { generatePagination } from "@/lib/pagination";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
+/** The paginated lists: the INTERNAL_ROUTES entries that build page links with href(). */
+type ListRoute = {
+  [K in keyof typeof INTERNAL_ROUTES]: (typeof INTERNAL_ROUTES)[K] extends { href: unknown }
+    ? K
+    : never;
+}[keyof typeof INTERNAL_ROUTES];
+
 interface IPaginationProps {
+  route: ListRoute;
   totalPages: number;
   currentPage: number;
 }
 
-export default function Pagination({ totalPages, currentPage }: IPaginationProps) {
-  const pathname = usePathname();
-
-  // Page 1 lives at the bare list path (/blog), pages 2..N at /blog/<n>. The pathname may be
-  // either /blog or the rewritten /blog/1, so strip any page segment to get the base.
-  const basePath = pathname.replace(/\/\d+$/, "");
-  const createPageURL = (pageNumber: number) =>
-    pageNumber === 1 ? basePath : `${basePath}/${pageNumber}`;
+// Server component: the list route comes in as a prop instead of usePathname(). The links keep
+// Next's default scroll, so a new page opens at the top instead of where the old one was left.
+export default function Pagination({ route, totalPages, currentPage }: IPaginationProps) {
+  // Page 1 is the bare list path (/blog), pages 2..N are /blog/<n>
+  const createPageURL = (pageNumber: number) => INTERNAL_ROUTES[route].href(pageNumber);
 
   const allPages = generatePagination(currentPage, totalPages);
 
@@ -86,7 +89,7 @@ function PaginationNumber({
   return isActive || position === "middle" ? (
     <div className={className}>{page}</div>
   ) : (
-    <Link href={href} className={className} scroll={false}>
+    <Link href={href} className={className}>
       {page}
     </Link>
   );
@@ -117,7 +120,7 @@ function PaginationArrow({
   return isDisabled ? (
     <div className={className}>{icon}</div>
   ) : (
-    <Link className={className} href={href} scroll={false}>
+    <Link className={className} href={href}>
       {icon}
     </Link>
   );
