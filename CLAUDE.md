@@ -42,7 +42,7 @@ Package manager: **Yarn** for both frontend and backend.
   - `blog.ts` — Merges Medium + Substack (`Promise.allSettled`, one source may fail), paginates, looks up single articles
   - `udemy.ts` — Udemy courses via the public API with `fetch`
 - **`lib/actions/contact.ts`** — Contact form server action: Zod validation (`lib/validations/contact.ts`, shared with the client form), honeypot, in-memory per-IP rate limit, email via Resend. Recipient is Strapi Contact Page `form_recipient_email`, falling back to `CONTACT_TO_EMAIL`.
-- **`lib/getImage.ts`** — Blur placeholders with plaiceholder
+- **`lib/getImage.ts`** — Blur placeholders with plaiceholder (`getBlurDataURL`, `getStrapiBlurDataURL`, `withBlurDataURLs`), cached per source URL with `unstable_cache` and generated from small image variants. Pages add them only to the items they render (after pagination); services, sitemaps and `generateStaticParams` never compute blur.
 - **`lib/metadata.ts`** — `buildMeta()` helper for page metadata (canonical, OG, Twitter)
 - **`config/site.ts`** — Public site constants (`SITE_URL`, `SITE_NAME`, Twitter, default banner, default theme colours). **`config/env.ts`** — Zod-validated server env; never import it from a Client Component.
 - **`config/constants/`** — Route definitions (`app-routes.ts`) and external service IDs
@@ -51,6 +51,7 @@ Package manager: **Yarn** for both frontend and backend.
 - **`context/providers.tsx`** — next-themes (dark/light, class based) + Lenis smooth scroll
 - **`types.ts`** — TypeScript types for Strapi content models and external sources
 - **Styling** — Tailwind 4 tokens live in `app/globals.css`: `@theme` spacing/text/radius tokens (e.g. `px-page-gutter`, `text-backdrop`, `rounded-card`) and a `--z-*` z-index scale used as `z-(--z-header)`. `cn()` in `lib/utils.ts` registers the custom token names with tailwind-merge; add new ones there too. Dark mode is class based (`@custom-variant dark`).
+- **Performance conventions** — Every `next/image` gets a `sizes` that matches its rendered width; only the LCP image (home hero, first list card) is eager with `fetchPriority="high"`. Entrance animations are CSS (`starting:` + `motion-reduce:`), never content hidden until hydration; `motion` is left only in the 404 page (`LazyMotion`). Swiper CSS is imported by the gallery components, not globally. The rocket cursor, theme-toggle animations and Lenis turn off under `prefers-reduced-motion`.
 - **Conventions** — TypeScript is strict (`noImplicitAny`, `noUncheckedIndexedAccess`). Comments and logs in English. No `console.log`; production builds strip it anyway (`compiler.removeConsole` keeps `error`/`warn`).
 
 ### Routing
