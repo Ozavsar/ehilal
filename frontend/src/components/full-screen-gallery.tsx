@@ -28,13 +28,13 @@ export default function FullScreenGallery({
   returnFocusRef,
   onClose,
 }: FullScreenGalleryProps) {
-  // Radix Dialog handles Escape, focus trap, scroll lock and the dialog role; z-[60] sits above
-  // the header, mobile nav and article TOC button (z-50).
+  // Radix Dialog handles Escape, focus trap, scroll lock and the dialog role; --z-modal sits above
+  // the header, the drawer and the article TOC button.
   // data-lenis-prevent stops Lenis from scrolling the page behind the dialog.
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[60] bg-black" />
+        <Dialog.Overlay className="fixed inset-0 z-(--z-modal) bg-black" />
         <Dialog.Content
           aria-describedby={undefined}
           data-lenis-prevent
@@ -43,11 +43,11 @@ export default function FullScreenGallery({
             event.preventDefault();
             returnFocusRef.current?.focus({ preventScroll: true });
           }}
-          className="fixed inset-0 z-[60] flex items-center justify-center focus:outline-none"
+          className="fixed inset-0 z-(--z-modal) flex items-center justify-center focus:outline-none"
         >
           <Dialog.Title className="sr-only">{title}</Dialog.Title>
           <Dialog.Close
-            className="text-primary hover:text-foreground absolute top-4 right-4 z-50"
+            className="text-primary hover:text-foreground absolute top-4 right-4 z-(--z-floating)"
             aria-label="Close full screen image"
           >
             <LuX size={24} />

@@ -14,7 +14,7 @@
   --card-foreground: #474747;
   --popover: #ffffff;
   --popover-foreground: #666666;
-  --primary: hsl(var(--primary-light));
+  --primary: var(--primary-light);
   --muted: #ededed;
   --muted-foreground: #757575;
   --accent: #ededed;
@@ -25,7 +25,21 @@
   --input: #e2e8f0;
   --ring: #666666;
   --radius: 0.5rem;
-  --blog-text-color: #1a1a1a;
+
+  /* Stacking scale, low to high. Use through z-(--z-*) or var(--z-*), never a bare number.
+     Most layers share the root stacking context with third-party ones (swiper containers sit
+     at 1, sonner at --z-toast), so the gaps between the values matter, not just their order. */
+  --z-behind: -10; /* decorative backdrops: home stripe, page-title word, button hover fill */
+  --z-cursor-trail: 7; /* rocket cursor fumes */
+  --z-cursor: 8; /* rocket cursor */
+  --z-pagination: 9;
+  --z-raised: 10; /* content lifted over a sibling backdrop (badges, card content, 404 content) */
+  --z-title-bar: 20; /* fixed mobile page-title bar */
+  --z-header: 21; /* fixed header: theme toggle, side nav, mobile bottom nav */
+  --z-floating: 50; /* floating controls: article TOC button, mobile bottom nav, gallery close */
+  --z-overlay: 50; /* vaul drawer overlay and panel (portaled after the TOC button) */
+  --z-modal: 60; /* full-screen gallery: above the header, the drawer and the TOC button */
+  --z-toast: 999999999; /* sonner's own default: toasts stay above everything */
 }
 
 .dark {
@@ -35,7 +49,7 @@
   --card-foreground: #dbdde3;
   --popover: #020617;
   --popover-foreground: #ffffff;
-  --primary: hsl(var(--primary-dark));
+  --primary: var(--primary-dark);
   --muted: #2b2a2a;
   --muted-foreground: #bfbfbf;
   --accent: #2b2a2a;
@@ -45,7 +59,6 @@
   --border: #2b2a2a;
   --input: #2b2a2a;
   --ring: #c9d6e7;
-  --blog-text-color: #f2f2f2;
 }
 
 @theme inline {
@@ -66,7 +79,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-blog-text-color: var(--blog-text-color);
 
   /* Border Radius */
   --radius-lg: var(--radius);
@@ -79,13 +91,29 @@
   --breakpoint-lg: 960px;
   --breakpoint-xl: 1140px;
   --breakpoint-2xl: 1320px;
-  --breakpoint-custom-lg: 1135px;
 
   /* Animations */
-  --animate-accordion-down: accordion-down 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-accordion-up: accordion-up 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-fade-in-elif: fade-in-elif 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
-  --animate-fade-in-right: fade-in-right 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Layout and type tokens. Register new names in the twMerge config in lib/utils.ts too, otherwise
+   cn() can mistake e.g. text-backdrop for a colour and drop the real colour class. */
+@theme {
+  /* Side padding of the list and article pages from lg up */
+  --spacing-page-gutter: 6rem;
+  /* Room kept clear for the fixed mobile title bar (top) and bottom nav */
+  --spacing-bar-offset: 6rem;
+  /* Distance of the home hero image from the viewport edges */
+  --spacing-hero-inset: 2.5rem;
+
+  /* TitleSection heading and the large faded words behind titles and on the error pages */
+  --text-page-title: 56px;
+  --text-backdrop: 110px;
+  --tracking-backdrop: 5px;
+  /* Tiny labels: mobile nav captions, article date ribbon year */
+  --text-2xs: 10px;
+
+  --radius-card: 5px;
 }
 
 @layer base {
@@ -96,7 +124,7 @@
     @apply bg-background text-foreground scroll-smooth;
   }
   main {
-    @apply max-sm:py-24;
+    @apply max-sm:py-bar-offset;
   }
   ::selection {
     @apply bg-primary text-white;
@@ -120,35 +148,6 @@
   }
   @media (width >= theme(--breakpoint-2xl)) {
     max-width: theme(--breakpoint-2xl);
-  }
-}
-
-@keyframes accordion-down {
-  from {
-    height: 0;
-  }
-  to {
-    height: var(--radix-accordion-content-height);
-  }
-}
-
-@keyframes accordion-up {
-  from {
-    height: var(--radix-accordion-content-height);
-  }
-  to {
-    height: 0;
-  }
-}
-
-@keyframes fade-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -178,7 +177,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 8;
+  z-index: var(--z-cursor);
 
   & svg {
     fill: #ff8811;
@@ -212,19 +211,4 @@
     opacity: 0;
     transform: translateY(10px);
   }
-}
-
-@keyframes slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s ease-out forwards;
 }

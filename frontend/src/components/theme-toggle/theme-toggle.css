@@ -1,4 +1,12 @@
+/* #switch is fixed and transformed, so it is its own stacking context: these layers only order
+   its parts (sun/moon, clouds, shooting star). The switch itself sits at --z-raised in the header. */
 #switch {
+  --switch-z-trail: 1;
+  --switch-z-sun: 2;
+  --switch-z-sky: 3;
+  --switch-z-cloud: 3;
+  --switch-z-cloud-front: 4;
+
   width: 150px;
   height: 60px;
 
@@ -12,7 +20,7 @@
   transition: background-color 1s;
 
   box-shadow: 0 0 17px 1px #565656;
-  z-index: 26 !important;
+  z-index: var(--z-raised);
 }
 
 #switch.off {
@@ -31,7 +39,7 @@
   -webkit-border-radius: 30px;
   overflow: hidden;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-sky);
 }
 
 #circle {
@@ -58,7 +66,7 @@
     height 2s,
     box-shadow 2s,
     background-color 2s 0.2s;
-  z-index: 23 !important;
+  z-index: var(--switch-z-sun);
 }
 
 #circle::before {
@@ -284,7 +292,7 @@
     5px 0 5px 1px rgba(237, 155, 61, 0.5),
     0px 2px 8px 3px rgba(237, 155, 61, 0.5),
     0px -2px 8px 3px rgba(237, 155, 61, 0.5);
-  z-index: 21 !important;
+  z-index: var(--switch-z-trail);
 }
 
 #switch.off #shtngstarwrapper {
@@ -336,7 +344,7 @@
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
   opacity: 1;
 
   transition: opacity 2s 0.4s;
@@ -359,7 +367,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(1)::after {
@@ -377,7 +385,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(1) .cloudpart:nth-of-type(1) {
@@ -395,7 +403,7 @@
 
   background: inherit;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 }
 
 .cloud:nth-of-type(1) .cloudpart:nth-of-type(2) {
@@ -413,7 +421,7 @@
 
   background: inherit;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 }
 
 .cloud:nth-of-type(1) .cloudpart:nth-of-type(1)::after {
@@ -431,7 +439,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(1) .cloudpart:nth-of-type(2)::before {
@@ -449,7 +457,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(2) {
@@ -464,7 +472,7 @@
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
   opacity: 1;
 
   transition: opacity 2s 0.4s;
@@ -487,7 +495,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(2)::after {
@@ -505,7 +513,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(2) .cloudpart:nth-of-type(1) {
@@ -523,7 +531,7 @@
 
   background: inherit;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 }
 
 .cloud:nth-of-type(2) .cloudpart:nth-of-type(2) {
@@ -541,7 +549,7 @@
 
   background: inherit;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 }
 
 .cloud:nth-of-type(2) .cloudpart:nth-of-type(1)::after {
@@ -559,7 +567,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(2) .cloudpart:nth-of-type(2)::before {
@@ -577,7 +585,7 @@
 
   background: inherit;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 }
 
 .cloud:nth-of-type(3) {
@@ -590,7 +598,7 @@
 
   border-radius: 50%;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
   opacity: 1;
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
@@ -613,7 +621,7 @@
 
   border-radius: 50%;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -631,7 +639,7 @@
 
   border-radius: 50%;
 
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -646,7 +654,7 @@
 
   border-radius: 50%;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 
   transform: translate(0%, -40%);
 
@@ -666,7 +674,7 @@
   transform: translate(-0%, -60%);
 
   border-radius: 50%;
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -684,7 +692,7 @@
   transform: translate(-0%, 10%);
 
   border-radius: 50%;
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -699,7 +707,7 @@
 
   border-radius: 50%;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 
   transform: translate(10%, -20%);
 
@@ -719,7 +727,7 @@
   transform: translate(-50%, -50%);
 
   border-radius: 50%;
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -737,7 +745,7 @@
   transform: translate(-0%, -40%);
 
   border-radius: 50%;
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }
@@ -752,7 +760,7 @@
 
   border-radius: 50%;
 
-  z-index: 24 !important;
+  z-index: var(--switch-z-cloud);
 
   transform: translate(-50%, -10%);
 
@@ -772,7 +780,7 @@
   transform: translate(40%, -30%);
 
   border-radius: 50%;
-  z-index: 25 !important;
+  z-index: var(--switch-z-cloud-front);
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 }

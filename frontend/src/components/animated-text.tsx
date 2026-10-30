@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView } from "motion/react";
 
 const characterVariants = {
   hidden: { opacity: 0, y: 5 },
@@ -16,10 +16,9 @@ const characterVariants = {
 interface AnimatedTextProps {
   text: string | string[];
   className?: string;
-  props?: any;
 }
 
-export default function AnimatedText({ text, className, ...props }: AnimatedTextProps) {
+export default function AnimatedText({ text, className }: AnimatedTextProps) {
   const ref = useRef<HTMLParagraphElement>(null);
   const isInView = useInView(ref, { amount: 0.5, once: true });
   const textArray = Array.isArray(text) ? text : [text];
@@ -28,7 +27,6 @@ export default function AnimatedText({ text, className, ...props }: AnimatedText
     <motion.p
       ref={ref}
       className={`flex flex-wrap ${className}`}
-      {...props}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       transition={{ staggerChildren: 0.03, delayChildren: 0.3 }}
