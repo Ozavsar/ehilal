@@ -11,26 +11,26 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.42.0",
-    "@strapi/plugin-color-picker": "^5.10.2",
-    "@strapi/plugin-users-permissions": "5.42.0",
-    "@strapi/provider-upload-aws-s3": "^5.10.2",
-    "@strapi/strapi": "5.42.0",
-    "pg": "8.8.0",
+    "@strapi/plugin-cloud": "5.60.0",
+    "@strapi/plugin-color-picker": "5.60.0",
+    "@strapi/plugin-users-permissions": "5.60.0",
+    "@strapi/provider-upload-aws-s3": "5.60.0",
+    "@strapi/strapi": "5.60.0",
+    "pg": "8.23.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "sharp": "0.33.5",
+    "react-router-dom": "^6.30.3",
+    "sharp": "0.35.5",
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.0.0 <=22.x.x",
+    "node": ">=22.19.0 <=26.x.x",
     "yarn": ">=1.0.0"
   },
   "strapi": {
