@@ -14,10 +14,7 @@ interface IContactContainerProps {
   content: IStrapiContactPage;
 }
 
-export default async function ContactContainer({
-  content,
-  socialMediaLinks,
-}: IContactContainerProps) {
+export default function ContactContainer({ content, socialMediaLinks }: IContactContainerProps) {
   return (
     <main className="container">
       <TitleSection backgroundText={content.page_title_background} text={content.page_title} />

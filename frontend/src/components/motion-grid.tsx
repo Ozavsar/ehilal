@@ -1,60 +1,45 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 interface AnimatedGridProps {
   children: ReactNode;
+  /** Seconds between two items entering */
   staggerDelay?: number;
+  /** Seconds before the first item enters */
   delay?: number;
   className?: string;
 }
 
+const toMs = (seconds: number) => `${Math.round(seconds * 1000)}ms`;
+
+// Each item fades/slides in with a @starting-style transition (Tailwind `starting:`), staggered
+// through transition-delay. Server component: no client JS, reduced-motion users get no movement.
+const itemClassName =
+  "transition-[opacity,translate] duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] starting:translate-y-5 starting:opacity-0 motion-reduce:transition-none";
+
 export default function MotionGrid({
   children,
-  delay,
+  delay = 0,
   staggerDelay = 0.15,
   className,
 }: AnimatedGridProps) {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: staggerDelay,
-        delay: delay || 0,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 260, damping: 20 },
-    },
-  };
-
   return (
-    <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className={cn(`grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3`, className)}
-    >
+    <div className={cn(`grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3`, className)}>
       {Array.isArray(children) ? (
         children.map((child, index) => (
-          <motion.div key={index} variants={item} className="h-full">
+          <div
+            key={index}
+            className={cn("h-full", itemClassName)}
+            style={{ transitionDelay: toMs(delay + index * staggerDelay) }}
+          >
             {child}
-          </motion.div>
+          </div>
         ))
       ) : (
-        <motion.div variants={item} className="grid">
+        <div className={cn("grid", itemClassName)} style={{ transitionDelay: toMs(delay) }}>
           {children}
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }

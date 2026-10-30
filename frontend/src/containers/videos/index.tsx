@@ -10,13 +10,9 @@ interface IVideosContainerProps {
   totalPages: number;
 }
 
-export default async function VideosContainer({
-  videos,
-  pageNumber,
-  totalPages,
-}: IVideosContainerProps) {
+export default function VideosContainer({ videos, pageNumber, totalPages }: IVideosContainerProps) {
   return (
-    <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
+    <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <MotionGrid>
           {videos.map((video) => (

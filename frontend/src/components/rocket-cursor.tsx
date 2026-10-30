@@ -41,6 +41,7 @@ export default function RocketCursor() {
     let mousePosition = { x: 0, y: 0 };
     let oldTimeStamp = 1;
     let fps = 10;
+    let frameId = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       mousePosition = { x: e.clientX, y: e.clientY };
@@ -109,8 +110,6 @@ export default function RocketCursor() {
         (180 / Math.PI);
 
       rocket.style.transform = `translate(${rocketPosition.x}px, ${rocketPosition.y}px) rotate(${angle}deg)`;
-      // body.style.backgroundPositionX = `-${rocketPosition.x / 10}px`; // Performance optimization
-      // body.style.backgroundPositionY = `-${rocketPosition.y / 10}px`; // Performance optimization
 
       if (tick % Math.floor(fps / fumeCount) === 0) {
         const div = document.createElement("div");
@@ -124,7 +123,7 @@ export default function RocketCursor() {
           display: flex; 
           align-items: flex-end; 
           justify-content: center;
-          z-index: 7;
+          z-index: var(--z-cursor-trail);
         `;
 
         const span = document.createElement("span");
@@ -137,7 +136,6 @@ export default function RocketCursor() {
           animation: fadeout 1s ease-in forwards; 
           opacity: 0.6; 
           box-shadow: 0 0 100px #ffffff20;
-          z-index: 7;
         `;
         div.append(span);
         body.append(div);
@@ -153,13 +151,15 @@ export default function RocketCursor() {
         heart.style.opacity = "0";
       }
 
-      window.requestAnimationFrame(loop);
+      frameId = window.requestAnimationFrame(loop);
     };
 
     document.addEventListener("mousemove", handleMouseMove);
-    window.requestAnimationFrame(loop);
+    frameId = window.requestAnimationFrame(loop);
 
+    // Stop the loop too, otherwise every desktop/mobile toggle on resize starts another one
     return () => {
+      window.cancelAnimationFrame(frameId);
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [isDesktop]);

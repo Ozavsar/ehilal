@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Button } from "../ui/button";
-import { MENUS } from "@/config/constants/app-routes";
+import { isNavItemActive, MENUS } from "@/config/constants/app-routes";
 
 export default function Nav() {
   const [hoveredItem, setHoveredItem] = useState<null | string>(null);
@@ -20,7 +20,7 @@ export default function Nav() {
       className="mx-auto flex flex-row gap-2 p-4 max-sm:hidden sm:my-auto sm:flex-col sm:gap-6 sm:p-8"
     >
       {MENUS.NAV.map(({ key, label, href, icon: Icon }) => {
-        const isActive = pathname === href;
+        const isActive = isNavItemActive(pathname, href);
         const isHovered = hoveredItem === label;
         return (
           <motion.div

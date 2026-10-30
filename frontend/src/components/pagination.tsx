@@ -14,14 +14,16 @@ interface IPaginationProps {
 export default function Pagination({ totalPages, currentPage }: IPaginationProps) {
   const pathname = usePathname();
 
-  const createPageURL = (pageNumber: number | string) => {
-    return pathname.replace(/\/\d+$/, `/${pageNumber}`);
-  };
+  // Page 1 lives at the bare list path (/blog), pages 2..N at /blog/<n>. The pathname may be
+  // either /blog or the rewritten /blog/1, so strip any page segment to get the base.
+  const basePath = pathname.replace(/\/\d+$/, "");
+  const createPageURL = (pageNumber: number) =>
+    pageNumber === 1 ? basePath : `${basePath}/${pageNumber}`;
 
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <div className="z-9 mx-auto mt-8 flex items-center self-end">
+    <div className="z-(--z-pagination) mx-auto mt-8 flex items-center self-end">
       <PaginationArrow
         direction="left"
         href={createPageURL(currentPage - 1)}
@@ -39,8 +41,9 @@ export default function Pagination({ totalPages, currentPage }: IPaginationProps
 
           return (
             <PaginationNumber
-              key={page}
-              href={createPageURL(page)}
+              // Two "..." entries can appear, so the value alone is not a unique key
+              key={`${page}-${index}`}
+              href={page === "..." ? "" : createPageURL(page)}
               page={page}
               position={position}
               isActive={currentPage === page}

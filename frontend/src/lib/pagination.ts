@@ -2,7 +2,7 @@
  * Updated pagination logic to include ellipsis for better UX
  * @param currentPage - Page currently active
  * @param totalPages - Total number of pages
- * @param maxVisible - Maximum number of visible pages (default: 7)
+ * @param maxVisible - Maximum number of visible pages (default: 5)
  * @returns Array containing page numbers and ellipsis ("...") where appropriate
  */
 export function generatePagination(
@@ -71,55 +71,3 @@ export function generatePagination(
 
   return uniquePages;
 }
-
-// /**
-//  * Helper to get pagination info
-//  * @param currentPage - Current active page
-//  * @param totalItems - Total number of items
-//  * @param itemsPerPage - Number of items per page
-//  * @returns Object containing pagination details
-//  */
-// export function getPaginationInfo(
-//   currentPage: number,
-//   totalItems: number,
-//   itemsPerPage: number,
-// ) {
-//   const totalPages = Math.ceil(totalItems / itemsPerPage);
-//   const startItem = (currentPage - 1) * itemsPerPage + 1;
-//   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-//   return {
-//     totalPages,
-//     startItem,
-//     endItem,
-//     hasNext: currentPage < totalPages,
-//     hasPrev: currentPage > 1,
-//     isFirstPage: currentPage === 1,
-//     isLastPage: currentPage === totalPages,
-//   };
-// }
-
-// /**
-//  * URL-safe pagination parameters
-//  */
-// export function createPaginationUrl(
-//   baseUrl: string,
-//   page: number,
-//   searchParams?: URLSearchParams,
-// ) {
-//   const url = new URL(baseUrl, window.location.origin);
-
-//   if (searchParams) {
-//     searchParams.forEach((value, key) => {
-//       if (key !== "page") {
-//         url.searchParams.set(key, value);
-//       }
-//     });
-//   }
-
-//   if (page > 1) {
-//     url.searchParams.set("page", page.toString());
-//   }
-
-//   return url.toString();
-// }

@@ -10,13 +10,13 @@ interface ICourseContainerProps {
   totalPages: number;
 }
 
-export default async function CourseContainer({
+export default function CourseContainer({
   courses,
   pageNumber,
   totalPages,
 }: ICourseContainerProps) {
   return (
-    <main className="container flex flex-col justify-between sm:pb-8 lg:px-24">
+    <main className="lg:px-page-gutter container flex flex-col justify-between sm:pb-8">
       <MotionGrid className="xl:grid-cols-2">
         {courses.map((course) => (
           <CourseCard key={course.udemyURL} {...course} />

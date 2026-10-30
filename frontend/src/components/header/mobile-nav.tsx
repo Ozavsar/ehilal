@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { MENUS } from "@/config/constants/app-routes";
+import { isNavItemActive, MENUS } from "@/config/constants/app-routes";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const container = {
   hidden: { opacity: 0 },
@@ -28,7 +28,7 @@ export default function MobileNav() {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="bg-background fixed right-0 bottom-0 left-0 z-50 flex w-full justify-around border-t sm:hidden"
+      className="bg-background fixed right-0 bottom-0 left-0 z-(--z-floating) flex w-full justify-around border-t sm:hidden"
     >
       <motion.div
         variants={container}
@@ -37,7 +37,7 @@ export default function MobileNav() {
         className="flex w-full justify-around"
       >
         {MENUS.NAV.map(({ key, label, href, icon: Icon }) => {
-          const isActive = pathname === href;
+          const isActive = isNavItemActive(pathname, href);
           return (
             <motion.div
               key={key}
@@ -64,7 +64,7 @@ export default function MobileNav() {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  className="relative z-10"
+                  className="relative z-(--z-raised)"
                 >
                   <Icon
                     className={cn("size-5", isActive ? "text-primary" : "text-muted-foreground")}
@@ -72,7 +72,7 @@ export default function MobileNav() {
                 </motion.div>
                 <span
                   className={cn(
-                    "relative z-10 text-[10px] font-bold",
+                    "text-2xs relative z-(--z-raised) font-bold",
                     isActive ? "text-primary" : "text-muted-foreground",
                   )}
                 >

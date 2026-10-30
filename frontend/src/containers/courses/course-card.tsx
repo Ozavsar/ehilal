@@ -20,7 +20,8 @@ export default function CourseCard({
       <CardHeader>
         <a href={udemyURL} target="_blank" rel="noopener noreferrer">
           <Image
-            src={thumbnailURL || "/images/courses/default-course.jpg"}
+            // No course-specific placeholder exists, share the blog one
+            src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt={title || ""}
             width={800}
             height={800}

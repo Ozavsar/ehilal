@@ -6,38 +6,20 @@ import LegalifiLogomark from "./assets/legalifi-logomark";
 
 export default async function SocialLinks() {
   const socialLinks = await getSocialMediaLinks();
+  // Links not filled in Strapi are skipped instead of rendering a dead "#" link
   const socialLinkContents = [
-    {
-      href: socialLinks.twitter_x || "#",
-      icon: BsTwitterX,
-      title: "Twitter",
-    },
-    {
-      href: socialLinks.linkedin || "#",
-      icon: LuLinkedin,
-      title: "LinkedIn",
-    },
-    {
-      href: socialLinks.youtube || "#",
-      icon: LuYoutube,
-      title: "YouTube",
-    },
-    // Optional in Strapi: only rendered once a URL has been entered
-    ...(socialLinks.instagram
-      ? [{ href: socialLinks.instagram, icon: BsInstagram, title: "Instagram" }]
-      : []),
+    { href: socialLinks.twitter_x, icon: BsTwitterX, title: "Twitter" },
+    { href: socialLinks.linkedin, icon: LuLinkedin, title: "LinkedIn" },
+    { href: socialLinks.youtube, icon: LuYoutube, title: "YouTube" },
+    { href: socialLinks.instagram, icon: BsInstagram, title: "Instagram" },
     { href: COMPANY_URL, icon: LuGlobe, title: "Karakod" },
-    {
-      href: LEGALIFI_URL,
-      icon: LegalifiLogomark,
-      title: "Legalifi",
-    },
-  ];
+    { href: LEGALIFI_URL, icon: LegalifiLogomark, title: "Legalifi" },
+  ].flatMap(({ href, ...link }) => (href ? [{ href, ...link }] : []));
   return (
     <div className="flex flex-wrap justify-center gap-4 self-center">
       {socialLinkContents.map(({ href, icon: Icon, title }) => (
         <a
-          key={href}
+          key={title}
           href={href}
           role="button"
           aria-label={href}

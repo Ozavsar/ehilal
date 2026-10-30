@@ -29,11 +29,11 @@ export default function VideoCard({
       });
 
   return (
-    <Card className="border-muted flex h-full flex-col gap-0 overflow-hidden rounded-[5px] border">
+    <Card className="border-muted flex h-full flex-col gap-0 overflow-hidden border">
       <CardHeader className="relative overflow-hidden p-0">
         <div className="group relative aspect-video object-cover">
           {isFeatured && (
-            <Badge className="bg-muted hover:bg-primary/50 absolute top-2 left-4 z-10 w-fit border-red-600 text-red-600 backdrop-blur-sm select-none dark:border-red-300 dark:text-red-300">
+            <Badge className="bg-muted hover:bg-primary/50 absolute top-2 left-4 z-(--z-raised) w-fit border-red-600 text-red-600 backdrop-blur-sm select-none dark:border-red-300 dark:text-red-300">
               <LuFlame className="mr-1 size-4" />
               Featured
             </Badge>

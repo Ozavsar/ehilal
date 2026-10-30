@@ -16,11 +16,11 @@ export default function ConferencesContainer({
   totalPages,
 }: IConferencesContainerProps) {
   return (
-    <main className="container flex min-h-screen flex-col justify-between sm:pb-8 lg:px-24">
+    <main className="lg:px-page-gutter container flex min-h-screen flex-col justify-between sm:pb-8">
       <div className="flex flex-col">
         <MotionGrid>
           {conferences.map((conference) => (
-            <ConferenceCard key={conference.title} {...conference} />
+            <ConferenceCard key={conference.documentId} {...conference} />
           ))}
         </MotionGrid>
       </div>

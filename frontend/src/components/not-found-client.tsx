@@ -3,26 +3,32 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { motion, AnimatePresence, useAnimationControls, type Variants } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ROUTES } from "@/config/constants/app-routes";
+import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 
 interface NotFoundClientProps {
   imageUrl: string | undefined;
 }
 
+type Star = { x: number; y: number; size: number; opacity: number; duration: number };
+type TrailParticle = { x: number; y: number; width: number; height: number };
+
+const PLANET_COLORS = ["#0D0E52", "#4C1D95", "#8E44AD", "#00BFFF", "#FFD700"] as const;
+
 export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
   const router = useRouter();
   const [clickCount, setClickCount] = useState(0);
-  const [stars, setStars] = useState<{ x: number; y: number; size: number; opacity: number }[]>([]);
+  const [stars, setStars] = useState<Star[]>([]);
   const [planets, setPlanets] = useState<
     { x: number; y: number; size: number; color: string; speed: number }[]
   >([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageControls = useAnimation();
-  const [showTrail, setShowTrail] = useState(false);
+  const imageControls = useAnimationControls();
+  // Random values are generated in effects/handlers, never during render
+  const [trail, setTrail] = useState<TrailParticle[] | null>(null);
 
   // Generate stars for the space background
   useEffect(() => {
@@ -36,6 +42,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
         y: Math.random() * height,
         size: Math.random() * 2 + 1,
         opacity: Math.random() * 0.7 + 0.3,
+        duration: Math.random() * 3 + 2,
       }));
       setStars(newStars);
 
@@ -44,10 +51,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
         x: Math.random() * width,
         y: Math.random() * height,
         size: Math.random() * 30 + 20,
-        color: ["#0D0E52", "#4C1D95", "#8E44AD", "#00BFFF", "#FFD700"][
-          Math.floor(Math.random() * 5)
-        ],
-
+        color: PLANET_COLORS[Math.floor(Math.random() * PLANET_COLORS.length)] ?? PLANET_COLORS[0],
         speed: Math.random() * 0.5 + 0.2,
       }));
       setPlanets(newPlanets);
@@ -73,8 +77,15 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
       });
 
     // Show rocket trail effect
-    setShowTrail(true);
-    setTimeout(() => setShowTrail(false), 1000);
+    setTrail(
+      Array.from({ length: 8 }, () => ({
+        x: Math.random() * 100 - 50,
+        y: Math.random() * 100 - 50,
+        width: Math.random() * 10 + 5,
+        height: Math.random() * 10 + 5,
+      })),
+    );
+    setTimeout(() => setTrail(null), 1000);
   };
 
   const getImageMessage = () => {
@@ -86,12 +97,14 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
     return <p>Initiating emergency return protocol. Prepare for lightspeed jump to home!</p>;
   };
 
-  if (clickCount > 5) {
-    router.push(ROUTES.INTERNAL.HOME);
-  }
+  useEffect(() => {
+    if (clickCount > 5) {
+      router.push(INTERNAL_ROUTES.HOME.path);
+    }
+  }, [clickCount, router]);
 
   // Glitch effect variants
-  const glitchVariants = {
+  const glitchVariants: Variants = {
     hidden: { opacity: 0, y: -20 },
     visible: {
       opacity: 1,
@@ -144,7 +157,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
             }}
             transition={{
               repeat: Number.POSITIVE_INFINITY,
-              duration: Math.random() * 3 + 2,
+              duration: star.duration,
               ease: "easeInOut",
             }}
           />
@@ -179,19 +192,16 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
 
       {/* Rocket trail effect */}
       <AnimatePresence>
-        {showTrail && (
+        {trail && (
           <motion.div
             initial={{ opacity: 1 }}
             animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1 }}
-            className="absolute"
-            style={{
-              zIndex: 10,
-            }}
+            className="absolute z-(--z-raised)"
           >
             <div className="relative">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {trail.map((particle, i) => (
                 <motion.div
                   key={i}
                   className="absolute rounded-full bg-orange-500"
@@ -202,15 +212,15 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
                     opacity: 0.8,
                   }}
                   animate={{
-                    x: Math.random() * 100 - 50,
-                    y: Math.random() * 100 - 50,
+                    x: particle.x,
+                    y: particle.y,
                     scale: 0,
                     opacity: 0,
                   }}
                   transition={{ duration: 1 }}
                   style={{
-                    width: Math.random() * 10 + 5,
-                    height: Math.random() * 10 + 5,
+                    width: particle.width,
+                    height: particle.height,
                   }}
                 />
               ))}
@@ -219,7 +229,7 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
         )}
       </AnimatePresence>
 
-      <div className="relative z-10 mx-auto flex max-w-md flex-col items-center text-center">
+      <div className="relative z-(--z-raised) mx-auto flex max-w-md flex-col items-center text-center">
         <motion.div
           className="mb-10 flex overflow-visible text-6xl font-bold tracking-tighter sm:text-9xl"
           initial="hidden"
@@ -272,11 +282,11 @@ export function NotFoundClient({ imageUrl }: NotFoundClientProps) {
               {/* Helmet visor reflection */}
               <div className="from-primary absolute inset-0 bg-linear-to-br via-transparent to-transparent" />
 
-              {/* Your image */}
+              {/* Astronaut image from the Strapi not-found page */}
               {imageUrl ? (
                 <div className="relative h-full w-full">
                   <Image
-                    src={imageUrl || "/placeholder.svg"}
+                    src={imageUrl}
                     alt="Astronaut lost in space"
                     fill
                     sizes="(max-width: 768px) 256px, 320px"

@@ -5,7 +5,7 @@ import type { IStrapiConference } from "@/types";
 
 export default function ConferenceCard({ title, date, location, images }: IStrapiConference) {
   return (
-    <Card className="flex h-full flex-col gap-0 overflow-hidden rounded-[5px]">
+    <Card className="flex h-full flex-col gap-0 overflow-hidden">
       <CardHeader className="border-primary bg-primary aspect-video h-fit overflow-hidden border-b-8 p-0">
         <Gallery images={images} title={title} />
       </CardHeader>

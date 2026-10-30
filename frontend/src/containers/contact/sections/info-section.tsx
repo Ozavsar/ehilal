@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { COMPANY_LINKEDIN_URL } from "@/config/constants";
+import { COMPANY_LINKEDIN_URL, YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
 import { LuLinkedin, LuMail, LuYoutube } from "react-icons/lu";
 import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import MotionGrid from "@/components/motion-grid";
@@ -23,19 +20,27 @@ interface IInfoSectionProps {
   };
 }
 
-// Links copied from the Instagram app carry a query string (?igsh=...), so parse instead of splitting
-function getInstagramHandle(url: string) {
+// CMS URLs may end with "/", lack "www" or carry a query string (?igsh=...), so parse them
+// instead of indexing split("/"). Returns [] for empty or invalid URLs.
+function getPathSegments(url: string | null | undefined): string[] {
+  if (!url) return [];
   try {
-    return "@" + new URL(url).pathname.split("/").filter(Boolean)[0];
+    return new URL(url).pathname.split("/").filter(Boolean);
   } catch {
-    return url;
+    return [];
   }
 }
 
+const toHandle = (segment: string | undefined) =>
+  segment ? `@${segment.replace(/^@/, "")}` : undefined;
+
 export default function InfoSection({ content, socialMediaLinks, className }: IInfoSectionProps) {
+  const youtubeHandle = getPathSegments(socialMediaLinks.youtube).find((s) => s.startsWith("@"));
+
+  // Links not filled in Strapi (e.g. the optional Instagram) are skipped
   const links = [
     {
-      href: `mailto:${socialMediaLinks.email}`,
+      href: socialMediaLinks.email && `mailto:${socialMediaLinks.email}`,
       icon: LuMail,
       title: "Mail Me",
       label: socialMediaLinks.email,
@@ -45,69 +50,54 @@ export default function InfoSection({ content, socialMediaLinks, className }: II
       href: socialMediaLinks.twitter_x,
       icon: BsTwitterX,
       title: "Follow Me",
-      label: "@" + socialMediaLinks.twitter_x.split("/")[3],
+      label: toHandle(getPathSegments(socialMediaLinks.twitter_x)[0]) ?? "X (Twitter)",
       lowercase: true,
     },
     {
       href: socialMediaLinks.linkedin,
       icon: LuLinkedin,
       title: "Connect with Me",
-      label: socialMediaLinks.linkedin.split("/")[4].replace(/-/g, " "),
+      // linkedin.com/in/<name>
+      label: getPathSegments(socialMediaLinks.linkedin).at(-1)?.replace(/-/g, " ") ?? "LinkedIn",
       lowercase: false,
     },
     {
-      href: socialMediaLinks.youtube || "#",
+      href: socialMediaLinks.youtube || `https://www.youtube.com/${YOUTUBE_CHANNEL_HANDLE}`,
       icon: LuYoutube,
       title: "Subscribe",
-      label: socialMediaLinks.youtube?.split("/")[3] || "@elifhilalumucu",
+      label: youtubeHandle ?? YOUTUBE_CHANNEL_HANDLE,
       lowercase: true,
     },
-    ...(socialMediaLinks.instagram
-      ? [
-          {
-            href: socialMediaLinks.instagram,
-            icon: BsInstagram,
-            title: "Follow on Instagram",
-            label: getInstagramHandle(socialMediaLinks.instagram),
-            lowercase: true,
-          },
-        ]
-      : []),
+    {
+      href: socialMediaLinks.instagram,
+      icon: BsInstagram,
+      title: "Follow on Instagram",
+      label: toHandle(getPathSegments(socialMediaLinks.instagram)[0]) ?? "Instagram",
+      lowercase: true,
+    },
     {
       href: COMPANY_LINKEDIN_URL,
       icon: LuLinkedin,
       title: "Connect with Us",
-      label: COMPANY_LINKEDIN_URL.split("/")[4],
+      // linkedin.com/company/<name>
+      label: getPathSegments(COMPANY_LINKEDIN_URL).at(-1) ?? "Karakod",
       lowercase: false,
     },
-  ];
+  ].flatMap(({ href, ...link }) => (href ? [{ href, ...link }] : []));
+
   return (
     <div className={cn("max-md:mb-8", className)}>
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-4 text-2xl font-bold uppercase sm:text-3xl"
-      >
+      <h1 className="mb-4 text-2xl font-bold uppercase transition-[opacity,translate] duration-500 motion-reduce:transition-none sm:text-3xl starting:-translate-y-5 starting:opacity-0">
         {content.title}
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-sm:text-sm"
-      >
+      </h1>
+      <p className="transition-[opacity,translate] duration-500 motion-reduce:transition-none max-sm:text-sm starting:-translate-y-5 starting:opacity-0">
         {content.description}
-      </motion.p>
+      </p>
       <MotionGrid className="mt-4 flex flex-col gap-4 text-sm">
-        {links.map(({ href, icon: Icon, title, label, lowercase }, i) => (
-          <Link key={i} href={href} aria-label={title} className="w-full">
-            <motion.div
-              whileHover={{ y: -4, scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              className="group border-border/50 bg-background/50 hover:border-primary/50 hover:bg-primary/5 dark:bg-card/40 relative flex w-full items-center gap-5 overflow-hidden rounded-2xl border p-5 shadow-sm transition-colors duration-300 hover:shadow-md"
-            >
-              <div className="relative z-10 flex items-center gap-5">
+        {links.map(({ href, icon: Icon, title, label, lowercase }) => (
+          <Link key={title} href={href} aria-label={title} className="w-full">
+            <div className="group border-border/50 bg-background/50 hover:border-primary/50 hover:bg-primary/5 dark:bg-card/40 relative flex w-full items-center gap-5 overflow-hidden rounded-2xl border p-5 shadow-sm transition-[color,background-color,border-color,box-shadow,translate,scale] duration-300 hover:shadow-md motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.01] motion-safe:active:scale-[0.98]">
+              <div className="relative z-(--z-raised) flex items-center gap-5">
                 <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:shadow-primary/20 flex size-12 items-center justify-center rounded-xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:text-white group-hover:shadow-lg">
                   <Icon className="size-5" />
                 </div>
@@ -121,7 +111,7 @@ export default function InfoSection({ content, socialMediaLinks, className }: II
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </Link>
         ))}
       </MotionGrid>

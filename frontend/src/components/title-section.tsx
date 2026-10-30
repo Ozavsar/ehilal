@@ -1,12 +1,12 @@
-"use client";
-
-import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface TitleSectionProps {
   text: string;
   backgroundText: string;
 }
 
+// Entrance animations are @starting-style transitions (Tailwind `starting:`): they run when the
+// element is first rendered, need no client JS, and are skipped for reduced-motion users.
 export default function TitleSection({ text, backgroundText }: TitleSectionProps) {
   const words = text.trim().split(" ");
   const lastWord = words.pop() || "";
@@ -16,52 +16,44 @@ export default function TitleSection({ text, backgroundText }: TitleSectionProps
     <section>
       {/* Desktop */}
       <div className="relative flex flex-col items-center justify-center overflow-visible py-17.5 max-sm:hidden">
-        {/* Background text animation */}
-        <motion.span
-          initial={{ opacity: 0, scale: 1.2, y: 40 }}
-          animate={{ opacity: 0.25, scale: 1, y: 0 }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="text-muted-foreground/25 dark:text-card absolute top-1/3 left-1/2 -z-10 -translate-x-1/2 -translate-y-1/3 text-[110px] font-extrabold tracking-[5px] uppercase"
+        <span
+          className={cn(
+            "text-muted-foreground/25 dark:text-card text-backdrop tracking-backdrop absolute top-1/3 left-1/2 z-(--z-behind) -translate-x-1/2 -translate-y-1/3 font-extrabold uppercase opacity-25",
+            "transition-[opacity,transform] duration-1500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none starting:[transform:translateY(40px)_scale(1.2)] starting:opacity-0",
+          )}
         >
           {backgroundText}
-        </motion.span>
+        </span>
 
-        {/* Foreground title animation */}
-        <motion.h2
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
-          className="text-[56px] font-black uppercase"
+        <h2
+          className={cn(
+            "text-page-title font-black uppercase",
+            "transition-[opacity,translate] duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none starting:translate-y-15 starting:opacity-0",
+          )}
         >
           {plainWord}{" "}
-          <motion.span
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className={plainWord ? "text-primary inline-block" : ""}
+          <span
+            className={cn(
+              plainWord && "text-primary inline-block",
+              "transition-[opacity,translate] duration-1000 ease-out motion-reduce:transition-none starting:translate-x-2.5 starting:opacity-0",
+            )}
           >
             {lastWord}
-          </motion.span>
-        </motion.h2>
+          </span>
+        </h2>
       </div>
 
       {/* Mobile */}
-      <AnimatePresence mode="wait">
-        <motion.div className="bg-muted fixed top-0 left-0 z-20 w-full py-4 pl-6 shadow-lg sm:hidden">
-          <motion.h2
-            initial={{ opacity: 0, scale: 0.9, filter: "blur(8px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 0.85, filter: "blur(10px)" }}
-            transition={{
-              duration: 0.7,
-              ease: [0.25, 1, 0.5, 1],
-            }}
-            className="text-2xl font-black uppercase"
-          >
-            {plainWord} <span className={plainWord ? "text-primary" : ""}>{lastWord}</span>
-          </motion.h2>
-        </motion.div>
-      </AnimatePresence>
+      <div className="bg-muted fixed top-0 left-0 z-(--z-title-bar) w-full py-4 pl-6 shadow-lg sm:hidden">
+        <h2
+          className={cn(
+            "text-2xl font-black uppercase",
+            "transition-[opacity,scale,filter] duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none starting:scale-90 starting:opacity-0 starting:blur-sm",
+          )}
+        >
+          {plainWord} <span className={plainWord ? "text-primary" : ""}>{lastWord}</span>
+        </h2>
+      </div>
     </section>
   );
 }
