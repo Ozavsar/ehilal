@@ -1,7 +1,7 @@
+import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { MEDIUM_USER_ID } from "@/config/constants";
 import { getCleanSlug } from "@/lib/utils";
-import { getImage } from "../getImage";
 import { BlogSource, type IBlog, type IBlogPreview, type IMediumParagraph } from "@/types";
 
 export const REVALIDATE = 60 * 60; // 1 hour
@@ -84,6 +84,8 @@ const POST_QUERY = `
               type
               metadata {
                 id
+                originalWidth
+                originalHeight
               }
               iframe {
                 mediaResource {
@@ -140,7 +142,13 @@ const paragraphSchema = z.object({
   name: z.string(),
   text: z.string().nullish(),
   type: z.string(),
-  metadata: z.object({ id: z.string() }).nullish(),
+  metadata: z
+    .object({
+      id: z.string(),
+      originalWidth: z.number().nullish(),
+      originalHeight: z.number().nullish(),
+    })
+    .nullish(),
   iframe: z
     .object({
       mediaResource: z.object({ iframeSrc: z.string(), title: z.string().nullish() }),
@@ -206,7 +214,7 @@ export function getMediumPostId(slug: string): string | null {
   return POST_ID_PATTERN.test(postId) ? postId : null;
 }
 
-export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
+async function fetchAllArticlePreviews(): Promise<IBlogPreview[]> {
   const previews: IBlogPreview[] = [];
   let from: string | null = null;
 
@@ -217,44 +225,40 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
     const { posts, pagingInfo } = parseResponse(listResponseSchema, json, "post list").data
       .userResult.homepagePostsConnection;
 
-    const pagePreviews = await Promise.all(
-      posts.map(async (post): Promise<IBlogPreview> => {
-        const imageUrl = post.previewImage?.id
-          ? `${MEDIUM_IMAGE_URL}/da:true/${post.previewImage.id}`
-          : "";
-
-        let blurDataURL = "";
-        if (imageUrl) {
-          try {
-            blurDataURL = (await getImage(imageUrl)).base64;
-          } catch {
-            console.warn("Could not create placeholder:", imageUrl);
-          }
-        }
-
-        return {
+    previews.push(
+      ...posts.map(
+        (post): IBlogPreview => ({
           title: post.title,
           externalURL: post.mediumUrl,
           externalBlogSource: BlogSource.MEDIUM,
           description: post.extendedPreviewContent?.subtitle || "",
-          thumbnailURL: imageUrl,
-          blurDataURL,
+          thumbnailURL: post.previewImage?.id
+            ? `${MEDIUM_IMAGE_URL}/da:true/${post.previewImage.id}`
+            : "",
           publishedAt: new Date(post.firstPublishedAt).toISOString(),
           slug: getMediumArticleSlug(post.mediumUrl),
-        };
-      }),
+        }),
+      ),
     );
-    previews.push(...pagePreviews);
 
     const next = pagingInfo.next?.from;
     if (!next) break;
     from = next;
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   return previews;
 }
+
+/**
+ * Every post the user published, newest first, without blur placeholders. The list takes one
+ * request per 10 posts, so it is cached as a whole across requests (fetches inside unstable_cache
+ * are not cached on their own). Errors aren't cached; a failed refresh keeps the previous list.
+ */
+export const getAllArticlePreviews = unstable_cache(
+  fetchAllArticlePreviews,
+  ["medium-article-previews"],
+  { revalidate: REVALIDATE, tags: ["articles"] },
+);
 
 // Returns null for unknown ids, posts without a body and posts by other authors.
 // Throws on network/HTTP failures and unexpected response shapes.
@@ -287,7 +291,13 @@ export async function getSingleArticle(postId: string): Promise<IBlog | null> {
         name: p.name,
         text: p.text ?? "",
         type: p.type,
-        metadata: p.metadata ?? null,
+        metadata: p.metadata
+          ? {
+              id: p.metadata.id,
+              originalWidth: p.metadata.originalWidth ?? undefined,
+              originalHeight: p.metadata.originalHeight ?? undefined,
+            }
+          : null,
         iframe: p.iframe
           ? {
               mediaResource: {

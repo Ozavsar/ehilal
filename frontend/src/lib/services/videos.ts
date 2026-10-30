@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { unstable_rethrow } from "next/navigation";
 import { fetchAPI } from "../api/fetchAPI";
-import { getImage } from "../getImage";
 import { YOUTUBE_CHANNEL_ID } from "@/config/constants";
 import { getUploadedVideos, getYoutubeThumbnails } from "@/lib/services/youtube";
 import type {
@@ -31,7 +30,7 @@ async function getAllStrapiVideos() {
 
 /**
  * get all videos (YouTube channel + Strapi), sorted, without blur placeholders.
- * Use `withVideoPlaceholders` on the slice that is actually rendered.
+ * Use `withBlurDataURLs` on the slice that is actually rendered.
  * Strapi is required (a failure throws); YouTube is best effort.
  * cache(): generateMetadata and the page share one result per request.
  */
@@ -112,25 +111,6 @@ export const getAllVideos = cache(async (): Promise<IVideoList> => {
 
   return { videos: allVideos, isComplete: youtubeVideos.length > 0 };
 });
-
-/**
- * add blur placeholders; a broken thumbnail only loses its placeholder.
- */
-export async function withVideoPlaceholders(videos: IUnifiedVideo[]): Promise<IUnifiedVideo[]> {
-  return Promise.all(
-    videos.map(async (video) => {
-      if (!video.thumbnailURL) return video;
-
-      try {
-        const placeholder = await getImage(video.thumbnailURL);
-        return { ...video, blurDataURL: placeholder.base64 };
-      } catch (error) {
-        console.error(`Failed to get placeholder for ${video.thumbnailURL}`, error);
-        return video;
-      }
-    }),
-  );
-}
 
 // Extract the YouTube video ID from a URL
 function extractYoutubeId(url: string): string | null {

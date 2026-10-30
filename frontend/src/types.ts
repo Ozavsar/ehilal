@@ -53,7 +53,8 @@ export interface IMediumParagraph {
   name: string;
   text: string;
   type: string;
-  metadata: { id: string } | null;
+  // originalWidth/originalHeight: pixel size of the source image (image paragraphs)
+  metadata: { id: string; originalWidth?: number; originalHeight?: number } | null;
   iframe: { mediaResource: { iframeSrc: string; title: string | null } } | null;
 }
 

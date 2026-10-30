@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import HomeContainer from "@/containers/home";
 import { getHomePageContent } from "@/lib/services/pages";
-import { getImage } from "@/lib/getImage";
+import { getStrapiBlurDataURL } from "@/lib/getImage";
 import { orNotFound } from "@/lib/api/fetchAPI";
 
 export default async function Home() {
@@ -10,13 +10,8 @@ export default async function Home() {
     notFound();
   }
 
-  // The blur placeholder is cosmetic: if the image host fails, render without it
-  let blurDataURL: string | undefined;
-  try {
-    blurDataURL = (await getImage(content.hero_image.url)).base64;
-  } catch (error) {
-    console.error(`Failed to get placeholder for ${content.hero_image.url}`, error);
-  }
+  // Built from a small Strapi format; undefined (no placeholder) if the image host fails
+  const blurDataURL = await getStrapiBlurDataURL(content.hero_image);
 
   return (
     <HomeContainer content={{ ...content, hero_image: { ...content.hero_image, blurDataURL } }} />

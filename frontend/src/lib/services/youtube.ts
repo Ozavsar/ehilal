@@ -23,16 +23,6 @@ const thumbnailsSchema = z
   })
   .nullish();
 
-const channelsSchema = z.object({
-  items: z
-    .array(
-      z.object({
-        contentDetails: z.object({ relatedPlaylists: z.object({ uploads: z.string() }) }),
-      }),
-    )
-    .nullish(),
-});
-
 const playlistItemsSchema = z.object({
   nextPageToken: z.string().nullish(),
   items: z.array(
@@ -99,13 +89,10 @@ async function youtubeGet<T>(
  * The channel's uploads, newest first (up to MAX_UPLOAD_PAGES pages). Throws when YouTube can't be read.
  */
 export async function getUploadedVideos(channelId: string): Promise<IVideoPreview[]> {
-  const channels = await youtubeGet(
-    "channels",
-    { part: "contentDetails", id: channelId },
-    channelsSchema,
-  );
-  const uploadsPlaylistId = channels.items?.[0]?.contentDetails.relatedPlaylists.uploads;
-  if (!uploadsPlaylistId) throw new Error(`Uploads playlist not found for channel ${channelId}`);
+  // A channel's uploads playlist id is its id with "UU" in place of the leading "UC", so no
+  // channels.list request is needed to look it up
+  if (!channelId.startsWith("UC")) throw new Error(`Unexpected YouTube channel id: ${channelId}`);
+  const uploadsPlaylistId = `UU${channelId.slice(2)}`;
 
   const videos: IVideoPreview[] = [];
   // Pages are cached separately, so a refresh between two of them could repeat a video

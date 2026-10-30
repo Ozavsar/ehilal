@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { SUBSTACK_USERNAME, SUBSTACK_USER_ID } from "@/config/constants";
 import { BlogSource, type IBlogPreview } from "@/types";
-import { getImage } from "../getImage";
 
 export const REVALIDATE = 60 * 60; // 1 hour
 
@@ -28,6 +27,7 @@ function toISODate(value: string): string {
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
 
+// Without blur placeholders. One request, kept in the fetch cache across requests.
 export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
   const url = new URL(`https://substack.com/api/v1/reader/feed/profile/${SUBSTACK_USER_ID}`);
 
@@ -54,30 +54,16 @@ export async function getAllArticlePreviews(): Promise<IBlogPreview[]> {
 
   const posts = parsed.data.items.flatMap((item) => (item.post ? [item.post] : []));
 
-  return Promise.all(
-    posts.map(async (post): Promise<IBlogPreview> => {
-      const coverImage = post.cover_image || "";
-
-      let blurDataURL = "";
-      if (coverImage) {
-        try {
-          blurDataURL = (await getImage(coverImage)).base64;
-        } catch {
-          console.warn("Could not create placeholder:", coverImage);
-        }
-      }
-
-      return {
-        title: post.title,
-        externalURL: `https://${SUBSTACK_USERNAME}.substack.com/p/${post.slug}`,
-        externalBlogSource: BlogSource.SUBSTACK,
-        description: post.subtitle || "",
-        thumbnailURL: coverImage,
-        blurDataURL,
-        publishedAt: toISODate(post.post_date),
-        // Substack posts are not rendered here; the card links out to Substack
-        slug: null,
-      };
+  return posts.map(
+    (post): IBlogPreview => ({
+      title: post.title,
+      externalURL: `https://${SUBSTACK_USERNAME}.substack.com/p/${post.slug}`,
+      externalBlogSource: BlogSource.SUBSTACK,
+      description: post.subtitle || "",
+      thumbnailURL: post.cover_image || "",
+      publishedAt: toISODate(post.post_date),
+      // Substack posts are not rendered here; the card links out to Substack
+      slug: null,
     }),
   );
 }

@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { SITE_URL } from "@/config/site";
-import { getAllConferences } from "@/lib/services/conferences";
+import { getConferenceCount } from "@/lib/services/conferences";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 
 export async function GET() {
   const now = new Date().toISOString();
 
-  const response = await getAllConferences(0, 1);
-  const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil((await getConferenceCount()) / ITEMS_PER_PAGE);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

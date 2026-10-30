@@ -2,7 +2,11 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import ConferencesContainer from "@/containers/conferences";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import { getAllConferences } from "@/lib/services/conferences";
+import {
+  getAllConferences,
+  getConferenceCount,
+  withCoverPlaceholders,
+} from "@/lib/services/conferences";
 import { buildMeta } from "@/lib/metadata";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 import { Metadata } from "next";
@@ -12,8 +16,7 @@ export const dynamicParams = true;
 // Canonical positive integers only: rejects "abc", "1abc", "01", "0"
 const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
 
-// Shared by the page and generateMetadata so image placeholders are built once per request
-// (and not at all for out-of-range pages, which return no data)
+// Shared by the page and generateMetadata: one Strapi request per render
 const getConferencesPage = cache((pageNum: number) =>
   getAllConferences(ITEMS_PER_PAGE * (pageNum - 1), ITEMS_PER_PAGE),
 );
@@ -42,9 +45,12 @@ export default async function ConferencesPage(props: { params: Promise<{ page: s
   const { page } = await props.params;
   const { conferences, pageNum, totalPages } = await getPageOrNotFound(page);
 
+  // Placeholders only for the cover photo of the conferences on this page
+  const pageConferences = await withCoverPlaceholders(conferences);
+
   return (
     <ConferencesContainer
-      conferences={conferences}
+      conferences={pageConferences}
       pageNumber={pageNum.toString()}
       totalPages={totalPages}
     />
@@ -53,8 +59,7 @@ export default async function ConferencesPage(props: { params: Promise<{ page: s
 
 export async function generateStaticParams() {
   try {
-    const response = await getAllConferences(0, 1);
-    const totalPages = Math.ceil(response.meta.pagination.total / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil((await getConferenceCount()) / ITEMS_PER_PAGE);
 
     return Array.from({ length: totalPages }, (_, i) => ({
       page: (i + 1).toString(),

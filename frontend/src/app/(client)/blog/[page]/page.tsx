@@ -7,6 +7,7 @@ import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 import { getAllArticles, getArticleBySlug, getArticlesPage } from "@/lib/services/blog";
 import { getMediumPostId } from "@/lib/services/medium";
+import { withBlurDataURLs } from "@/lib/getImage";
 import { buildMeta } from "@/lib/metadata";
 
 export const dynamicParams = true;
@@ -37,9 +38,10 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
     notFound();
   }
 
-  return (
-    <BlogContainer articles={result.items} currentPage={pageNum} totalPages={result.totalPages} />
-  );
+  // Placeholders only for the articles on this page
+  const articles = await withBlurDataURLs(result.items, (article) => article.thumbnailURL);
+
+  return <BlogContainer articles={articles} currentPage={pageNum} totalPages={result.totalPages} />;
 }
 
 export async function generateStaticParams() {

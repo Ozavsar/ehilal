@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import VideosContainer from "@/containers/videos";
 import { ITEMS_PER_PAGE } from "@/config/constants";
-import { getAllVideos, withVideoPlaceholders } from "@/lib/services/videos";
+import { getAllVideos } from "@/lib/services/videos";
+import { withBlurDataURLs } from "@/lib/getImage";
 import { buildMeta } from "@/lib/metadata";
 import { SITE_NAME, SITE_URL } from "@/config/site";
 
@@ -45,7 +46,7 @@ export default async function VideosPage(props: { params: Promise<{ page: string
   const { videos, pageNum, totalPages } = await getPageOrNotFound(page);
 
   // Placeholders only for the videos on this page
-  const pageVideos = await withVideoPlaceholders(videos);
+  const pageVideos = await withBlurDataURLs(videos, (video) => video.thumbnailURL);
 
   return (
     <VideosContainer videos={pageVideos} pageNumber={pageNum.toString()} totalPages={totalPages} />

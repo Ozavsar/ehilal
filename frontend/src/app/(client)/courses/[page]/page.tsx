@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import CourseContainer from "@/containers/courses";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllCourses } from "@/lib/services/udemy";
+import { withBlurDataURLs } from "@/lib/getImage";
 import { Metadata } from "next";
 import { buildMeta } from "@/lib/metadata";
 import { SITE_NAME, SITE_URL } from "@/config/site";
@@ -21,7 +22,7 @@ async function getPageOrNotFound(page: string) {
   }
 
   const pageNum = Number(page);
-  // Cached per request, so generateMetadata and the page share one fetch and one set of placeholders
+  // Cached per request, so generateMetadata and the page share one result
   const courses = await getAllCourses();
   const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
 
@@ -40,8 +41,15 @@ export default async function CoursesPage(props: { params: Promise<{ page: strin
   const { page } = await props.params;
   const { courses, pageNum, totalPages } = await getPageOrNotFound(page);
 
+  // Placeholders only for the courses on this page
+  const pageCourses = await withBlurDataURLs(courses, (course) => course.thumbnailURL);
+
   return (
-    <CourseContainer courses={courses} pageNumber={pageNum.toString()} totalPages={totalPages} />
+    <CourseContainer
+      courses={pageCourses}
+      pageNumber={pageNum.toString()}
+      totalPages={totalPages}
+    />
   );
 }
 

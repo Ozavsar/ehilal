@@ -4,7 +4,9 @@ import fs from "fs";
 import path from "path";
 
 export const runtime = "nodejs";
-export const revalidate = 0;
+// The index only changes when a sitemap route is added or edited, i.e. on a deploy: prerendered at
+// build time and refreshed daily instead of reading the file system on every request
+export const revalidate = 86400;
 
 export async function GET() {
   const appDir = path.join(process.cwd(), "src/app/(sitemaps)");

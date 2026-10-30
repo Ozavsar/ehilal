@@ -1,6 +1,5 @@
 import { cache } from "react";
 import { UDEMY_USER_ID } from "@/config/constants";
-import { getImage } from "../getImage";
 import type { ICourse } from "@/types";
 
 const REVALIDATE = 60 * 60 * 24; // 24 hours
@@ -25,7 +24,8 @@ interface IUdemyResponse {
   results: IUdemyCourse[];
 }
 
-// cache(): generateMetadata and the page share one fetch and one set of blur placeholders per request
+// Every course, without blur placeholders (add them to the rendered page with withBlurDataURLs).
+// The Udemy responses are in the fetch cache; cache() shares the result within one request.
 export const getAllCourses = cache(async (): Promise<ICourse[]> => {
   const fields = [
     "@default",
@@ -65,32 +65,16 @@ export const getAllCourses = cache(async (): Promise<ICourse[]> => {
     url = json.next?.startsWith("https://www.udemy.com/api-2.0/") ? json.next : null;
   }
 
-  const courses = await Promise.all(
-    results.map(async (course): Promise<ICourse> => {
-      const thumbnailURL = course.image_480x270 || null;
-
-      let blurDataURL: string | undefined;
-      if (thumbnailURL) {
-        try {
-          blurDataURL = (await getImage(thumbnailURL)).base64;
-        } catch (error) {
-          console.error(`Failed to get placeholder for ${thumbnailURL}`, error);
-        }
-      }
-
-      return {
-        title: course.title,
-        headline: course.headline,
-        contentInfo: course.content_info,
-        instructionalLevel: course.instructional_level_simple,
-        numReviews: String(course.num_reviews),
-        rating: course.avg_rating ? course.avg_rating.toFixed(1) : null,
-        udemyURL: `https://www.udemy.com${course.url}`,
-        thumbnailURL,
-        blurDataURL,
-      };
+  return results.map(
+    (course): ICourse => ({
+      title: course.title,
+      headline: course.headline,
+      contentInfo: course.content_info,
+      instructionalLevel: course.instructional_level_simple,
+      numReviews: String(course.num_reviews),
+      rating: course.avg_rating ? course.avg_rating.toFixed(1) : null,
+      udemyURL: `https://www.udemy.com${course.url}`,
+      thumbnailURL: course.image_480x270 || null,
     }),
   );
-
-  return courses;
 });

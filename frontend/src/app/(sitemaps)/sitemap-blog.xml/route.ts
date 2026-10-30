@@ -4,6 +4,10 @@ import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { SITE_URL } from "@/config/site";
 import { getAllArticles } from "@/lib/services/blog";
 
+// Dynamic on purpose (no `revalidate`): a route handler with `revalidate` is prerendered at build time,
+// and the build would fail whenever Medium and Substack are both down. The data behind it is cached
+// across requests (Medium list in unstable_cache, Substack in the fetch cache), so a request only
+// builds the XML; a stale list is served while it refreshes in the background.
 export async function GET() {
   const now = new Date().toISOString();
 
@@ -39,6 +43,10 @@ export async function GET() {
   </urlset>`;
 
   return new NextResponse(xml, {
-    headers: { "Content-Type": "application/xml; charset=utf-8" },
+    headers: {
+      "Content-Type": "application/xml; charset=utf-8",
+      // Same lifetime as the cached article lists
+      "Cache-Control": "public, max-age=3600",
+    },
   });
 }
