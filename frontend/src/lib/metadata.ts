@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import {
-  DEFAULT_BANNER,
-  SITE_NAME,
-  SITE_URL,
-  TWITTER_HANDLE,
-  TWITTER_USER_ID,
-} from "@/config/site";
+import { SITE_URL } from "@/config/site";
+import { getSiteSettings } from "@/lib/services";
 
 interface BuildMetaOptions {
   title: string;
@@ -20,14 +15,21 @@ interface BuildMetaOptions {
   };
 }
 
-export function buildMeta({
+export async function buildMeta({
   title,
   description,
   path,
   type = "website",
   image,
-}: BuildMetaOptions): Metadata {
+}: BuildMetaOptions): Promise<Metadata> {
+  const site = await getSiteSettings();
   const url = `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const ogImage = image || {
+    ...site.defaultOgImage,
+    alt: site.defaultOgImage.alt || `${site.siteName} Open Graph Image`,
+  };
+  const twitterImageAlt =
+    (image ? image.alt : site.defaultOgImage.alt) || `${site.siteName} Twitter Card Image`;
 
   return {
     title,
@@ -38,8 +40,8 @@ export function buildMeta({
       description,
       type,
       url,
-      siteName: SITE_NAME,
-      images: [image || DEFAULT_BANNER],
+      siteName: site.siteName,
+      images: [ogImage],
       locale: "en_US",
       alternateLocale: ["tr_TR"],
     },
@@ -47,16 +49,11 @@ export function buildMeta({
       card: "summary_large_image",
       title,
       description,
-      site: TWITTER_HANDLE,
-      siteId: TWITTER_USER_ID,
-      creator: TWITTER_HANDLE,
-      creatorId: TWITTER_USER_ID,
-      images: [
-        {
-          url: image?.url || DEFAULT_BANNER,
-          alt: image?.alt || `${SITE_NAME} Twitter Card Image`,
-        },
-      ],
+      site: site.twitterHandle,
+      siteId: site.twitterUserId,
+      creator: site.twitterHandle,
+      creatorId: site.twitterUserId,
+      images: [{ url: ogImage.url, alt: twitterImageAlt }],
     },
     alternates: {
       canonical: url,

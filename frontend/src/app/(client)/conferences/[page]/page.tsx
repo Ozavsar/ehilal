@@ -8,7 +8,8 @@ import {
   withCoverPlaceholders,
 } from "@/lib/services/conferences";
 import { buildMeta } from "@/lib/metadata";
-import { SITE_NAME, SITE_URL } from "@/config/site";
+import { SITE_URL } from "@/config/site";
+import { getSiteSettings } from "@/lib/services";
 import { Metadata } from "next";
 
 export const dynamicParams = true;
@@ -78,12 +79,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { page } = await params;
   const { pageNum } = await getPageOrNotFound(page);
+  const { siteName } = await getSiteSettings();
 
   const title = pageNum > 1 ? `Conferences – Page ${pageNum}` : "Conferences & Talks";
   const description =
     pageNum > 1
-      ? `Explore the conferences and talks attended by ${SITE_NAME} — page ${pageNum}.`
-      : `Explore all conferences, panels, and events where ${SITE_NAME} has spoken or participated.`;
+      ? `Explore the conferences and talks attended by ${siteName} — page ${pageNum}.`
+      : `Explore all conferences, panels, and events where ${siteName} has spoken or participated.`;
 
   return buildMeta({
     title,
@@ -92,7 +94,7 @@ export async function generateMetadata({
     type: "website",
     image: {
       url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Conferences and Talks by ${SITE_NAME}`,
+      alt: `Conferences and Talks by ${siteName}`,
     },
   });
 }

@@ -1,0 +1,65 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "Site Settings",
+    "description": "Persona data and SEO defaults; empty fields fall back to the website defaults"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "site_name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "default": "Elif Hilal Kara"
+    },
+    "job_title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "default": "Legal Engineer"
+    },
+    "site_description": {
+      "type": "text",
+      "required": true,
+      "maxLength": 300,
+      "default": "Personal portfolio of Elif Hilal Kara — legal engineer, conference speaker, and lifelong learner."
+    },
+    "default_og_image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "twitter_handle": {
+      "type": "string",
+      "regex": "^@?[A-Za-z0-9_]{1,15}$",
+      "default": "@elifhilalumucu"
+    },
+    "twitter_user_id": {
+      "type": "string",
+      "regex": "^[0-9]+$",
+      "default": "1035512458935521280"
+    },
+    "karakod_url": {
+      "type": "string",
+      "regex": "^https?://\\S+$",
+      "default": "https://karakod.io/"
+    },
+    "karakod_linkedin_url": {
+      "type": "string",
+      "regex": "^https?://\\S+$",
+      "default": "https://www.linkedin.com/company/karakodcenter/"
+    },
+    "legalifi_url": {
+      "type": "string",
+      "regex": "^https?://\\S+$",
+      "default": "https://legalifi.io/"
+    }
+  }
+}

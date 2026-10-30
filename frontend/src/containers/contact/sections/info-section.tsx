@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { COMPANY_LINKEDIN_URL, YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
+import { YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
 import { LuLinkedin, LuMail, LuYoutube } from "react-icons/lu";
 import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import MotionGrid from "@/components/motion-grid";
@@ -18,6 +18,7 @@ interface IInfoSectionProps {
     youtube: string;
     instagram?: string | null;
   };
+  companyLinkedinUrl: string;
 }
 
 // CMS URLs may end with "/", lack "www" or carry a query string (?igsh=...), so parse them
@@ -34,7 +35,12 @@ function getPathSegments(url: string | null | undefined): string[] {
 const toHandle = (segment: string | undefined) =>
   segment ? `@${segment.replace(/^@/, "")}` : undefined;
 
-export default function InfoSection({ content, socialMediaLinks, className }: IInfoSectionProps) {
+export default function InfoSection({
+  content,
+  socialMediaLinks,
+  companyLinkedinUrl,
+  className,
+}: IInfoSectionProps) {
   const youtubeHandle = getPathSegments(socialMediaLinks.youtube).find((s) => s.startsWith("@"));
 
   // Links not filled in Strapi (e.g. the optional Instagram) are skipped
@@ -76,11 +82,11 @@ export default function InfoSection({ content, socialMediaLinks, className }: II
       lowercase: true,
     },
     {
-      href: COMPANY_LINKEDIN_URL,
+      href: companyLinkedinUrl,
       icon: LuLinkedin,
       title: "Connect with Us",
       // linkedin.com/company/<name>
-      label: getPathSegments(COMPANY_LINKEDIN_URL).at(-1) ?? "Karakod",
+      label: getPathSegments(companyLinkedinUrl).at(-1) ?? "Karakod",
       lowercase: false,
     },
   ].flatMap(({ href, ...link }) => (href ? [{ href, ...link }] : []));

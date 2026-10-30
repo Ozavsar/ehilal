@@ -4,7 +4,8 @@ import ArticleContainer from "@/containers/article";
 import BlogContainer from "@/containers/blog";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
-import { SITE_NAME, SITE_URL } from "@/config/site";
+import { SITE_URL } from "@/config/site";
+import { getSiteSettings } from "@/lib/services";
 import { getAllArticles, getArticleBySlug, getArticlesPage } from "@/lib/services/blog";
 import { getMediumPostId } from "@/lib/services/medium";
 import { withBlurDataURLs } from "@/lib/getImage";
@@ -65,6 +66,7 @@ export async function generateMetadata({
   const { page } = await params;
   const pageNum = parsePageNumber(page);
   const isArticle = isNaN(pageNum);
+  const { siteName } = await getSiteSettings();
 
   // Invalid segments 404 in the page; don't fetch anything for them
   if (isArticle && !getMediumPostId(page)) {
@@ -88,7 +90,7 @@ export async function generateMetadata({
 
       return buildMeta({
         title: article.title,
-        description: article.subtitle || `Read the article "${article.title}" by ${SITE_NAME}.`,
+        description: article.subtitle || `Read the article "${article.title}" by ${siteName}.`,
         path: INTERNAL_ROUTES.BLOG.href(article.slug),
         type: "article",
         image: {
@@ -110,7 +112,7 @@ export async function generateMetadata({
     }
 
     const title = pageNum > 1 ? `Blog – Page ${pageNum}` : "Blog";
-    const description = `Explore ${SITE_NAME}'s latest articles and insights${
+    const description = `Explore ${siteName}'s latest articles and insights${
       pageNum > 1 ? ` on page ${pageNum}` : ""
     }.`;
 
@@ -121,18 +123,18 @@ export async function generateMetadata({
       type: "website",
       image: {
         url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-        alt: `Blog Articles by ${SITE_NAME}`,
+        alt: `Blog Articles by ${siteName}`,
       },
     });
   } catch {
     // The page throws the same (cached) error and error.tsx shows it
     return buildMeta({
       title: "Blog",
-      description: `Read ${SITE_NAME}'s latest articles and insights.`,
+      description: `Read ${siteName}'s latest articles and insights.`,
       path: "/blog",
       image: {
         url: `${SITE_URL}/api/og?title=blog`,
-        alt: `Blog Articles by ${SITE_NAME}`,
+        alt: `Blog Articles by ${siteName}`,
       },
     });
   }

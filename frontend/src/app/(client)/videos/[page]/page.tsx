@@ -5,7 +5,8 @@ import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllVideos } from "@/lib/services/videos";
 import { withBlurDataURLs } from "@/lib/getImage";
 import { buildMeta } from "@/lib/metadata";
-import { SITE_NAME, SITE_URL } from "@/config/site";
+import { SITE_URL } from "@/config/site";
+import { getSiteSettings } from "@/lib/services";
 
 export const dynamicParams = true;
 
@@ -67,9 +68,10 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { page } = await props.params;
   const { pageNum } = await getPageOrNotFound(page);
+  const { siteName } = await getSiteSettings();
 
   const title = pageNum > 1 ? `Videos – Page ${pageNum}` : "Videos";
-  const description = `Explore ${SITE_NAME}'s collection of insightful videos on web development, programming, and more${pageNum > 1 ? ` — page ${pageNum}` : ""}.`;
+  const description = `Explore ${siteName}'s collection of insightful videos on web development, programming, and more${pageNum > 1 ? ` — page ${pageNum}` : ""}.`;
 
   return buildMeta({
     title,
@@ -78,7 +80,7 @@ export async function generateMetadata(props: {
     type: "website",
     image: {
       url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Videos by ${SITE_NAME}`,
+      alt: `Videos by ${siteName}`,
     },
   });
 }

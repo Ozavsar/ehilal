@@ -1,19 +1,18 @@
 import { LuGlobe, LuLinkedin, LuYoutube } from "react-icons/lu";
 import { BsInstagram, BsTwitterX } from "react-icons/bs";
-import { getSocialMediaLinks } from "@/lib/services";
-import { COMPANY_URL, LEGALIFI_URL } from "@/config/constants";
+import { getSiteSettings, getSocialMediaLinks } from "@/lib/services";
 import LegalifiLogomark from "./assets/legalifi-logomark";
 
 export default async function SocialLinks() {
-  const socialLinks = await getSocialMediaLinks();
+  const [socialLinks, site] = await Promise.all([getSocialMediaLinks(), getSiteSettings()]);
   // Links not filled in Strapi are skipped instead of rendering a dead "#" link
   const socialLinkContents = [
     { href: socialLinks.twitter_x, icon: BsTwitterX, title: "Twitter" },
     { href: socialLinks.linkedin, icon: LuLinkedin, title: "LinkedIn" },
     { href: socialLinks.youtube, icon: LuYoutube, title: "YouTube" },
     { href: socialLinks.instagram, icon: BsInstagram, title: "Instagram" },
-    { href: COMPANY_URL, icon: LuGlobe, title: "Karakod" },
-    { href: LEGALIFI_URL, icon: LegalifiLogomark, title: "Legalifi" },
+    { href: site.karakodUrl, icon: LuGlobe, title: "Karakod" },
+    { href: site.legalifiUrl, icon: LegalifiLogomark, title: "Legalifi" },
   ].flatMap(({ href, ...link }) => (href ? [{ href, ...link }] : []));
   return (
     <div className="flex flex-wrap justify-center gap-4 self-center">

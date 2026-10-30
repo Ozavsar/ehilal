@@ -23,7 +23,7 @@ export interface IImage {
   // null for files Strapi can't measure (e.g. PDFs)
   width: number | null;
   height: number | null;
-  // Strapi only generates formats smaller than the original, and none for SVGs, GIFs or non-image files
+  // Strapi only generates formats smaller than the original, and none for SVGs or non-image files
   formats: Partial<Record<ImageFormatName, IImageFormat>> | null;
   hash: string;
   ext: string;
@@ -32,7 +32,9 @@ export interface IImage {
   url: string;
   previewUrl: string | null;
   provider: string;
-  provider_metadata: unknown;
+  // JSON kept by the upload provider. The backend adds a blur placeholder (backend/src/utils/blur.ts):
+  // validate it before use, see getStoredBlurDataURL()
+  provider_metadata: { blurDataURL?: unknown } | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -80,8 +82,8 @@ export interface ICourse {
   thumbnailURL: string | null;
   blurDataURL?: string;
 }
-// Strapi content types (backend/src/api/*/content-types/*/schema.json). Strapi returns every attribute,
-// with null for optional ones that are empty.
+// Strapi content types (backend/src/api/*/content-types/*/schema.json), kept in sync by hand: update them
+// together with the schema. Strapi returns every attribute, with null for optional ones that are empty.
 export interface IStrapiSocialLinks extends IStrapiBasePage {
   email: string;
   linkedin: string;
@@ -147,6 +149,32 @@ export interface IStrapiTheme extends IStrapiBasePage {
   // Hex colours; optional in Strapi
   primaryDark: string | null;
   primaryLight: string | null;
+}
+
+export interface IStrapiSiteSettings extends IStrapiBasePage {
+  // Every field may be empty; getSiteSettings() falls back to DEFAULT_SITE_SETTINGS per field
+  site_name: string | null;
+  job_title: string | null;
+  site_description: string | null;
+  default_og_image: IImage | null;
+  twitter_handle: string | null;
+  twitter_user_id: string | null;
+  karakod_url: string | null;
+  karakod_linkedin_url: string | null;
+  legalifi_url: string | null;
+}
+
+// Site Settings with the defaults filled in, as returned by getSiteSettings()
+export interface ISiteSettings {
+  siteName: string;
+  jobTitle: string;
+  siteDescription: string;
+  twitterHandle: string; // with the leading "@"
+  twitterUserId: string;
+  defaultOgImage: { url: string; width?: number; height?: number; alt?: string };
+  karakodUrl: string;
+  karakodLinkedinUrl: string;
+  legalifiUrl: string;
 }
 
 // Single types answer with an empty `meta`

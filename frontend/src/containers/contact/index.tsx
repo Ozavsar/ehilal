@@ -12,9 +12,15 @@ interface IContactContainerProps {
     instagram?: string | null;
   };
   content: IStrapiContactPage;
+  // Karakod LinkedIn page from the Site Settings
+  companyLinkedinUrl: string;
 }
 
-export default function ContactContainer({ content, socialMediaLinks }: IContactContainerProps) {
+export default function ContactContainer({
+  content,
+  socialMediaLinks,
+  companyLinkedinUrl,
+}: IContactContainerProps) {
   return (
     <main className="container">
       <TitleSection backgroundText={content.page_title_background} text={content.page_title} />
@@ -23,6 +29,7 @@ export default function ContactContainer({ content, socialMediaLinks }: IContact
         <InfoSection
           content={{ title: content.title, description: content.description }}
           socialMediaLinks={socialMediaLinks}
+          companyLinkedinUrl={companyLinkedinUrl}
         />
         <FormSection className="col-span-1 md:col-span-2 md:pl-8" />
       </div>

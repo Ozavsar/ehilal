@@ -12,6 +12,8 @@ const MODEL_TAGS: Record<string, string[]> = {
   conference: ["conferences"],
   "social-media-link": ["social-media-links"],
   theme: ["theme"],
+  // Used by the root metadata, so this revalidates every page
+  "site-setting": ["site-settings"],
   "home-page": ["home-title"],
   "contact-page": ["contact-title"],
   "not-found-page": ["not-title"],

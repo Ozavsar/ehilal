@@ -1,7 +1,14 @@
+import { cache } from "react";
 import { unstable_rethrow } from "next/navigation";
-import type { IStrapiResponse, IStrapiSocialLinks, IStrapiTheme } from "@/types";
-import { DEFAULT_THEME_COLORS } from "@/config/site";
-import { fetchAPI } from "../api/fetchAPI";
+import type {
+  ISiteSettings,
+  IStrapiResponse,
+  IStrapiSiteSettings,
+  IStrapiSocialLinks,
+  IStrapiTheme,
+} from "@/types";
+import { DEFAULT_SITE_SETTINGS, DEFAULT_THEME_COLORS } from "@/config/site";
+import { fetchAPI, getStrapiURL } from "../api/fetchAPI";
 
 /**
  * get the theme data from the Strapi API.
@@ -41,6 +48,68 @@ export async function getThemeColors(): Promise<{ primaryDark: string; primaryLi
     return DEFAULT_THEME_COLORS;
   }
 }
+
+const textOr = (value: string | null | undefined, fallback: string) => value?.trim() || fallback;
+// The links are rendered as hrefs, so only http(s) URLs are accepted
+const urlOr = (value: string | null | undefined, fallback: string) => {
+  const url = value?.trim();
+  return url && /^https?:\/\/\S+$/i.test(url) ? url : fallback;
+};
+
+// fetchAPI's ApiError carries the HTTP status
+const isNotFound = (error: unknown) =>
+  error instanceof Error && "status" in error && error.status === 404;
+
+function resolveSiteSettings(settings: IStrapiSiteSettings | null): ISiteSettings {
+  const defaults = DEFAULT_SITE_SETTINGS;
+  const image = settings?.default_og_image;
+  const twitterHandle = settings?.twitter_handle?.trim().replace(/^@/, "");
+
+  return {
+    siteName: textOr(settings?.site_name, defaults.siteName),
+    jobTitle: textOr(settings?.job_title, defaults.jobTitle),
+    siteDescription: textOr(settings?.site_description, defaults.siteDescription),
+    twitterHandle: twitterHandle ? `@${twitterHandle}` : defaults.twitterHandle,
+    twitterUserId: textOr(settings?.twitter_user_id, defaults.twitterUserId),
+    defaultOgImage: image?.url
+      ? {
+          // The S3 upload provider returns absolute URLs, the local one /uploads/... paths
+          url: image.url.startsWith("/") ? getStrapiURL(image.url) : image.url,
+          width: image.width ?? undefined,
+          height: image.height ?? undefined,
+          alt: image.alternativeText?.trim() || undefined,
+        }
+      : defaults.defaultOgImage,
+    karakodUrl: urlOr(settings?.karakod_url, defaults.karakodUrl),
+    karakodLinkedinUrl: urlOr(settings?.karakod_linkedin_url, defaults.karakodLinkedinUrl),
+    legalifiUrl: urlOr(settings?.legalifi_url, defaults.legalifiUrl),
+  };
+}
+
+/**
+ * Site Settings (persona data and SEO defaults) with DEFAULT_SITE_SETTINGS filled in for every empty
+ * field. Never throws: the root metadata of every page depends on it, and Strapi answers 404 until the
+ * single type is created and published. cache() makes it one request per render.
+ */
+export const getSiteSettings = cache(async (): Promise<ISiteSettings> => {
+  try {
+    const response = await fetchAPI<IStrapiResponse<IStrapiSiteSettings | null>>(
+      "/site-setting",
+      { populate: "default_og_image" },
+      { tags: ["site-settings"] },
+    );
+    return resolveSiteSettings(response.data);
+  } catch (error) {
+    unstable_rethrow(error);
+    if (!isNotFound(error)) {
+      console.error(
+        "Site settings could not be loaded, using the defaults:",
+        error instanceof Error ? error.message : error,
+      );
+    }
+    return resolveSiteSettings(null);
+  }
+});
 
 /**
  * Get Social Media Links

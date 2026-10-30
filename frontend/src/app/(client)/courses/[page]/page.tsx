@@ -5,7 +5,8 @@ import { getAllCourses } from "@/lib/services/udemy";
 import { withBlurDataURLs } from "@/lib/getImage";
 import { Metadata } from "next";
 import { buildMeta } from "@/lib/metadata";
-import { SITE_NAME, SITE_URL } from "@/config/site";
+import { SITE_URL } from "@/config/site";
+import { getSiteSettings } from "@/lib/services";
 
 export const dynamicParams = true;
 
@@ -75,12 +76,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { page } = await params;
   const { pageNum } = await getPageOrNotFound(page);
+  const { siteName } = await getSiteSettings();
 
   const title = pageNum > 1 ? `Courses – Page ${pageNum}` : "Courses & Workshops";
   const description =
     pageNum > 1
-      ? `Discover ${SITE_NAME}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`
-      : `Browse all courses and workshops by ${SITE_NAME} — from full-stack development to creative coding and professional growth.`;
+      ? `Discover ${siteName}’s courses and workshops on page ${pageNum}. Learn and grow with topics in modern web development, UX, and AI.`
+      : `Browse all courses and workshops by ${siteName} — from full-stack development to creative coding and professional growth.`;
 
   return buildMeta({
     title,
@@ -89,7 +91,7 @@ export async function generateMetadata({
     type: "website",
     image: {
       url: `${SITE_URL}/api/og?title=${encodeURIComponent(title)}`,
-      alt: `Courses and Workshops by ${SITE_NAME}`,
+      alt: `Courses and Workshops by ${siteName}`,
     },
   });
 }

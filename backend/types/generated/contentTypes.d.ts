@@ -704,6 +704,63 @@ export interface ApiNotFoundPageNotFoundPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiSiteSettingSiteSetting extends Struct.SingleTypeSchema {
+  collectionName: 'site_settings';
+  info: {
+    description: 'Persona data and SEO defaults; empty fields fall back to the website defaults';
+    displayName: 'Site Settings';
+    pluralName: 'site-settings';
+    singularName: 'site-setting';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    default_og_image: Schema.Attribute.Media<'images'>;
+    job_title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }> &
+      Schema.Attribute.DefaultTo<'Legal Engineer'>;
+    karakod_linkedin_url: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'https://www.linkedin.com/company/karakodcenter/'>;
+    karakod_url: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'https://karakod.io/'>;
+    legalifi_url: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'https://legalifi.io/'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::site-setting.site-setting'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    site_description: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }> &
+      Schema.Attribute.DefaultTo<'Personal portfolio of Elif Hilal Kara \u2014 legal engineer, conference speaker, and lifelong learner.'>;
+    site_name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }> &
+      Schema.Attribute.DefaultTo<'Elif Hilal Kara'>;
+    twitter_handle: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'@elifhilalumucu'>;
+    twitter_user_id: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'1035512458935521280'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSocialMediaLinkSocialMediaLink
   extends Struct.SingleTypeSchema {
   collectionName: 'social_media_links';
@@ -1359,6 +1416,7 @@ declare module '@strapi/strapi' {
       'api::courses-page.courses-page': ApiCoursesPageCoursesPage;
       'api::home-page.home-page': ApiHomePageHomePage;
       'api::not-found-page.not-found-page': ApiNotFoundPageNotFoundPage;
+      'api::site-setting.site-setting': ApiSiteSettingSiteSetting;
       'api::social-media-link.social-media-link': ApiSocialMediaLinkSocialMediaLink;
       'api::theme.theme': ApiThemeTheme;
       'api::video.video': ApiVideoVideo;
