@@ -48,7 +48,7 @@ export default function TitleSection({ text, backgroundText }: TitleSectionProps
         <h2
           className={cn(
             "text-2xl font-black uppercase",
-            "transition-[opacity,scale,filter] duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none starting:scale-90 starting:opacity-0 starting:blur-sm",
+            "transition-[opacity,scale,translate] duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none starting:-translate-y-1 starting:scale-90 starting:opacity-0",
           )}
         >
           {plainWord} <span className={plainWord ? "text-primary" : ""}>{lastWord}</span>

@@ -1,11 +1,20 @@
 /* #switch is fixed and transformed, so it is its own stacking context: these layers only order
-   its parts (sun/moon, clouds, shooting star). The switch itself sits at --z-raised in the header. */
+   its parts (sun/moon, clouds, shooting star). The switch itself sits at --z-raised in the header.
+
+   Every transition here is !important: next-themes' disableTransitionOnChange adds
+   `* { transition: none !important }` while it swaps the theme class, which would make the sun
+   jump to the moon instead of sliding. These selectors are more specific than `*`, so they win,
+   and among themselves they cascade exactly as before. */
 #switch {
   --switch-z-trail: 1;
   --switch-z-sun: 2;
   --switch-z-sky: 3;
   --switch-z-cloud: 3;
   --switch-z-cloud-front: 4;
+  /* The sky (stars, clouds, shooting star) only moves while the toggle is hovered or keyboard
+     focused, never with reduced motion. At rest every animation is paused; the negative delays
+     below pick the paused frame, the scene as it looked a few seconds after page load. */
+  --switch-play: paused;
 
   width: 150px;
   height: 60px;
@@ -17,7 +26,7 @@
 
   background-color: rgb(186, 230, 255);
 
-  transition: background-color 1s;
+  transition: background-color 1s !important;
 
   box-shadow: 0 0 17px 1px #565656;
   z-index: var(--z-raised);
@@ -26,6 +35,18 @@
 #switch.off {
   border-color: rgb(40, 40, 51);
   background-color: rgb(23, 23, 35);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  #switch:hover {
+    --switch-play: running;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #switch:focus-visible {
+    --switch-play: running;
+  }
 }
 
 #contentwrapper {
@@ -65,7 +86,7 @@
     width 2s,
     height 2s,
     box-shadow 2s,
-    background-color 2s 0.2s;
+    background-color 2s 0.2s !important;
   z-index: var(--switch-z-sun);
 }
 
@@ -87,7 +108,7 @@
     0 0 5px 3px rgb(192, 198, 197);
 
   opacity: 0;
-  transition: opacity 0s;
+  transition: opacity 0s !important;
 }
 
 #circle::after {
@@ -108,7 +129,7 @@
     0 0 3px 2px rgb(192, 198, 197);
 
   opacity: 0;
-  transition: opacity 0s;
+  transition: opacity 0s !important;
 }
 
 #switch.off #circle {
@@ -126,12 +147,12 @@
 
 #switch.off #circle::before {
   opacity: 1;
-  transition: opacity 2s 0.2s;
+  transition: opacity 2s 0.2s !important;
 }
 
 #switch.off #circle::after {
   opacity: 1;
-  transition: opacity 2s 0.2s;
+  transition: opacity 2s 0.2s !important;
 }
 
 .star {
@@ -168,7 +189,7 @@
 
   box-shadow: 0 0 2px 0px rgb(255, 255, 255);
 
-  animation: growbrighter 1s linear alternate infinite;
+  animation: growbrighter 1s linear -0.5s alternate infinite var(--switch-play);
 }
 
 .star::after {
@@ -189,27 +210,24 @@
 
   box-shadow: 0 0 2px 0px rgb(255, 255, 255);
 
-  animation: growbrighter 1s linear alternate infinite;
+  animation: growbrighter 1s linear -0.5s alternate infinite var(--switch-play);
 }
 
 #switch.off .star {
   opacity: 1;
-  transition: opacity 2s 1.5s;
+  transition: opacity 2s 1.5s !important;
 }
 
 #switch.off #stars .star:nth-of-type(1) {
-  animation: startravel1 15s linear infinite;
-  animation-delay: 0.4s;
+  animation: startravel1 15s linear -3.6s infinite var(--switch-play);
 }
 
 #switch.off #stars .star:nth-of-type(2) {
-  animation: startravel2 12s linear infinite;
-  animation-delay: 0.2s;
+  animation: startravel2 12s linear -3.8s infinite var(--switch-play);
 }
 
 #switch.off #stars .star:nth-of-type(3) {
-  animation: startravel3 18s linear infinite;
-  animation-delay: 0s;
+  animation: startravel3 18s linear -4s infinite var(--switch-play);
 }
 
 @keyframes growbrighter {
@@ -295,17 +313,16 @@
   z-index: var(--switch-z-trail);
 }
 
+/* No delay: paused before it enters the sky, so it shoots as soon as the toggle is hovered */
 #switch.off #shtngstarwrapper {
-  animation: shootingstartravel 24s linear infinite;
-  animation-delay: 6s;
+  animation: shootingstartravel 24s linear infinite var(--switch-play);
 
   opacity: 1;
-  transition: opacity 0s 2s;
+  transition: opacity 0s 2s !important;
 }
 
 #switch.off #shootingstar::after {
-  animation: growtrail 24s linear infinite;
-  animation-delay: 6s;
+  animation: growtrail 24s linear infinite var(--switch-play);
 }
 
 @keyframes shootingstartravel {
@@ -347,9 +364,8 @@
   z-index: var(--switch-z-cloud);
   opacity: 1;
 
-  transition: opacity 2s 0.4s;
-  animation: cloudtravel1 22s linear infinite;
-  animation-delay: 5.4s;
+  transition: opacity 2s 0.4s !important;
+  animation: cloudtravel1 22s linear -4.6s infinite var(--switch-play);
 }
 
 .cloud:nth-of-type(1)::before {
@@ -475,9 +491,8 @@
   z-index: var(--switch-z-cloud);
   opacity: 1;
 
-  transition: opacity 2s 0.4s;
-  animation: cloudtravel2 18s linear infinite;
-  animation-delay: 1.2s;
+  transition: opacity 2s 0.4s !important;
+  animation: cloudtravel2 18s linear -8.8s infinite var(--switch-play);
 }
 
 .cloud:nth-of-type(2)::before {
@@ -603,9 +618,8 @@
 
   background: radial-gradient(rgb(255, 255, 255) 30%, rgb(230, 230, 230));
 
-  transition: opacity 2s 0.4s;
-  animation: cloudtravel3 30s linear infinite;
-  animation-delay: 8.6s;
+  transition: opacity 2s 0.4s !important;
+  animation: cloudtravel3 30s linear -1.4s infinite var(--switch-play);
 }
 
 .cloud:nth-of-type(3)::before {
@@ -788,19 +802,19 @@
 #switch.off .cloud:nth-of-type(1) {
   animation: none;
   opacity: 0;
-  transition: opacity 1s 0s;
+  transition: opacity 1s 0s !important;
 }
 
 #switch.off .cloud:nth-of-type(2) {
   animation: none;
   opacity: 0;
-  transition: opacity 1s 0s;
+  transition: opacity 1s 0s !important;
 }
 
 #switch.off .cloud:nth-of-type(3) {
   animation: none;
   opacity: 0;
-  transition: opacity 1s 0s;
+  transition: opacity 1s 0s !important;
 }
 
 @keyframes cloudtravel1 {
