@@ -1,3 +1,4 @@
-# To prevent search engines from seeing the site altogether, uncomment the next two lines:
-# User-Agent: *
-# Disallow: /
+# Strapi (admin and API) is not the website: keep search engines out. The site is the Next.js
+# frontend, which has its own robots.txt. Every response also sends X-Robots-Tag (src/middlewares/noindex.ts).
+User-Agent: *
+Disallow: /

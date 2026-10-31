@@ -8,6 +8,8 @@ const frontendOrigin = (url: string | undefined): string[] => {
 };
 
 export default ({ env }) => [
+  // X-Robots-Tag: noindex on every response (src/middlewares/noindex.ts)
+  "global::noindex",
   "strapi::errors",
 
   {
