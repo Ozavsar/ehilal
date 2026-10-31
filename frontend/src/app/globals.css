@@ -111,6 +111,11 @@
   /* Keyframe animations (keyframes below). Inline, so a component can retune the fade timing on
      the element itself: [--m3-enter-duration:200ms] [--m3-exit-duration:100ms] (menus) */
   --animate-hero-in: hero-in var(--duration-long2) var(--ease-emphasized-decelerate) both;
+  /* Home hero: colour band, accent line, word-by-word text and the waving hand */
+  --animate-hero-band: hero-band var(--duration-extra-long2) var(--ease-emphasized-decelerate) both;
+  --animate-hero-line: hero-line var(--duration-long2) var(--ease-emphasized-decelerate) both;
+  --animate-hero-rise: hero-rise var(--duration-long2) var(--ease-emphasized-decelerate) both;
+  --animate-hero-wave: hero-wave 1.6s var(--ease-standard) both;
   /* Fade: popups appearing within the screen (dialog, menu, popover, toast) */
   --animate-m3-fade-enter: m3-fade-enter var(--m3-enter-duration, var(--duration-medium4))
     var(--ease-emphasized-decelerate) both;
@@ -418,6 +423,73 @@
   }
 }
 
+/* The band slides in from its own side; each layout sets where it starts (--hero-band-from) */
+@keyframes hero-band {
+  from {
+    translate: var(--hero-band-from, none);
+  }
+}
+
+@keyframes hero-line {
+  from {
+    scale: 0 1;
+  }
+}
+
+/* Home hero: from 840px its colour band covers the whole height of the transparent navigation rail
+   (containers/home), so the rail's items and the theme toggle read in the band's on-colour: on
+   primary in the light theme, on primary-container in the dark one (where the active indicator
+   turns light too). Scoped to the items, not the <nav>: the Learn menu (a popover beside the
+   items) keeps the page's colours. The colour utilities read the --m3-* roles directly (@theme inline). */
+@media (width >= theme(--breakpoint-md)) {
+  body:has(main[data-hero-band])
+    :is([data-nav-anchor] > nav > :is(a, button), [data-nav-anchor] > button) {
+    --m3-on-surface: var(--m3-on-primary);
+    --m3-on-surface-variant: var(--m3-on-primary);
+    --m3-primary: var(--m3-on-primary);
+  }
+  .dark
+    body:has(main[data-hero-band])
+    :is([data-nav-anchor] > nav > :is(a, button), [data-nav-anchor] > button) {
+    --m3-on-surface: var(--m3-on-primary-container);
+    --m3-on-surface-variant: var(--m3-on-primary-container);
+    --m3-primary: var(--m3-on-primary-container);
+    /* The dark indicator pill would be the band's own tone: make it the light one */
+    --m3-secondary-container: var(--m3-on-primary-container);
+    --m3-on-secondary-container: var(--m3-primary-container);
+  }
+}
+
+/* Fades in while rising into place (--hero-rise). Opacity and translate only: the compositor runs
+   them, so they stay smooth while the page hydrates (an animated blur filter can't be composited
+   and stuttered on the main thread). */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--hero-rise, 0.5em);
+  }
+}
+
+@keyframes hero-wave {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  15%,
+  45% {
+    rotate: 14deg;
+  }
+  30% {
+    rotate: -8deg;
+  }
+  60% {
+    rotate: -4deg;
+  }
+  75% {
+    rotate: 10deg;
+  }
+}
+
 /* M3 transition patterns (material-components-android timings). They animate the independent
    scale/translate properties, so a positioning transform on the same element survives. */
 @keyframes m3-fade-enter {
@@ -566,6 +638,29 @@
     from,
     to {
       transform: none;
+    }
+  }
+  @keyframes hero-band {
+    from,
+    to {
+      translate: none;
+    }
+  }
+  @keyframes hero-line {
+    from,
+    to {
+      scale: none;
+    }
+  }
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes hero-wave {
+    from,
+    to {
+      rotate: none;
     }
   }
   @keyframes m3-fade-enter {
