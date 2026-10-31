@@ -3,3 +3,5 @@ src/app/fonts/*.json
 src/config/default-palette.json
 # Local notes, kept out of git
 update.md
+# Search Console verification file: must stay byte-for-byte as Google issued it
+public/google*.html
