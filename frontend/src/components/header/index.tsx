@@ -8,6 +8,11 @@ import ThemeToggle from "./theme-toggle";
 // stacking context the active indicator slides in. Below 600px the theme toggle sits in a slim
 // top row instead: in the page flow (the first block in <body>), so it scrolls away and never
 // covers a title, which fixed in the corner it would.
+// Background: the page scrolls under the bar, so the bar is a translucent surface container that
+// blurs what is behind it, keeping its labels readable over text and photos. The rail is
+// transparent: on the home page the hero's colour band runs under it from 840px, and its items
+// then take the band's on-colours (app/globals.css, `data-hero-band`); elsewhere only the page
+// surface is behind it.
 // Entrance: the bar/rail slides in from its edge with a @starting-style transition (Tailwind
 // `starting:`), visible without JS and still for reduced-motion users.
 // data-nav-anchor: page view transitions leave the bar/rail in place (app/globals.css), so only
@@ -25,8 +30,9 @@ export default function Header() {
       <div
         data-nav-anchor
         className={cn(
-          "bg-surface-container h-nav-bar fixed inset-x-0 bottom-0 z-(--z-header) flex",
-          "sm:bg-surface sm:w-rail sm:inset-y-0 sm:right-auto sm:h-auto sm:flex-col",
+          "h-nav-bar fixed inset-x-0 bottom-0 z-(--z-header) flex",
+          "max-sm:bg-surface-container/70 max-sm:backdrop-blur-md",
+          "sm:w-rail sm:inset-y-0 sm:right-auto sm:h-auto sm:flex-col",
           "ease-emphasized-decelerate transition-[translate] duration-500 motion-reduce:transition-none",
           "starting:translate-y-full sm:starting:-translate-x-full sm:starting:translate-y-0",
         )}
