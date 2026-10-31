@@ -3,17 +3,21 @@
 import { useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/icon";
-import { isNavItemActive, MENUS } from "@/config/constants/app-routes";
+import { isNavGroup, isNavItemActive, MENUS } from "@/config/constants/app-routes";
 import { cn } from "@/lib/utils";
 import { NAV_TOP } from "@/components/view-transitions";
+import NavGroup from "./nav-group";
 import NavLink from "./nav-link";
 
 // The destinations of the M3 navigation bar (below 600px, sm) and navigation rail (from 600px);
-// the bar/rail box itself is in ../header. Every destination shows its icon and its label; the
-// current one has the active indicator pill, a filled icon and aria-current="page".
+// the bar/rail box itself is in ../header. Every item shows its icon and its label; the current
+// one has the active indicator pill and a filled icon, and its link aria-current="page". A group
+// item ("Learn") opens a menu of its destinations and is current when one of them is.
 export default function NavigationLinks() {
   const pathname = usePathname();
-  const activeIndex = MENUS.NAV.findIndex(({ href }) => isNavItemActive(pathname, href));
+  const activeIndex = MENUS.MAIN.findIndex((item) =>
+    (isNavGroup(item) ? item.items : [item]).some(({ href }) => isNavItemActive(pathname, href)),
+  );
   const navRef = useRef<HTMLElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
   const previousIndex = useRef(activeIndex);
@@ -54,18 +58,14 @@ export default function NavigationLinks() {
       aria-label="Main"
       className="flex min-h-0 min-w-0 flex-1 sm:flex-col sm:justify-center-safe sm:gap-3 sm:overflow-y-auto sm:py-6"
     >
-      {MENUS.NAV.map(({ key, label, href, icon }, index) => {
+      {MENUS.MAIN.map((item, index) => {
+        const { key, label, icon } = item;
         const isActive = index === activeIndex;
-        return (
-          <NavLink
-            key={key}
-            href={href}
-            aria-current={isActive ? "page" : undefined}
-            // M3 fade through of the page content (app/template.tsx)
-            transitionTypes={[NAV_TOP]}
-            // Rail: 80px wide in the 96px rail, so even "Conferences" keeps 8px from the edges
-            className="group flex min-w-0 flex-1 flex-col items-center gap-1 pt-3 pb-4 outline-none sm:mx-auto sm:h-14 sm:w-20 sm:flex-none sm:p-0"
-          >
+        // Rail: 80px wide in the 96px rail, so even "Conferences" keeps 8px from the edges
+        const itemClassName =
+          "group flex min-w-0 flex-1 flex-col items-center gap-1 pt-3 pb-4 outline-none sm:mx-auto sm:h-14 sm:w-20 sm:flex-none sm:p-0";
+        const content = (
+          <>
             {/* Slot: holds the indicator; the state layer and the M3 focus ring share its shape */}
             <span
               data-nav-slot
@@ -97,6 +97,23 @@ export default function NavigationLinks() {
             >
               {label}
             </span>
+          </>
+        );
+
+        return isNavGroup(item) ? (
+          <NavGroup key={key} items={item.items} className={itemClassName}>
+            {content}
+          </NavGroup>
+        ) : (
+          <NavLink
+            key={key}
+            href={item.href}
+            aria-current={isActive ? "page" : undefined}
+            // M3 fade through of the page content (app/template.tsx)
+            transitionTypes={[NAV_TOP]}
+            className={itemClassName}
+          >
+            {content}
           </NavLink>
         );
       })}

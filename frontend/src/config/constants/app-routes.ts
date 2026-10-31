@@ -45,14 +45,47 @@ export const INTERNAL_ROUTES = {
   { path: string; label: string; icon: IconName; href?: unknown }
 >;
 
+export interface NavDestination {
+  key: string;
+  label: string;
+  href: string;
+  icon: IconName;
+}
+
+/** Several destinations behind one navigation item, listed in a menu that opens from it */
+export interface NavGroup {
+  key: string;
+  label: string;
+  icon: IconName;
+  items: NavDestination[];
+}
+
+const destination = (key: keyof typeof INTERNAL_ROUTES): NavDestination => ({
+  key,
+  label: INTERNAL_ROUTES[key].label,
+  href: INTERNAL_ROUTES[key].path,
+  icon: INTERNAL_ROUTES[key].icon,
+});
+
 export const MENUS = {
-  NAV: Object.entries(INTERNAL_ROUTES).map(([key, route]) => ({
-    key,
-    label: route.label,
-    href: route.path,
-    icon: route.icon,
-  })),
+  // Every destination (the 404 page lists them)
+  NAV: (Object.keys(INTERNAL_ROUTES) as (keyof typeof INTERNAL_ROUTES)[]).map(destination),
+  // The navigation bar/rail: talks, videos and courses share "Learn", so the bar keeps to M3's
+  // 3–5 destinations
+  MAIN: [
+    destination("HOME"),
+    destination("BLOG"),
+    {
+      key: "LEARN",
+      label: "Learn",
+      icon: "auto_stories",
+      items: [destination("CONFERENCES"), destination("VIDEOS"), destination("COURSES")],
+    },
+    destination("CONTACT"),
+  ] satisfies (NavDestination | NavGroup)[],
 };
+
+export const isNavGroup = (item: NavDestination | NavGroup): item is NavGroup => "items" in item;
 
 /** A nav item is active on its own path and on every page below it (/blog/2, /blog/<slug>). */
 export const isNavItemActive = (pathname: string, href: string) =>
