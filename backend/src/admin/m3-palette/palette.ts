@@ -1,5 +1,4 @@
-// Helpers for the palette field. The palette itself is generated on the server
-// (src/utils/m3-palette.ts) when the theme is saved; the field only reads its seed and variant.
+// Palette field helpers; the palette itself is generated on the server (src/utils/m3-palette.ts)
 
 export const VARIANTS = [
   "tonal_spot",
@@ -58,9 +57,9 @@ export const parseStoredSource = (
 
 /** postMessage type the website's theme preview bar sends (frontend components/theme-preview-bar.tsx) */
 export const THEME_CHOICE_MESSAGE = "ehilal:theme-choice";
-/** sessionStorage key app.tsx keeps the last choice in until the palette field applies or dismisses it */
+/** sessionStorage key of the last choice, kept by app.tsx until the field applies or dismisses it */
 export const THEME_CHOICE_STORAGE_KEY = "m3-theme-choice";
-/** Window event app.tsx dispatches when a new choice arrives while the field is mounted */
+/** Window event app.tsx dispatches when a new choice arrives */
 export const THEME_CHOICE_EVENT = "m3-theme-choice";
 
 export interface ThemeChoice {
@@ -68,7 +67,6 @@ export interface ThemeChoice {
   variant: Variant;
 }
 
-/** A valid `{ seed, variant }`, or null */
 export const parseThemeChoice = (value: unknown): ThemeChoice | null => {
   if (typeof value !== "object" || value === null) return null;
   const { seed, variant } = value as { seed?: unknown; variant?: unknown };

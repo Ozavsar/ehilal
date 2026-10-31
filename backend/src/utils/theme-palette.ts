@@ -22,10 +22,8 @@ import {
 import { loadImage, signFileUrls } from "./upload-blur";
 
 /**
- * Keeps the theme's generated fields (`palette`, `image_candidates`) consistent with its source
- * fields (`source_type`, `seed_color`, `source_image`, `variant`) on every save, in the draft and
- * therefore in the published version (Publish copies the draft). Editors never write the generated
- * fields: whatever a request sends for them is replaced.
+ * Keeps the theme's generated fields (`palette`, `image_candidates`) in sync with its source fields
+ * on every save; whatever a request sends for the generated fields is replaced.
  */
 
 const THEME_UID = "api::theme.theme";
@@ -70,9 +68,8 @@ const isRecord = (value: unknown): value is Fields =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 /**
- * The generated fields for a theme state. Pure apart from `loadCandidates`, which is only called
- * when the image changed or its candidates are missing. Throws a ValidationError (shown on the
- * field in the admin) when the state can't make a palette.
+ * The generated fields for a theme state; `loadCandidates` runs only when the image changed or has
+ * no candidates. Throws a ValidationError (shown on the field in the admin) for an invalid state.
  */
 export async function resolveThemePalette(
   state: ThemeState,
@@ -158,7 +155,6 @@ export function readMediaId(value: unknown): number | null | undefined {
   return undefined;
 }
 
-/** The fields of `next` whose stored value differs (JSON comparison). */
 export function changedFields(stored: Fields, next: ThemePaletteFields): Partial<ThemePaletteFields> {
   const changes: Fields = {};
   for (const [key, value] of Object.entries(next)) {
@@ -279,10 +275,8 @@ export function registerThemePalette(strapi: Core.Strapi) {
 }
 
 /**
- * Theme versions without a palette (saved before it existed) get one from the legacy colour:
- * source "color", seed = primaryLight, variant tonal_spot. Stored palettes that are out of date
- * (a new PALETTE_VERSION) are regenerated. Idempotent: does nothing once every version is current.
- * Runs once the HTTP server is up, so not in CLI commands that load the app. Call in bootstrap().
+ * Once the HTTP server is up: versions without a palette get one from the legacy primaryLight, and
+ * outdated ones (new PALETTE_VERSION) are regenerated. Idempotent. Call in bootstrap().
  */
 export function scheduleThemePaletteBackfill(strapi: Core.Strapi) {
   const { populate, themes, refreshRow } = createThemeStore(strapi);

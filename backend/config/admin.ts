@@ -27,9 +27,7 @@ export default ({ env }) => {
       nps: env.bool('FLAG_NPS', true),
       promoteEE: env.bool('FLAG_PROMOTE_EE', true),
     },
-    // "Open preview" on the Theme: the website in draft mode with the draft palette and a toolbar to
-    // try other colours live (frontend components/theme-preview-bar.tsx).
-    // Off without FRONTEND_URL and PREVIEW_SECRET.
+    // "Open preview" on the Theme: the website in draft mode with its theme preview bar
     preview: {
       enabled: Boolean(frontendUrl && previewSecret),
       config: {

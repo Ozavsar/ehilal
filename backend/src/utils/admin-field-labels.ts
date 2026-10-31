@@ -1,16 +1,8 @@
 import type { Core, Schema, UID } from "@strapi/strapi";
 
 /**
- * Human-readable labels and help texts for the fields in the admin (content-manager edit and list
- * views). Strapi keeps them in the content-manager view configuration (core store), not in
- * schema.json, so bootstrap writes them on every start.
- *
- * This file is the source of truth for labels: `label` and `description` (and `placeholder` when
- * given) overwrite whatever is stored, so a label changed under "Configure the view" is reset on the
- * next start. Layouts, field sizes, order and every other setting stay as they are, apart from the
- * one-off tidy-up of the theme's edit view below. Copy is Turkish: the site's editor works in
- * Turkish (like src/admin/m3-palette/texts.ts). Descriptions say what the field does on the site,
- * so update them when the frontend changes how a field is used.
+ * Turkish admin field labels and help texts. Strapi stores them in the content-manager view
+ * configuration, not schema.json, so bootstrap rewrites them on every start.
  */
 
 export interface FieldLabel {
@@ -287,10 +279,7 @@ export const ADMIN_FIELD_LABELS: LabelMap = {
   },
 };
 
-/* -------------------------------------------------------------------------------------------------
- * View configuration (shape of @strapi/content-manager services/utils/configuration/*)
- * -----------------------------------------------------------------------------------------------*/
-
+// Shape of @strapi/content-manager services/utils/configuration
 interface EditMetadata {
   label?: string;
   description?: string | null;
@@ -325,11 +314,7 @@ export interface MergeResult {
 // The stored configuration is plain JSON
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
-/**
- * The configuration with the labels applied: edit label / description / placeholder (placeholder
- * only when given) and list label. Fields without stored metadata are skipped. Doesn't mutate
- * `config`; `changed` is false when everything already matched.
- */
+/** Applies the labels to a copy of `config`; fields without stored metadata are skipped. */
 export function mergeFieldLabels(
   config: ViewConfiguration,
   labels: Record<string, FieldLabel>,
@@ -356,10 +341,6 @@ export function mergeFieldLabels(
   return { config: next, changed };
 }
 
-/* -------------------------------------------------------------------------------------------------
- * Theme edit view
- * -----------------------------------------------------------------------------------------------*/
-
 const THEME_UID = "api::theme.theme";
 const MAX_ROW_SIZE = 12;
 
@@ -375,9 +356,8 @@ const THEME_FIELD_SIZES: Record<string, number> = {
   primaryLight: 6,
 };
 
-// Generated on save (shown by the palette preview) or legacy. Hidden fields stay in the form values:
-// the edit view builds them from the document, not from the layout, so the palette input still reads
-// `image_candidates`.
+// Generated or legacy. Hidden fields stay in the form values (built from the document, not the
+// layout), so the palette input still reads `image_candidates`.
 const THEME_HIDDEN_FIELDS = ["image_candidates", "primaryDark", "primaryLight"];
 
 const THEME_EDIT_LAYOUT: string[][] = [
@@ -404,10 +384,7 @@ function packRows(fields: EditLayoutField[]): EditLayoutField[][] {
 const sameLayout = (a: EditLayoutField[][], b: EditLayoutField[][]) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-/**
- * True when the edit layout is still the one Strapi generated: every theme field once, default
- * sizes, rows filled in order. Anything else was arranged by hand and is left alone.
- */
+/** True when the edit layout is still the one Strapi generated (not arranged by hand). */
 export function isGeneratedThemeLayout(edit: EditLayoutField[][]): boolean {
   const fields = edit.flat();
   const names = new Set(fields.map((field) => field.name));
@@ -421,9 +398,8 @@ export function isGeneratedThemeLayout(edit: EditLayoutField[][]): boolean {
 }
 
 /**
- * Tidies the theme's generated edit view once: source fields first, the palette preview on its own
- * full-width row after the variant, generated and legacy fields hidden. A layout arranged by hand
- * (including this one, so later runs do nothing) is kept as it is.
+ * Arranges the theme's generated edit view once (palette full width, generated and legacy fields
+ * hidden). A hand-arranged layout, including this one, is kept.
  */
 export function tidyThemeEditView(config: ViewConfiguration): MergeResult {
   const edit = config.layouts?.edit;
@@ -440,10 +416,6 @@ export function tidyThemeEditView(config: ViewConfiguration): MergeResult {
   return { config: next, changed: true };
 }
 
-/* -------------------------------------------------------------------------------------------------
- * Bootstrap
- * -----------------------------------------------------------------------------------------------*/
-
 // The part of the content-manager "content-types" service used here (services/content-types.js)
 interface ContentTypesService {
   findContentType(uid: string): { uid: string } | null | undefined;
@@ -457,9 +429,8 @@ interface ContentTypesService {
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /**
- * Writes the labels into the stored view configurations. Idempotent (nothing is written when they
- * already match) and never throws: a failing type is logged and left as it is. Call in bootstrap(),
- * which runs after the content-manager has synced the configurations with the schemas.
+ * Writes the labels into the stored view configurations; idempotent, never throws. Call in
+ * bootstrap(), which runs after the content-manager has synced the configurations with the schemas.
  */
 export async function applyAdminFieldLabels(strapi: Core.Strapi): Promise<void> {
   let service: ContentTypesService;

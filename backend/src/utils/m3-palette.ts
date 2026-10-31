@@ -19,16 +19,14 @@ import {
 import sharp from "sharp";
 
 /**
- * Material 3 colour palette for the site theme: a seed colour and a variant become six schemes
- * (light/dark x standard/medium/high contrast) of the 47 colour roles, stored as the theme's
- * `palette` JSON and read by the frontend. Pure helpers, no Strapi dependency (see
- * theme-palette.ts for the wiring). Must produce exactly what frontend/src/config/default-palette.json
- * holds for the same input (`yarn palette:default` regenerates that file).
+ * Material 3 palette: seed colour + variant -> six schemes (light/dark x 3 contrast levels) of the 47
+ * colour roles. No Strapi dependency: `yarn palette:default` compiles this file alone to regenerate
+ * frontend/src/config/default-palette.json.
  */
 
 // Bump when the generated output changes for the same input, so stored palettes are regenerated
 export const PALETTE_VERSION = 1;
-// Material colour spec the schemes follow; a code constant, not an editor setting
+// Material colour spec the schemes follow
 export const SPEC_VERSION = "2021";
 export const DEFAULT_SEED = "#bf2821";
 export const DEFAULT_VARIANT = "tonal_spot";
@@ -120,7 +118,7 @@ export interface PaletteSource {
   type: SourceType;
   seed: string;
   imageId: number | null;
-  // Image sources only: which file content the candidates were read from (see theme-palette.ts)
+  // Image sources only: which file content the candidates were read from
   imageFingerprint?: string;
 }
 
@@ -158,10 +156,7 @@ export interface GeneratePaletteOptions {
   source?: { type: SourceType; imageId?: number | null; imageFingerprint?: string };
 }
 
-/**
- * Seed + variant -> the palette JSON. Role values are the library's dynamic colours, as in the
- * Material Theme Builder.
- */
+/** Seed + variant -> the palette JSON, with the same dynamic colours as Material Theme Builder. */
 export function generatePalette({
   seed,
   variant = DEFAULT_VARIANT,
@@ -193,9 +188,7 @@ export function generatePalette({
   };
 }
 
-/**
- * Identifies the input a palette was generated from: equal fingerprints mean equal palettes.
- */
+/** Identifies the input a palette was generated from: equal fingerprints mean equal palettes. */
 export function getPaletteFingerprint(palette: Pick<Palette, "version" | "source" | "options">) {
   const { version, source, options } = palette;
   return JSON.stringify([
@@ -209,9 +202,7 @@ export function getPaletteFingerprint(palette: Pick<Palette, "version" | "source
   ]);
 }
 
-/**
- * Whether a stored value is a complete palette (every scheme with every role as "#rrggbb").
- */
+/** Whether a stored value is a complete palette (every scheme with every role as "#rrggbb"). */
 export function isPalette(value: unknown): value is Palette {
   if (!isRecord(value) || !isRecord(value.source) || !isRecord(value.options)) return false;
   if (!isRecord(value.schemes) || typeof value.version !== "number") return false;
@@ -228,7 +219,6 @@ export function isPalette(value: unknown): value is Palette {
   });
 }
 
-/** Whether a stored value is a list of candidate colours. */
 export const isCandidateList = (value: unknown): value is string[] =>
   Array.isArray(value) &&
   value.length > 0 &&
@@ -241,9 +231,8 @@ const QUANTIZER_COLORS = 128;
 const NO_COLOR = 0;
 
 /**
- * Up to `max` seed candidates from an image, best first, picked like the Material Theme Builder
- * does (Celebi quantizer + Score). An image with no colourful area (a grey photo) still gives its
- * dominant greys instead of the library's fallback blue. Empty when the image has no opaque pixel.
+ * Up to `max` seed candidates from an image, best first (Celebi quantizer + Score, as in Material
+ * Theme Builder). A grey photo gives its dominant greys, not the library's fallback blue.
  */
 export async function extractCandidates(image: Buffer, max = 4): Promise<string[]> {
   const { data } = await sharp(image)

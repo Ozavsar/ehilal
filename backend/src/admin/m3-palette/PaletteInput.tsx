@@ -1,6 +1,5 @@
-// Custom field input for `theme.palette`: the variant, the photo's candidate colours and the state of
-// the stored palette. Colours are tried on the website itself (Strapi Preview → theme preview bar).
-// It writes `seed_color` (a candidate, or the colour sent from the preview) and `variant` (from the preview).
+// Custom field input for `theme.palette`: variant, photo candidates and the stored palette's state.
+// Writes `seed_color` (a candidate or the preview's colour) and `variant`.
 import * as React from "react";
 import { Box, Button, Field, Flex, Typography } from "@strapi/design-system";
 import { useForm } from "@strapi/strapi/admin";
@@ -27,7 +26,7 @@ interface PaletteInputProps {
   value?: unknown;
 }
 
-// Sibling fields of the `theme` single type (see the schema).
+// Sibling fields of the `theme` single type
 const FIELDS = {
   sourceType: "source_type",
   seed: "seed_color",

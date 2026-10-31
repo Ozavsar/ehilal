@@ -28,9 +28,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/**
- * The file's URLs, signed when the bucket is private, the stored ones otherwise.
- */
+/** The file's URLs, signed when the bucket is private, the stored ones otherwise. */
 export function signFileUrls(
   strapi: Core.Strapi,
   file: Pick<BlurFile, "url" | "formats" | "provider">,
@@ -41,9 +39,7 @@ export function signFileUrls(
     .signFileUrls({ url: file.url, formats: file.formats, provider: file.provider });
 }
 
-/**
- * The bytes of an uploaded image (a URL from signFileUrls). Also used by theme-palette.ts.
- */
+/** The bytes of an uploaded image (a URL from signFileUrls). */
 export async function loadImage(strapi: Core.Strapi, url: string): Promise<Buffer> {
   // Local provider: "/uploads/<file>" in the public folder
   if (url.startsWith("/")) return readFile(path.join(strapi.dirs.static.public, url));
@@ -59,8 +55,8 @@ export async function loadImage(strapi: Core.Strapi, url: string): Promise<Buffe
 }
 
 /**
- * Stores a blur placeholder on every uploaded or replaced image (see utils/blur.ts), and backfills
- * images that don't have one yet. Runs in the background: never blocks or fails an upload or startup.
+ * Stores a blur placeholder on every uploaded or replaced image and backfills the missing ones, in
+ * the background: never blocks or fails an upload or startup.
  */
 export function registerBlurPlaceholders(strapi: Core.Strapi) {
   const files = () => strapi.db.query(FILE_UID);
@@ -156,7 +152,7 @@ export function registerBlurPlaceholders(strapi: Core.Strapi) {
     );
   }
 
-  // Only when the HTTP server starts: not in CLI commands that load the app (console, transfer, export…)
+  // Only once the HTTP server is up, not in CLI commands that load the app (console, transfer…)
   strapi.server.httpServer.once("listening", () => {
     setTimeout(() => {
       backfill().catch((error) => {

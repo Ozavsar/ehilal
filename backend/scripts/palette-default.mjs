@@ -1,7 +1,5 @@
-// Writes the website's fallback palette (frontend/src/config/default-palette.json), used when
-// Strapi has no published theme palette or can't be reached. Same generator as the theme save
-// (src/utils/m3-palette.ts), run from its compiled output: `yarn palette:default [seed] [variant]`.
-// No Strapi app is loaded.
+// Writes the website's fallback palette (frontend/src/config/default-palette.json) with the theme's
+// generator (src/utils/m3-palette.ts): `yarn palette:default [seed] [variant]`. Loads no Strapi app.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";

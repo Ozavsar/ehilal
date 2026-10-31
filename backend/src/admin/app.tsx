@@ -7,9 +7,8 @@ import {
   parseThemeChoice,
 } from "./m3-palette/palette";
 
-// The website's theme preview bar (inside Strapi Preview's iframe) posts the colour chosen there.
-// The preview page doesn't mount the edit form, so the choice is kept in sessionStorage until the
-// Theme's palette field offers to apply it. Only messages from a frame on this page are accepted.
+// Keeps the colour posted by the website's preview bar (Strapi Preview iframe) in sessionStorage,
+// since the preview page doesn't mount the edit form. Only frames on this page are trusted.
 const receiveThemeChoice = (event: MessageEvent) => {
   if ((event.data as { type?: unknown } | null)?.type !== THEME_CHOICE_MESSAGE) return;
   const fromPreviewFrame = Array.from(document.querySelectorAll("iframe")).some(

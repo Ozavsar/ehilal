@@ -1,4 +1,4 @@
-// Editor-facing copy of the palette field. The site's editor works in Turkish, so the copy is Turkish.
+// Editor-facing (Turkish) copy of the palette field
 import type { Variant } from "./palette";
 
 export const VARIANT_INFO: Record<Variant, { name: string; description: string }> = {
