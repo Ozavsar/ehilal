@@ -62,6 +62,9 @@ const LEGACY_SITEMAPS = ["main", "blog", "videos", "courses", "conferences"];
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // `yarn dev` only: lets a phone on the local network open the dev server by its LAN address
+  // (http://192.168.x.y:3000); Next blocks dev resources for other origins than localhost
+  allowedDevOrigins: ["192.168.*.*"],
   async headers() {
     const headers = isProductionSite()
       ? securityHeaders
