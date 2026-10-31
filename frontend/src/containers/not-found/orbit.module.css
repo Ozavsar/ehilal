@@ -1,6 +1,4 @@
-/* The rocket circling the "0": one revolution every 12 s. Linear, as a steady orbit has no start or
-   end to ease into (the same reason M3's circular progress spins linearly). Still under reduced
-   motion. */
+/* The rocket circling the "0". Linear: a steady orbit has no start or end to ease into. */
 .orbit {
   animation: orbit calc(var(--duration-extra-long4) * 12) linear infinite;
 }

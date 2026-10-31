@@ -1,16 +1,14 @@
 import { COMPANY_LINKEDIN_URL, COMPANY_URL, LEGALIFI_URL } from "@/config/constants";
 import type { ISiteSettings } from "@/types";
 
-// Public site settings shared by layouts, metadata and sitemaps.
-// NEXT_PUBLIC_* values are inlined at build time, so each one must be read with a literal process.env access.
+// NEXT_PUBLIC_* values are inlined at build time: read each one with a literal process.env access
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ehilal.net";
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Elif Hilal Kara";
 export const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@elifhilalumucu";
 export const TWITTER_USER_ID = process.env.NEXT_PUBLIC_TWITTER_USER_ID || "1035512458935521280";
 export const DEFAULT_BANNER = process.env.NEXT_PUBLIC_DEFAULT_BANNER || `${SITE_URL}/api/og`;
 
-// Used for every field the Strapi Site Settings leave empty (getSiteSettings()), and for all of them
-// until the single type is published. Prefer getSiteSettings() over the constants above when rendering.
+// Fallback for every field the Strapi Site Settings leave empty; render getSiteSettings() instead
 export const DEFAULT_SITE_SETTINGS: ISiteSettings = {
   siteName: SITE_NAME,
   jobTitle: "Legal Engineer",

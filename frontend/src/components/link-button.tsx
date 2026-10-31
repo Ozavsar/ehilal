@@ -1,7 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// A secondary link in a card footer, as an M3 text button (same height as a small filled button)
+// A secondary link in a card footer, as an M3 text button
 export default function LinkButton({
   children,
   className,

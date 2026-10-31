@@ -9,10 +9,8 @@ import { NAV_TOP } from "@/components/view-transitions";
 import NavGroup from "./nav-group";
 import NavLink from "./nav-link";
 
-// The destinations of the M3 navigation bar (below 600px, sm) and navigation rail (from 600px);
-// the bar/rail box itself is in ../header. Every item shows its icon and its label; the current
-// one has the active indicator pill and a filled icon, and its link aria-current="page". A group
-// item ("Learn") opens a menu of its destinations and is current when one of them is.
+// The destinations of the navigation bar/rail (the box itself is in ../header). A group item opens
+// a menu of its destinations and is current when one of them is.
 export default function NavigationLinks() {
   const pathname = usePathname();
   const activeIndex = MENUS.MAIN.findIndex((item) =>
@@ -22,10 +20,8 @@ export default function NavigationLinks() {
   const indicatorRef = useRef<HTMLSpanElement>(null);
   const previousIndex = useRef(activeIndex);
 
-  // The indicator is rendered in the active destination, so it is right without JS. When the
-  // destination changes, it slides over from the previous one (FLIP: start at the old slot's
-  // offset, then transition to its own place); with no previous destination it grows from its
-  // centre. Measured on the live layout, so it works the same along the bar and down the rail.
+  // The indicator renders in the active destination (right without JS) and slides over from the
+  // previous one with a measured FLIP, so it works along the bar and down the rail.
   useLayoutEffect(() => {
     const from = previousIndex.current;
     previousIndex.current = activeIndex;
@@ -44,7 +40,7 @@ export default function NavigationLinks() {
       indicator.style.scale = "0.32 1";
       indicator.style.opacity = "0";
     }
-    // Commit the start state, then let the indicator's transition carry it home
+    // Forced reflow: commits the start state before the transition takes over
     indicator.getBoundingClientRect();
     indicator.style.removeProperty("transition");
     indicator.style.removeProperty("translate");
@@ -66,7 +62,6 @@ export default function NavigationLinks() {
           "group flex min-w-0 flex-1 flex-col items-center gap-1 pt-3 pb-4 outline-none sm:mx-auto sm:h-14 sm:w-20 sm:flex-none sm:p-0";
         const content = (
           <>
-            {/* Slot: holds the indicator; the state layer and the M3 focus ring share its shape */}
             <span
               data-nav-slot
               className={cn(
@@ -75,8 +70,7 @@ export default function NavigationLinks() {
               )}
             >
               {isActive && (
-                // Behind every icon and label of the bar/rail (its stacking context), so it slides
-                // under the destinations it passes
+                // Behind every icon and label, so it slides under the destinations it passes
                 <span
                   ref={indicatorRef}
                   aria-hidden="true"
@@ -109,7 +103,6 @@ export default function NavigationLinks() {
             key={key}
             href={item.href}
             aria-current={isActive ? "page" : undefined}
-            // M3 fade through of the page content (app/template.tsx)
             transitionTypes={[NAV_TOP]}
             className={itemClassName}
           >

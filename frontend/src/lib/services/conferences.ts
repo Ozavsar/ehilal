@@ -5,10 +5,7 @@ import type { IImage, IStrapiCollectionResponse, IStrapiConference } from "@/typ
 // The media field may hold non-image uploads, which next/image can't render
 const isPhoto = (image: IImage) => Boolean(image.mime?.startsWith("image/"));
 
-/**
- * Fetch conferences, newest first, with optional pagination. `images` only holds photos and has no
- * blur placeholders: add them to the rendered conferences with `withCoverPlaceholders`.
- */
+/** Conferences, newest first. `images` holds photos only, without blur placeholders. */
 export async function getAllConferences(start?: number, limit?: number) {
   const baseQuery = {
     sort: { date: "desc" },
@@ -37,9 +34,6 @@ export async function getAllConferences(start?: number, limit?: number) {
   };
 }
 
-/**
- * Number of conferences, without loading any images (generateStaticParams).
- */
 export async function getConferenceCount(): Promise<number> {
   const response = await fetchAPI<IStrapiCollectionResponse<Pick<IStrapiConference, "date">>>(
     "/conferences",
@@ -49,10 +43,7 @@ export async function getConferenceCount(): Promise<number> {
   return response.meta.pagination.total;
 }
 
-/**
- * Adds a blur placeholder to the first photo of each conference: the only one visible until the
- * card's gallery is used.
- */
+/** Blur placeholder for each conference's first photo, the only one visible before the gallery */
 export function withCoverPlaceholders(
   conferences: IStrapiConference[],
 ): Promise<IStrapiConference[]> {

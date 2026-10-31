@@ -11,7 +11,6 @@ import MediumRenderer, { getGiphyId, giphyUrl } from "./medium-renderer";
 
 interface IArticleContainerProps {
   article: IBlog;
-  /** Detected from the text (lib/language.ts), the same as the page metadata */
   language: ContentLanguage;
   /** ISO 8601 dates from the article list; undefined when the list can't load */
   publishedAt?: string;
@@ -34,8 +33,7 @@ export default async function ArticleContainer({
     const giphyId = p.iframe ? getGiphyId(p.iframe.mediaResource.iframeSrc) : null;
     return giphyId ? [giphyUrl(giphyId, "480w_s.jpg")] : [];
   });
-  // Settings and list are cached and already loaded by the page (metadata, dates); the media
-  // checks are cached per URL
+  // All cached: the page already loaded settings and list, media checks are cached per URL
   const [{ siteName }, articles, animatedImages, removedMedia] = await Promise.all([
     getSiteSettings(),
     getArticlesForLinks(),
@@ -45,8 +43,7 @@ export default async function ArticleContainer({
   const { postPaths, series, related } = getArticleLinks(articles, article, language, translation);
 
   return (
-    // M3 top margin: below the theme toggle row on compact screens, 32dp from the window edge above.
-    // <main> is the (client) template's.
+    // <main> is the (client) template's
     <div className="px-4 pt-4 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
       <MediumRenderer
         postId={article.id}

@@ -3,18 +3,14 @@ import { cn } from "@/lib/utils";
 interface TitleSectionProps {
   text: string;
   backgroundText: string;
-  /** A line under the title, part of the heading: what the page is about, in search terms */
+  /** A line under the title, inside the heading: the page topic in search terms */
   subtitle?: string;
   /** Heading level; pass "h1" where the page has no other h1 */
   as?: "h1" | "h2";
 }
 
-// The list pages' title: one heading for every window size (display role sizes, uppercase and
-// black weight), the last word in the primary colour, and from sm a large faded word behind it
-// (decorative, hidden from assistive tech). The subtitle (config/seo.ts) gives the short CMS title
-// the topic searchers look for, inside the same heading.
-// Entrances are @starting-style transitions (Tailwind `starting:`): they run when the element is
-// first rendered, need no client JS, and are skipped for reduced-motion users.
+// The list pages' title: the last word in the primary colour and, from sm, a large faded word
+// behind it (decorative)
 export default function TitleSection({
   text,
   backgroundText,

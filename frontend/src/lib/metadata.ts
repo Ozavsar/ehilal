@@ -19,23 +19,18 @@ interface BuildMetaOptions {
   /** og:title / twitter:title; defaults to `title` */
   ogTitle?: string;
   path: string;
-  /**
-   * The title already names the site: skip the root layout's " | <site name>" template. Titles
-   * that would pass MAX_TITLE_LENGTH with it (long article titles) skip it too.
-   */
+  /** Skip the " | <site name>" template (also skipped when it would pass MAX_TITLE_LENGTH) */
   absoluteTitle?: boolean;
   type?: "website" | "article";
   /** Defaults to the Site Settings' default OG image */
   image?: OgImage;
-  /** Content language (og:locale); the site language when omitted */
+  /** og:locale; English when omitted */
   language?: ContentLanguage;
-  /** Article pages: article:published_time / modified_time */
   article?: { publishedTime?: string; modifiedTime?: string };
   /** The same page in each language, this one included (hreflang); English is the x-default */
   languages?: Partial<Record<ContentLanguage, string>>;
 }
 
-/** The article RSS feed (app/feed.xml), announced in every page's <head> */
 export const FEED_PATH = "/feed.xml";
 
 export const absoluteUrl = (path: string) =>
@@ -63,7 +58,6 @@ export async function buildMeta({
 }: BuildMetaOptions): Promise<Metadata> {
   const site = await getSiteSettings();
   const url = absoluteUrl(path);
-  // Article titles come from Medium: no emoji in results, cut to what results show
   const pageTitle = fitTitle(title);
   const ogImage = image || {
     ...site.defaultOgImage,
@@ -123,7 +117,7 @@ export async function buildMeta({
   };
 }
 
-/** buildMeta for a page whose copy is in config/seo.ts (lists: listPageSeo()), with its /api/og card as the image */
+/** buildMeta for a page whose copy is in config/seo.ts, with its /api/og card as the image */
 export function buildPageMeta(seo: PageSeo, path: string): Promise<Metadata> {
   return buildMeta({
     title: seo.title,
@@ -134,17 +128,14 @@ export function buildPageMeta(seo: PageSeo, path: string): Promise<Metadata> {
   });
 }
 
-// ---------------------------------------------------------------------------------------------
-// Schema.org JSON-LD (rendered with components/json-ld.tsx). Nodes reference each other by @id:
-// the Person and the WebSite are in the root layout, pages add their own nodes and link to them.
+// Schema.org JSON-LD: page nodes link by @id to the root layout's Person and WebSite
 
 type JsonLdNode = Record<string, unknown>;
 
 export const PERSON_ID = `${SITE_URL}/#person`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
-// The companies' own @id (their sites' Organization JSON-LD uses "<origin>#organization"), so
-// search engines join the nodes of both sites; ours when the URL isn't one
+// Same @id as the companies' own sites ("<origin>#organization"), so search engines join the nodes
 const organizationId = (url: string, fallback: string) => {
   try {
     return `${new URL(url).origin}#organization`;
@@ -153,16 +144,12 @@ const organizationId = (url: string, fallback: string) => {
   }
 };
 
-/** Wraps nodes in one document with a single @context */
 export const jsonLdGraph = (...nodes: JsonLdNode[]) => ({
   "@context": "https://schema.org",
   "@graph": nodes,
 });
 
-/**
- * The site owner, the companies she co-founded and the website, for the root layout. `sameAs`: her
- * profiles on other sites; `portrait`: the home page photo (absolute URL), when Strapi has one.
- */
+/** Root layout graph: the Person, her companies and the WebSite. `portrait` has an absolute URL. */
 export function siteJsonLd(
   site: ISiteSettings,
   sameAs: string[],
@@ -189,7 +176,6 @@ export function siteJsonLd(
       description: HOME_SEO.description,
       worksFor: [{ "@id": karakodId }, { "@id": legalifiId }],
       knowsAbout: PERSON_KNOWS_ABOUT,
-      // She writes in both (the blog has Turkish and English articles)
       knowsLanguage: ["tr", "en"],
       sameAs: [...new Set(sameAs)],
     },
@@ -222,7 +208,6 @@ export function siteJsonLd(
   );
 }
 
-/** Home page: a profile page about the Person (the root layout's node, photo included) */
 export function profilePageJsonLd(dateModified: string | undefined) {
   return jsonLdGraph({
     "@type": "ProfilePage",
@@ -237,7 +222,7 @@ export function profilePageJsonLd(dateModified: string | undefined) {
   });
 }
 
-/** Home → … → the current page. Each item is a name and a site path. */
+/** Home → … → the current page (Home is added) */
 export function breadcrumbJsonLd(items: { name: string; path: string }[]): JsonLdNode {
   return {
     "@type": "BreadcrumbList",
@@ -262,9 +247,8 @@ export function listBreadcrumbJsonLd(
 }
 
 /**
- * A list page's Udemy courses, taught by the Person. No rich result (Google's course list needs
- * course pages on this site, Course info was retired in 2025): it tells search engines who the
- * instructor is. `firstPosition`: the first course's place in the whole list (page 2 goes on).
+ * A list page's Udemy courses, taught by the Person (no rich result: it names the instructor).
+ * `firstPosition`: the first course's place in the whole list.
  */
 export function courseListJsonLd(
   courses: Pick<ICourse, "title" | "headline" | "udemyURL">[],
@@ -302,7 +286,6 @@ interface BlogPostingOptions {
   site: ISiteSettings;
 }
 
-/** An article page (/blog/<slug>), written and published by the Person */
 export function blogPostingJsonLd({
   path,
   headline,

@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 // A heading becomes current once its top passes this share of the viewport height
 const ACTIVE_LINE = 0.25;
 
-// Id of the section being read: the last heading above the active line. Scrolling up through a
-// long section keeps it current, and at the very bottom the last heading wins (short final
+// Id of the last heading above the active line; at the very bottom the last heading (short final
 // sections never reach the line). Lenis scrolls the window, so plain scroll events cover it too.
 export function useScrollSpy(headingIds: string[]) {
   const [activeId, setActiveId] = useState<string | null>(null);

@@ -17,10 +17,7 @@ const DESTINATION_HINTS: Record<string, string> = {
 
 const DESTINATIONS = MENUS.NAV.filter(({ key }) => key !== "HOME");
 
-/**
- * The 404 page: "4, planet, 4" over a short message, a filled button home and a card for every
- * other destination so a lost visitor can carry on. Same chrome and palette as every page.
- */
+/** The 404 page: "4, planet, 4", a button home and a card for every other destination */
 export default function NotFoundView({ image }: { image: IImage | null | undefined }) {
   return (
     <main

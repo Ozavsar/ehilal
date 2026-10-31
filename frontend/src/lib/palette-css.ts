@@ -1,9 +1,8 @@
 import defaultPaletteJson from "@/config/default-palette.json";
 
-// Palette types, the default palette and the CSS output, without zod: global-error.tsx (a Client
-// Component) uses them. Server code reads palettes through lib/palette.ts, which validates them.
+// Palette types and CSS output without zod, so Client Components (global-error.tsx) can use them
 
-// Material 3 colour roles, in the order the Strapi generator writes them (backend/src/utils/m3-palette.ts)
+// Material 3 colour roles, in the order backend/src/utils/m3-palette.ts writes them
 export const ROLES = [
   "primary",
   "onPrimary",
@@ -72,7 +71,7 @@ export const kebab = (role: string) => role.replace(/[A-Z]/g, (c) => `-${c.toLow
 
 export type Scheme = Record<Role, string>;
 
-// The JSON Strapi stores in theme.palette (backend/src/utils/m3-palette.ts writes it)
+// The JSON Strapi stores in theme.palette
 export interface Palette {
   version: 1;
   source: { type: "color" | "image"; seed: string; imageId?: number | null };
@@ -81,22 +80,21 @@ export interface Palette {
 }
 
 /**
- * Generated from the default seed (`yarn palette:default` in backend/); used whenever Strapi has no
- * valid palette. Cast, not parsed, to keep zod out of the client: the file is generated, not edited.
+ * Fallback when Strapi has no valid palette (`yarn palette:default` in backend/). Cast, not parsed,
+ * to keep zod out of the client.
  */
 export const DEFAULT_PALETTE = defaultPaletteJson as Palette;
 
 const schemeVars = (scheme: Scheme) =>
   ROLES.map((role) => `--m3-${kebab(role)}:${scheme[role].toLowerCase()};`).join("");
 
-/** The light and dark schemes as CSS custom properties: light on :root, dark on .dark (next-themes). */
+/** Light scheme on :root, dark on .dark (next-themes), as CSS custom properties */
 export const schemesToCss = (light: Scheme, dark: Scheme) =>
   `:root{${schemeVars(light)}}.dark{${schemeVars(dark)}}`;
 
 /**
- * The palette as CSS custom properties: light on :root, dark on .dark (next-themes), and the
- * high-contrast schemes when the OS asks for more contrast. Medium contrast is not emitted yet.
- * Only call it with DEFAULT_PALETTE or a palette that passed parsePalette(): values are not escaped.
+ * schemesToCss plus the high-contrast schemes under prefers-contrast: more. Values are not escaped:
+ * pass only DEFAULT_PALETTE or a palette that passed parsePalette().
  */
 export function paletteToCss(palette: Palette): string {
   const { schemes } = palette;

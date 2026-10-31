@@ -8,17 +8,14 @@ import { useScrollSpy } from "./table-of-contents/use-scroll-spy";
 import { flattenHeadingTree, type IHeadingNode } from "./table-of-contents/heading-tree";
 import { ARTICLE_STRINGS } from "./strings";
 
-// Client shell around the server-rendered article body: desktop and mobile TOC share one scroll spy.
-// From lg the TOC is a sticky column beside the text; below lg a FAB opens it in a bottom sheet.
-// The TOC follows the article in the DOM (the flex row still shows it on the right), so the
-// article's <h1> is the first heading screen readers list.
+// Client shell around the server-rendered article body; desktop and mobile TOC share one scroll spy.
+// The TOC follows the article in the DOM so the <h1> is the first heading screen readers list.
 export default function ArticleLayout({
   headingTree,
   lang,
   children,
 }: {
   headingTree: IHeadingNode[];
-  // Language of the article: the TOC label is written in it and the entries (its headings) are read in it
   lang: ContentLanguage;
   children: ReactNode;
 }) {

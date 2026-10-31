@@ -33,8 +33,7 @@ interface ArticleLinkProps {
   children: ReactNode;
 }
 
-// Internal article page when the article is readable here, otherwise the source site. The title
-// link is the card's one link for keyboard and screen reader users, named by the title itself.
+// Internal article page when the article is readable here, otherwise the source site
 function ArticleLink({ slug, externalURL, duplicate, className, children }: ArticleLinkProps) {
   const duplicateProps = duplicate ? { tabIndex: -1, "aria-hidden": true } : {};
   if (slug) {
@@ -104,7 +103,6 @@ export default function ArticleCard({
               src={thumbnailURL || "/images/blog/default-blog.jpg"}
               // Decorative: the title right below names the card
               alt=""
-              // 16:9 like the rendered box; the card is one column of the list grid
               width={640}
               height={360}
               sizes={LIST_CARD_IMAGE_SIZES}
@@ -116,7 +114,6 @@ export default function ArticleCard({
               fetchPriority={priority ? "high" : "auto"}
               className="ease-standard aspect-video w-full object-cover duration-300 select-none group-hover:scale-105 motion-safe:transition-transform"
             />
-            {/* Hover cue, same as the video and conference cards */}
             <span
               aria-hidden="true"
               className="bg-scrim/40 ease-standard absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100"

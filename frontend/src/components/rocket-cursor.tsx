@@ -7,34 +7,27 @@ import { ROCKET_QUERY, rocketDock, useRocketPhase } from "@/hooks/use-rocket-doc
 import { cn } from "@/lib/utils";
 
 const MOUSE_MARGIN = 5;
-// Fumes come from a fixed pool reused round-robin: one every 50ms, each fading out over 1s, so
-// about 20 are visible at once and the DOM never changes while the rocket flies.
+// Fixed pool reused round-robin, so the DOM never changes while the rocket flies
 const FUME_POOL_SIZE = 20;
 const FUME_INTERVAL_MS = 50;
 const FUME_LIFETIME_MS = 1000;
-// Each puff is a 30px circle scaled down to its random 10-30px size. The old per-puff
-// `box-shadow: 0 0 100px #ffffff20` is gone: a blur that wide spreads a puff this small to ~1%
-// alpha (measured at most 2/255 brighter on the dark theme), but it was expensive to paint.
+// Base size, scaled down per puff; no box-shadow (expensive to paint, invisible at this size)
 const FUME_SIZE = 30;
-// The puffs of a touchdown or an ignition, spreading sideways over the pad
+// Touchdown and ignition puffs
 const BURST_LIFETIME_MS = 700;
-// Following, the rocket turns toward the pointer with this time constant instead of snapping
-// (about 40% of the way per 60 Hz frame)
+// Time constant of the turn toward the pointer
 const TURN_MS = 40;
-// After a take-off the follow loop eases its speed and turn rate in over this long, so the rocket
-// leaves the top of its climb without a jerk
+// The follow loop eases in over this long after a take-off
 const HANDOVER_MS = 700;
-// The engine glow: a fixed (theme-independent) warm palette role, as a flame is the same colour on
-// any background; it follows palette changes through the variable
+// A theme-independent warm role: a flame looks the same on any background
 const GLOW_SHADOW =
   "0 0 100px 20px color-mix(in oklab, var(--m3-tertiary-fixed-dim) 80%, transparent)";
 
 type Ease = (progress: number) => number;
 
 /**
- * One step of a landing or take-off: the pose to reach by `end` ms, relative to the parking spot
- * (dx/dy in px, angle in deg, scale), with the M3 easing of the move. `engine` keeps the trail of
- * fumes going during the step.
+ * A landing or take-off step: the pose reached at `end` ms, relative to the parking spot (dx/dy in
+ * px, angle in deg). `engine` emits fumes during the step.
  */
 type Step = {
   end: number;
@@ -52,7 +45,6 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): Ease {
   const curve = (p1: number, p2: number, t: number) =>
     3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t;
   return (x) => {
-    // x(t) rises monotonically for CSS easings, so bisection always finds t
     let low = 0;
     let high = 1;
     for (let i = 0; i < 20; i++) {
@@ -65,8 +57,8 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): Ease {
 }
 
 /**
- * An M3 easing token of globals.css as a function, so JS motion matches CSS. Pass the full
- * utility name (`"ease-standard"`): Tailwind only emits the `--ease-*` variables it sees used.
+ * An M3 easing token of globals.css as a function. Pass the full utility name (`"ease-standard"`):
+ * Tailwind only emits the `--ease-*` variables it sees used.
  */
 function readEasing(styles: CSSStyleDeclaration, utility: string): Ease {
   const match = /cubic-bezier\(([^)]*)\)/.exec(styles.getPropertyValue(`--${utility}`));
@@ -79,13 +71,12 @@ function readEasing(styles: CSSStyleDeclaration, utility: string): Ease {
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
-// Degrees folded into -180..180, so a turn takes the short way round
+// Folds into -180..180, so a turn takes the short way round
 const wrapAngle = (degrees: number) => degrees - 360 * Math.round(degrees / 360);
 
 export default function RocketCursor() {
   const enabled = useMediaQuery(ROCKET_QUERY);
-  // Parked, the dock draws the rocket (components/header/rocket-dock.tsx); this one hides in the
-  // same render, so the hand-over at the end of a landing or the start of a take-off is seamless
+  // Parked, the dock draws the rocket and this one hides in the same render (seamless hand-over)
   const phase = useRocketPhase();
   const rocketRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
@@ -134,7 +125,7 @@ export default function RocketCursor() {
     let stepIndex = -1;
     let timelineStart = 0;
     let onTimelineEnd = () => {};
-    // The pose a timeline started from (its first step moves away from it)
+    // The pose the timeline started from
     let fromX = 0;
     let fromY = 0;
     let fromAngle = 0;
@@ -163,7 +154,6 @@ export default function RocketCursor() {
       }
     };
 
-    // One puff from the pool: centred on x/y, drifting by driftX/driftY while it fades
     const puff = (
       x: number,
       y: number,
@@ -192,7 +182,7 @@ export default function RocketCursor() {
       );
     };
 
-    // Puff at the nozzle (bottom centre of the rotated rocket box), drifting 10px further back
+    // A puff at the nozzle (bottom centre of the rotated rocket box)
     const spawnFume = () => {
       const size = Math.random() * 20 + 10;
       const radians = (angle * Math.PI) / 180;
@@ -204,7 +194,7 @@ export default function RocketCursor() {
       puff(x, y, size, -10 * sin, 10 * cos, FUME_LIFETIME_MS);
     };
 
-    // Upright on the pad: puffs roll out to both sides of the nozzle
+    // Puffs rolling out to both sides of the nozzle, upright on the pad
     const burst = (count: number, spread: number) => {
       const x = rocketX + rocketWidth / 2;
       const y = rocketY + rocketHeight - 6;
@@ -227,7 +217,6 @@ export default function RocketCursor() {
     const follow = (elapsed: number) => {
       const fps = Math.max(1, Math.min(Math.round(1000 / elapsed), 200));
 
-      // Each frame covers 1/fps of the distance, unless the rocket already sits on the pointer
       let xSpeed = 0;
       let ySpeed = 0;
       const onPointer =
@@ -275,7 +264,7 @@ export default function RocketCursor() {
       const step = steps[stepIndex];
       if (!step) return;
 
-      // Measured every frame: the pad leans toward the pointer while the rocket comes in
+      // Measured every frame: the pad leans toward the pointer
       const box = pad.getBoundingClientRect();
       const spotX = box.left + box.width / 2 - rocketWidth / 2;
       const spotY = box.top + box.height / 2 - rocketHeight / 2;
@@ -305,7 +294,6 @@ export default function RocketCursor() {
       if (mode === "follow") follow(elapsed);
       else if (mode === "timeline") advanceTimeline(timeStamp, elapsed);
 
-      // Parked: the loop stops until the next take-off
       if (mode === "parked") {
         frameId = 0;
         return;
@@ -336,14 +324,12 @@ export default function RocketCursor() {
       startLoop();
     };
 
-    // Engine off: no glow, no fumes, no frames; the dock shows the rocket from now on
     const park = () => {
       mode = "parked";
       glow.style.opacity = "0";
       setHeart(false);
     };
 
-    // Back on the pad's centre, upright, to take off from where the dock drew it
     const placeOnPad = () => {
       const box = rocketDock.getPad()?.getBoundingClientRect();
       if (box) {
@@ -364,8 +350,7 @@ export default function RocketCursor() {
       glow.style.opacity = "";
     };
 
-    // Glides in above the pad while turning upright, eases down onto it with the engine braking,
-    // then a soft touchdown: a slight squash and a small hop (about 2 s)
+    // Glide in above the pad, ease down, then a soft touchdown with a squash and a hop (~2 s)
     const landing: Step[] = [
       { end: 950, dx: 0, dy: -28, angle: 0, scaleX: 1, scaleY: 1, ease: emphasized, engine: true },
       { end: 1600, dx: 0, dy: 0, angle: 0, scaleX: 1, scaleY: 1, ease: standard, engine: true },
@@ -392,8 +377,7 @@ export default function RocketCursor() {
       },
       { end: 1960, dx: 0, dy: 0, angle: 0, scaleX: 1, scaleY: 1, ease: standard, engine: false },
     ];
-    // Ignites and crouches, then lifts off gradually and slows at the top of its climb, where the
-    // follow loop eases in (about 1.25 s)
+    // Ignite and crouch, then lift off and slow at the top, where the follow loop eases in (~1.25 s)
     const takeoff: Step[] = [
       {
         end: 350,
@@ -433,7 +417,6 @@ export default function RocketCursor() {
       });
     };
 
-    // Mid-flight requests turn the rocket around from wherever it is
     const handlePhase = () => {
       const current = rocketDock.getPhase();
       if (current === "landing" && mode !== "parked") land();
@@ -455,7 +438,7 @@ export default function RocketCursor() {
       startLoop();
     }
 
-    // Stop the loop too, otherwise every time the media query flips on another one starts
+    // Cancel the frame too, or every media query flip starts another loop
     return () => {
       window.cancelAnimationFrame(frameId);
       unsubscribe();
@@ -467,8 +450,7 @@ export default function RocketCursor() {
 
   if (!enabled) return null;
 
-  // will-change keeps the rocket (and its large glow) on its own layer, so moving it each frame
-  // doesn't repaint the page underneath
+  // will-change keeps the rocket and its large glow on their own layer (no repaint per frame)
   return (
     <>
       {Array.from({ length: FUME_POOL_SIZE }, (_, index) => (
@@ -491,7 +473,6 @@ export default function RocketCursor() {
         aria-hidden="true"
       >
         <RocketGlyph />
-        {/* The engine's glow: off while parked */}
         <div
           ref={glowRef}
           className="ease-standard absolute top-0 left-1/2 size-0 transition-opacity duration-500"

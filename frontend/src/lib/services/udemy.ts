@@ -3,12 +3,11 @@ import { z } from "zod";
 import { UDEMY_USER_ID } from "@/config/constants";
 import type { ICourse } from "@/types";
 
-const REVALIDATE = 60 * 60 * 24; // 24 hours
+const REVALIDATE = 60 * 60 * 24;
 
 const UDEMY_PAGE_SIZE = 100; // Udemy API max
 const MAX_UDEMY_PAGES = 10; // safety cap while following `next` links
 
-// Only the fields we use: a schema change fails loudly instead of rendering undefined
 const courseSchema = z.object({
   title: z.string(),
   url: z.string(), // path on www.udemy.com
@@ -26,8 +25,6 @@ const responseSchema = z.object({
   results: z.array(courseSchema),
 });
 
-// Every course, without blur placeholders (add them to the rendered page with withBlurDataURLs).
-// The Udemy responses are in the fetch cache; cache() shares the result within one request.
 export const getAllCourses = cache(async (): Promise<ICourse[]> => {
   const fields = [
     "@default",
@@ -45,7 +42,7 @@ export const getAllCourses = cache(async (): Promise<ICourse[]> => {
     `?page=1&fields[course]=${encodeURIComponent(fields)}` +
     `&filter_hq_courses=true&ordering=lang&page_size=${UDEMY_PAGE_SIZE}`;
 
-  // Fetch every course; pagination is done by the page, not the API
+  // All courses: the page paginates, not the API
   const results: z.infer<typeof courseSchema>[] = [];
   for (let i = 0; url && i < MAX_UDEMY_PAGES; i++) {
     const res = await fetch(url, {
@@ -70,16 +67,14 @@ export const getAllCourses = cache(async (): Promise<ICourse[]> => {
     url = parsed.data.next?.startsWith("https://www.udemy.com/api-2.0/") ? parsed.data.next : null;
   }
 
-  return results.map(
-    (course): ICourse => ({
-      title: course.title,
-      headline: course.headline,
-      contentInfo: course.content_info,
-      instructionalLevel: course.instructional_level_simple,
-      numReviews: String(course.num_reviews),
-      rating: course.avg_rating ? course.avg_rating.toFixed(1) : null,
-      udemyURL: `https://www.udemy.com${course.url}`,
-      thumbnailURL: course.image_480x270 || null,
-    }),
-  );
+  return results.map((course): ICourse => ({
+    title: course.title,
+    headline: course.headline,
+    contentInfo: course.content_info,
+    instructionalLevel: course.instructional_level_simple,
+    numReviews: String(course.num_reviews),
+    rating: course.avg_rating ? course.avg_rating.toFixed(1) : null,
+    udemyURL: `https://www.udemy.com${course.url}`,
+    thumbnailURL: course.image_480x270 || null,
+  }));
 });

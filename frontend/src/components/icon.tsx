@@ -12,9 +12,8 @@ type IconProps = {
 };
 
 /**
- * A Material Symbols Rounded glyph from the self-hosted subset font (`.material-symbols` in
- * globals.css). Always decorative: the control around it carries the accessible name. Colour
- * follows `currentColor`; animate the axes with `--icon-fill` (e.g. `group-hover:[--icon-fill:1]`).
+ * A Material Symbols Rounded glyph from the self-hosted subset font. Always decorative: the control
+ * around it carries the accessible name. Animate the fill with `--icon-fill`.
  */
 export function Icon({ name, filled, size, className }: IconProps) {
   const style: Record<string, string | number> = {};
@@ -25,8 +24,7 @@ export function Icon({ name, filled, size, className }: IconProps) {
     <span
       data-slot="icon"
       aria-hidden="true"
-      // The text is a ligature name: browser translation would break the glyph, and search
-      // snippets would quote it ("co_present")
+      // A ligature name: translation would break the glyph and search snippets would quote it
       translate="no"
       data-nosnippet
       className={cn("material-symbols", className)}

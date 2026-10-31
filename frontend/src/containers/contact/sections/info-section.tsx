@@ -19,8 +19,8 @@ interface IInfoSectionProps {
   companyLinkedinUrl: string;
 }
 
-// CMS URLs may end with "/", lack "www" or carry a query string (?igsh=...), so parse them
-// instead of indexing split("/"). Returns [] for empty or invalid URLs.
+// CMS URLs may end with "/", lack "www" or carry a query string (?igsh=...), so parse them.
+// [] for empty or invalid URLs.
 function getPathSegments(url: string | null | undefined): string[] {
   if (!url) return [];
   try {
@@ -33,8 +33,7 @@ function getPathSegments(url: string | null | undefined): string[] {
 const toHandle = (segment: string | undefined) =>
   segment ? `@${segment.replace(/^@/, "")}` : undefined;
 
-// The contact channels as an M3 list in a card. It stretches to the form's height beside it, and
-// the items share the extra space so the two panes end on one line.
+// The contact channels as an M3 list in a card, stretched to the height of the form beside it
 export default function InfoSection({
   socialMediaLinks,
   companyLinkedinUrl,
@@ -106,8 +105,7 @@ export default function InfoSection({
             href={href}
             className="state-layer group text-on-surface flex h-full min-h-18 items-center gap-4 rounded-sm px-4 py-2 focus-visible:outline-none"
           >
-            {/* Primary fill: the card is surface-container-highest, which a container role (same
-                tone) would blend into in some palettes */}
+            {/* Primary fill: a container role would blend into the card in some palettes */}
             <span className="bg-primary text-on-primary flex size-10 shrink-0 items-center justify-center rounded-full">
               {icon}
             </span>

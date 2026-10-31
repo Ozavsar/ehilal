@@ -1,9 +1,8 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Where the rocket cursor (and its dock in the navigation rail) exists: the primary pointer is a
- * mouse or trackpad, so touchscreen laptops still get it, the window is wide, and the user hasn't
- * asked for reduced motion. Phones and touch tablets never match.
+ * Where the rocket cursor and its dock exist: fine primary pointer (touchscreen laptops included),
+ * a wide window and no reduced motion.
  */
 export const ROCKET_QUERY =
   "(pointer: fine) and (min-width: 769px) and (prefers-reduced-motion: no-preference)";
@@ -54,9 +53,8 @@ export function isRocketParked(phase: RocketPhase): boolean {
 }
 
 /**
- * The page-wide rocket state shared by the cursor (`components/rocket-cursor.tsx`, loaded once the
- * page is idle) and the dock (`components/header/rocket-dock.tsx`). Parked survives navigations
- * (one module) and reloads (localStorage).
+ * The page-wide rocket state shared by the cursor and the dock; parked survives navigations and
+ * reloads (localStorage).
  */
 export const rocketDock = {
   getPhase,

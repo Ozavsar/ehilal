@@ -51,7 +51,7 @@ function toCandidates(articles: IBlogPreview[]): Candidate[] {
       path: INTERNAL_ROUTES.BLOG.href(article.slug),
       thumbnailURL: article.thumbnailURL,
       publishedAt: article.publishedAt,
-      // Detected the way the blog card does it, from the title and the subtitle
+      // Same detection as the blog card
       language: detectLanguage(`${article.title} ${article.description}`),
       tags: article.tags ?? [],
     };

@@ -2,10 +2,8 @@ import { SUBSTACK_USERNAME, YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
 import { SITE_URL } from "@/config/site";
 import type { ContentLanguage } from "@/lib/language";
 
-// Page titles, descriptions and social titles. Written here on purpose rather than in Strapi: the
-// CMS keeps the site identity (Site Settings: name, job title, default OG image), the copy that
-// search results show lives with the code. Rules: `title` + " | <site name>" ≤ 60 characters,
-// descriptions 140–160 characters, English (the site language).
+// Page SEO copy, in code on purpose (Strapi only keeps the site identity). Rules: `title` +
+// " | <site name>" ≤ 60 characters, descriptions 140–160 characters, English.
 
 export interface PageSeo {
   /** <title>, before the " | <site name>" suffix of the root layout's template */
@@ -22,7 +20,7 @@ export interface PageSeo {
 export interface ListPageSeo extends PageSeo {
   /** Shorter title of pages 2..N (" – Page n" is added), so they stay within 60 characters */
   pagedTitle: string;
-  /** Description of pages 2..N, so every page of a list has its own */
+  /** Description of pages 2..N */
   pagedDescription: (page: number) => string;
 }
 
@@ -128,8 +126,7 @@ export const articleFallbackDescription = (
     ? `“${title}”: ${siteName} tarafından hukuk, Web3, tokenizasyon ve yapay zekâ üzerine yazılmış bir makale.`
     : `“${title}”, an article by ${siteName} on law, Web3, tokenization and AI.`;
 
-// Only the live site may be indexed: the same hosts as app/robots.ts and next.config.mjs (which
-// sends X-Robots-Tag: noindex everywhere else)
+// Only the live site may be indexed: the same hosts as app/robots.ts and next.config.mjs
 const PRODUCTION_HOSTS = new Set(["ehilal.net", "www.ehilal.net"]);
 export const IS_PRODUCTION_SITE = (() => {
   try {

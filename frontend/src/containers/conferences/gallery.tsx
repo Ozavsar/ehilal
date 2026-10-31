@@ -19,22 +19,20 @@ import { useIdleAfterLoad } from "@/hooks/use-idle-after-load";
 import { useSlideSpeed } from "@/hooks/use-media-query";
 import { LIST_CARD_IMAGE_SIZES } from "@/containers/list-layout";
 
-// The dialog (Radix) and the keyboard module load when a visitor first opens a photo
+// Loaded when a photo is first opened
 const FullScreenGallery = dynamic(() => import("@/components/full-screen-gallery"));
-// Swiper and its CSS load with the first card carousel that is needed (see `active` below)
+// Swiper and its CSS load only once a card carousel is needed (see `active` below)
 const loadCardSwiper = () => import("./card-swiper");
 
 // Cards this close to the viewport get their carousel once the page is idle, ready before a swipe
 const CAROUSEL_ROOT_MARGIN = "200px 0px";
 
-// Swiper's navigation arrow, drawn before Swiper and its CSS load so the card looks the same either
-// way. The overrides in globals.css size, place and colour it; these classes repeat the rest of
-// Swiper's arrow styles. Swiper toggles `swiper-button-disabled` itself.
+// Swiper's arrow styles, so the card looks the same before Swiper's CSS loads (rest in globals.css)
 const ARROW_CLASS_NAME =
   "absolute z-10 flex cursor-pointer items-center justify-center [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:cursor-auto [&.swiper-button-disabled]:opacity-35";
 
-// Swiper's own chevron (Swiper adds none when the arrow already has an svg). A transform, not
-// `rotate-*`: Swiper's CSS rotates the previous arrow with a transform too, and the two would add up.
+// Swiper's chevron. A transform, not `rotate-*`: Swiper's CSS also transforms the previous arrow
+// and the two would add up.
 function ArrowIcon({ previous = false }: { previous?: boolean }) {
   return (
     <svg
@@ -45,7 +43,7 @@ function ArrowIcon({ previous = false }: { previous?: boolean }) {
       fill="none"
       className={
         previous
-          ? "swiper-navigation-icon pointer-events-none [transform:rotate(180deg)]"
+          ? "swiper-navigation-icon pointer-events-none transform-[rotate(180deg)]"
           : "swiper-navigation-icon pointer-events-none"
       }
     >
@@ -71,18 +69,15 @@ interface Props {
   conferenceId: number;
   photos: IConferencePhoto[];
   title: string;
-  // First card on the page: its cover is the likely LCP element, so it is preloaded from the <head>.
-  // Measured against eager + fetchPriority="high" (worse simulated LCP), fetchPriority alone and
-  // plain lazy loading: same simulated LCP, but the preload paints it earliest in a real load.
+  // First card: its cover is the likely LCP image, preloaded from the <head> (measured better than
+  // eager + fetchPriority="high")
   priority?: boolean;
 }
 
-// How much the `large` format may be stretched on screen (in device pixels) before the original is
-// used: up to ~1.25x the difference is barely visible, at 2x (a 1440px wide retina screen) it is soft.
+// Largest on-screen upscale (in device pixels) of the `large` format before the original is used
 const MAX_LARGE_UPSCALE = 1.25;
 
-// Full-screen source for this screen: the light `large` format on phones and small windows, the
-// original on big or high-density screens (the image optimizer resizes either, it never upscales)
+// The light `large` format on small screens, the original on big or high-density ones
 function getFullScreenSrc({ url, large }: IConferencePhoto): string {
   if (!large) return url;
   const containScale = Math.min(window.innerWidth / large.width, window.innerHeight / large.height);
@@ -94,7 +89,6 @@ const photoTransitionName = (conferenceId: number, photo: IConferencePhoto) =>
   `conference-${conferenceId}-photo-${photo.id}`;
 
 // Opening and closing are transitions, so the photo morphs between its thumbnail and full screen
-// (React <ViewTransition>; without browser support the gallery just opens and closes)
 function galleryTransition(type: typeof GALLERY_OPEN | typeof GALLERY_CLOSE, update: () => void) {
   startTransition(() => {
     addTransitionType(GALLERY);
@@ -103,53 +97,47 @@ function galleryTransition(type: typeof GALLERY_OPEN | typeof GALLERY_CLOSE, upd
   });
 }
 
-// The open gallery has its own history entry (same URL, marked in history.state), so the
-// browser's Back button closes it and Forward opens it again
+// The open gallery has its own same-URL history entry, so Back closes it and Forward reopens it
 const HISTORY_KEY = "conferenceGallery";
 type GalleryEntry = { conferenceId: number; index: number };
 const galleryEntry = (state: unknown) =>
   (state as Record<string, GalleryEntry | undefined> | null)?.[HISTORY_KEY];
 
 export default function Gallery({ conferenceId, photos, title, priority = false }: Props) {
-  // Full-screen images and the one opened, null when closed
+  // null when closed
   const [fullScreen, setFullScreen] = useState<{
     images: IGalleryImage[];
     index: number;
     morph: boolean;
   } | null>(null);
-  // The card renders Swiper's markup; Swiper (null until then) takes it over once it is active
+  // Swiper (null until then) takes over the card's markup once active
   const swiperElRef = useRef<HTMLDivElement>(null);
   const prevElRef = useRef<HTMLDivElement>(null);
   const nextElRef = useRef<HTMLDivElement>(null);
   const cardSwiperRef = useRef<SwiperInstance | null>(null);
-  // The next arrow was clicked before Swiper was ready: it slides on once it is
+  // The next arrow was clicked before Swiper was ready
   const pendingNextRef = useRef(false);
   // Thumbnail of the photo shown full screen; focus returns to it on close
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  // Until the carousel is needed the card is static markup showing the cover: setting up a Swiper
-  // per card during hydration blocked the main thread on mobile. It is needed once the card is
-  // pointed at, focused or opened, or comes near the viewport after the page went idle (in time
-  // for a swipe, which can't wait for a script to load). A single photo needs no carousel.
+  // Static markup until pointed at, focused, opened or near the viewport once idle: a Swiper per
+  // card during hydration blocked the main thread on mobile
   const hasCarousel = photos.length > 1;
   const [active, setActive] = useState(false);
   const activate = () => {
     if (hasCarousel) setActive(true);
   };
-  // Off-screen slides sit next to the visible one, inside the browser's lazy-load margin, so every
-  // photo of every card would download on page load. Only the current slide gets an image, plus the
-  // adjacent ones once the carousel is active (they would compete with the visible covers before).
+  // Only the current slide gets an image (plus its neighbours once active): off-screen slides sit
+  // inside the lazy-load margin and would all download on page load
   const [activeIndex, setActiveIndex] = useState(0);
   const idle = useIdleAfterLoad();
   const slideSpeed = useSlideSpeed();
 
-  // The card follows the full-screen gallery, so closing morphs the photo back into a visible
-  // slide. Focus returns to that slide's button too: Swiper's a11y module would otherwise slide
-  // back to the one that opened the gallery as it gets focus, mid-transition.
+  // The card follows the full-screen gallery so closing morphs into a visible slide; focus returns
+  // to that slide, or Swiper's a11y module would slide back to the opener mid-transition
   const showInCard = (index: number) => {
     triggerRef.current = thumbnailRefs.current[index] ?? triggerRef.current;
-    // Before Swiper is ready, the slide it starts on. A gallery opened without pointing at or
-    // focusing the card first (a screen reader's click) needs the carousel as well.
+    // Also the starting slide when a screen reader's click opens the gallery before activation
     setActiveIndex(index);
     activate();
     cardSwiperRef.current?.slideTo(index, 0);
@@ -190,7 +178,7 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
     if (!active) return;
     let cancelled = false;
     loadCardSwiper().then(({ createCardSwiper }) => {
-      // A task per card: cards that come into view together don't set up in one long task
+      // One task per card, so cards that come into view together don't make one long task
       setTimeout(() => {
         if (!cancelled) cardSwiperRef.current = createSwiper(createCardSwiper);
       });
@@ -238,9 +226,8 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
     else hide();
   };
 
-  // Back/Forward into or out of this gallery's entry. Capture phase, ahead of Next's listener,
-  // which has nothing to do for a same-URL step. The state change runs a task later: React commits
-  // updates from a popstate event synchronously, without a view transition.
+  // Capture phase, ahead of Next's listener. Deferred a task: React commits popstate updates
+  // synchronously, without a view transition.
   const isOpen = fullScreen !== null;
   useEffect(() => {
     const onPopState = (event: PopStateEvent) => {
@@ -256,8 +243,7 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
 
   return (
     <>
-      {/* Swiper's markup (its classes plus utilities that lay it out before its CSS loads). The
-          class names never change: React would drop the ones Swiper adds. */}
+      {/* Swiper's markup. Class names never change: React would drop the ones Swiper adds. */}
       <div
         ref={swiperElRef}
         onPointerEnter={activate}
@@ -277,9 +263,8 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
                 className="group relative block h-full w-full cursor-pointer overflow-hidden focus-visible:outline-none"
               >
                 <ViewTransition
-                  // While the gallery is open the full-screen photos have the names; the thumbnails
-                  // remount under another key, so React pairs the two on open and on close and no
-                  // name is mounted twice
+                  // Full-screen photos own the names while open; the new key remounts the thumbnail
+                  // so React pairs the two and no name is mounted twice
                   key={fullScreen ? "full-screen" : "card"}
                   name={fullScreen ? undefined : photoTransitionName(conferenceId, photo)}
                   share="photo-morph"
@@ -288,7 +273,7 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
                   {/* The morph's starting box: the slide, not the image scaled on hover */}
                   <span className="block overflow-hidden">
                     {Math.abs(index - activeIndex) <= (active ? 1 : 0) ? (
-                      // `large` is plenty for a card (at most ~570px wide) and much lighter for the optimizer
+                      // `large` is plenty for a card (at most ~570px wide)
                       <Image
                         src={photo.large?.url ?? photo.url}
                         alt={title || ""}
@@ -344,8 +329,8 @@ export default function Gallery({ conferenceId, photos, title, priority = false 
       </div>
       {fullScreen && (
         <FullScreenGallery
-          // Every photo keeps its name (a name that changes between photos would be tracked as a
-          // duplicate); React only pairs the one on screen, the other slides are outside the viewport
+          // Every photo keeps its name (a changing name would be tracked as a duplicate); React
+          // only pairs the one on screen
           images={fullScreen.images}
           title={title}
           initialIndex={fullScreen.index}

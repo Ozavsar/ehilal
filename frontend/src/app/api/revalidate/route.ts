@@ -5,8 +5,8 @@ import { env } from "@/config/env";
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest();
 
-// Strapi model (the webhook's `model`) → the fetch cache tags its content is stored under.
-// Keep in sync with the `tags` passed in lib/services and the getPageTitle() calls in the (client) layouts.
+// Strapi model (the webhook's `model`) → its fetch cache tags. Keep in sync with the `tags` in
+// lib/services and the getPageTitle() calls in the (client) layouts.
 const MODEL_TAGS: Record<string, string[]> = {
   video: ["videos"],
   conference: ["conferences"],
@@ -23,7 +23,6 @@ const MODEL_TAGS: Record<string, string[]> = {
   "videos-page": ["videos-title"],
 };
 
-// Hashing both sides gives equal-length buffers, so timingSafeEqual never throws on a length mismatch
 function isValidKey(providedKey: string | null) {
   const expectedKey = env.REVALIDATE_KEY;
   if (!expectedKey) {

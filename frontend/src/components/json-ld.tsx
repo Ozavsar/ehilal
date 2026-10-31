@@ -8,9 +8,8 @@ export function serializeJsonLd(data: object): string {
 }
 
 /**
- * Schema.org structured data, server-rendered as <script type="application/ld+json"> (a plain
- * script tag: it is data, not code for next/script). Build the data with the helpers in
- * lib/metadata.ts.
+ * Schema.org structured data as a plain <script type="application/ld+json"> (data, not code for
+ * next/script). Build the data with the helpers in lib/metadata.ts.
  */
 export default function JsonLd({ data }: { data: object }) {
   return (

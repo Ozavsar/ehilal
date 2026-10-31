@@ -12,16 +12,11 @@ interface AnimatedGridProps {
 
 const toMs = (seconds: number) => `${Math.round(seconds * 1000)}ms`;
 
-// M3 stagger: at most 50 ms between items, and only the first few are staggered so a long list
-// doesn't keep the last cards waiting
+// Only the first few items are staggered, so a long list doesn't keep the last cards waiting
 const MAX_STAGGER = 0.05;
 const MAX_STAGGERED_ITEMS = 6;
 
-// M3 fade entrance: each item fades in (and rises 16px) with a @starting-style transition
-// (Tailwind `starting:`), medium4 + emphasized-decelerate, staggered through transition-delay.
-// Server component: no client JS. Reduced motion keeps the fade and drops the movement.
-// Not while a page view transition runs (components/view-transitions.tsx): that one animates
-// the grid already.
+// CSS entrance, no client JS; off during a page view transition, which animates the grid already
 const itemClassName =
   "transition-[opacity,translate] duration-400 ease-emphasized-decelerate starting:opacity-0 motion-safe:starting:translate-y-4 [:root:active-view-transition_&]:transition-none";
 
@@ -33,7 +28,6 @@ export default function MotionGrid({
 }: AnimatedGridProps) {
   const step = Math.min(staggerDelay, MAX_STAGGER);
   return (
-    // Columns per window size class: 1 compact, 2 medium, 3 expanded; gaps 16, then 24
     <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3", className)}>
       {Array.isArray(children) ? (
         children.map((child, index) => (

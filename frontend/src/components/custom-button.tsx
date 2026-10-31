@@ -11,8 +11,7 @@ interface CustomButtonProps extends Omit<ButtonProps, "children" | "asChild"> {
   href?: string;
 }
 
-// The page's main call to action: an M3 filled button at the medium size (56dp) with a trailing
-// icon that nudges forward on hover.
+// The page's main call to action: a medium filled button with a trailing icon
 export default function CustomButton({
   text,
   className,

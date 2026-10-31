@@ -5,8 +5,6 @@ import { getThemePalette } from "@/lib/services";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Prerendered, then refreshed daily; the palette request is tagged `theme`, so the Strapi theme
-// webhook refreshes the icon too
 export const revalidate = 86400;
 
 // Opaque square: iOS masks the corners itself and fills transparent pixels with black

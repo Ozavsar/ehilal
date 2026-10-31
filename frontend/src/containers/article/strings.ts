@@ -1,8 +1,7 @@
 import type { ContentLanguage } from "@/lib/language";
 
-// Text around the Medium content, in the article's language: a Turkish article gets a Turkish
-// byline, contents label, image buttons and end-of-article links. The site chrome outside the
-// article column (navigation, "Back to blog", the full-screen gallery) stays English.
+// Text around the Medium content, in the article's language; the site chrome outside the article
+// column stays English
 const EN = {
   locale: "en-US",
   minutesRead: (minutes: number) => `${minutes} min read`,
@@ -57,7 +56,7 @@ export const ARTICLE_STRINGS: Record<ContentLanguage, ArticleStrings> = {
   },
 };
 
-// Pin the time zone so the day doesn't depend on the server (same as the blog cards)
+// Pin the time zone so the day doesn't depend on the server
 const DATE_OPTIONS = { timeZone: "Europe/Istanbul", year: "numeric", day: "numeric" } as const;
 
 /** "14 Kasım 2025" / "November 14, 2025" (month "short": "14 Kas 2025" / "Nov 14, 2025"); null

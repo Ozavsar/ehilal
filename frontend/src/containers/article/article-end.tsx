@@ -8,11 +8,9 @@ import { cn } from "@/lib/utils";
 import type { ArticleLinks, LinkedArticle } from "./article-links";
 import { ARTICLE_STRINGS, formatArticleDate } from "./strings";
 
-// Related thumbnails: 112px wide on compact screens, 160px from medium
 const THUMBNAIL_SIZES = "(min-width: 600px) 160px, 112px";
 
-// The card's one link, stretched over the whole card (its ::after covers the card), so the card is
-// a single click target and a single stop for keyboard and screen reader users
+// The card's one link, stretched over the whole card by its ::after
 const STRETCHED_LINK =
   "ease-standard transition-colors duration-200 after:absolute after:inset-0 hover:text-primary";
 
@@ -106,7 +104,6 @@ function RelatedArticleCard({
       <div className="bg-surface-container relative aspect-video w-28 shrink-0 overflow-hidden rounded-sm sm:w-40">
         <Image
           src={article.thumbnailURL || "/images/blog/default-blog.jpg"}
-          // Decorative: the title next to it names the card
           alt=""
           fill
           sizes={THUMBNAIL_SIZES}

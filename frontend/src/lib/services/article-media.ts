@@ -1,7 +1,6 @@
 import { unstable_cache } from "next/cache";
 
-// HEAD checks on an article's media that its Medium data can't answer, cached for a week per URL
-// (an image only changes when the post is edited, and then its id changes too)
+// HEAD checks on article media, cached a week per URL (an edited image gets a new id)
 const REVALIDATE = 7 * 24 * 60 * 60;
 const TIMEOUT_MS = 5000;
 
@@ -27,10 +26,8 @@ async function head(url: string) {
 }
 
 /**
- * Medium images its CDN can't resize or convert: animated GIFs, also ones stored without a .gif
- * extension, which come back as the original bytes (application/octet-stream), several hundred
- * kilobytes for a 200px GIF. Only ids without an extension are checked; a failed check counts as
- * a normal image.
+ * Medium images its CDN can't convert: GIFs, also ones stored without a .gif extension (served as
+ * the original bytes). A failed check counts as a normal image.
  */
 export async function getUnconvertedMediumImages(imageIds: string[]): Promise<Set<string>> {
   const unconverted = new Set(imageIds.filter((id) => /\.gif$/i.test(id)));
@@ -47,7 +44,7 @@ export async function getUnconvertedMediumImages(imageIds: string[]): Promise<Se
   return unconverted;
 }
 
-/** The URLs that answer 404 or 410: media taken down at the source (a GIF removed from Giphy) */
+/** The URLs that answer 404 or 410 (media taken down at the source) */
 export async function getRemovedUrls(urls: string[]): Promise<Set<string>> {
   const unique = [...new Set(urls)];
   const results = await Promise.all(unique.map(head));

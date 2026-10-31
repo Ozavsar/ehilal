@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 
 const BLOG_LIST_PATH = /^\/blog(?:\/[1-9]\d*)?$/;
 
-// The previous history entry's path when it is a blog list page of this site, else null.
-// Navigation API only (Chromium, recent Safari and Firefox); elsewhere the link opens /blog.
+// The previous history entry's path when it is a blog list page of this site, else null
+// (Navigation API only; elsewhere the link opens /blog)
 function previousBlogListPath() {
   const { navigation } = window as Window & {
     navigation?: { currentEntry: { index: number } | null; entries(): { url: string | null }[] };
@@ -24,9 +24,8 @@ function previousBlogListPath() {
   return url.origin === location.origin && BLOG_LIST_PATH.test(url.pathname) ? url.pathname : null;
 }
 
-// M3 text button back to the list page the reader came from (else the first one). A push
-// navigation tagged "nav-back", not a history step: React runs no view transition for a
-// back/forward (popstate) navigation, and this way the cover and title morph back into their card.
+// Back to the list page the reader came from (else the first one). A push, not a history step:
+// React runs no view transition for a popstate navigation, so the morph back would be lost.
 export default function BackToBlog({
   className,
   iconOnly = false,

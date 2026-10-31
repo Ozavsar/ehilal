@@ -20,7 +20,7 @@ export default function ErrorPage({
     console.error(error);
   }, [error]);
 
-  // Refetch the server components, then clear the error state to render them again
+  // reset() alone doesn't refetch the server components
   const retry = () =>
     startTransition(() => {
       router.refresh();

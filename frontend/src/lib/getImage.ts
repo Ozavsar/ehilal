@@ -5,8 +5,7 @@ import { getPlaiceholder } from "plaiceholder";
 import { getStrapiURL } from "./api/fetchAPI";
 import type { IImage } from "@/types";
 
-// A 10px blur doesn't need more than a thumbnail. Known image CDNs serve resized variants by URL;
-// other URLs (e.g. Strapi, see getStrapiBlurDataURL) are used as they are.
+// A 10px blur only needs a thumbnail: known CDNs serve resized variants by URL
 function getSmallVariantURL(src: string): string {
   // Medium: https://miro.medium.com/v2/da:true/<image id>
   const medium = /^https:\/\/miro\.medium\.com\/v2\/(?:da:true\/)?([^/]+)$/.exec(src);
@@ -40,16 +39,12 @@ async function createBlurDataURL(src: string): Promise<string> {
   return base64;
 }
 
-// The placeholder of an image URL never changes, so it is kept in the Next.js data cache with no
-// expiry: across requests, ISR refreshes and deploys (.next/cache survives them). Failures aren't cached.
+// A URL's placeholder never changes, so it is cached with no expiry (failures aren't cached)
 const getCachedBlurDataURL = unstable_cache(createBlurDataURL, ["blur-data-url"], {
   revalidate: false,
 });
 
-/**
- * Blur placeholder (base64 data URL) for an image, or undefined when it can't be built: the
- * placeholder is cosmetic, so a broken image only loses it.
- */
+/** Blur placeholder (base64 data URL), or undefined when it can't be built: it is cosmetic */
 export async function getBlurDataURL(src: string): Promise<string | undefined> {
   const smallSrc = getSmallVariantURL(src);
   try {
@@ -64,23 +59,15 @@ export async function getBlurDataURL(src: string): Promise<string | undefined> {
 // Base64 only: the placeholder ends up in a CSS url(), so nothing may break out of it
 const STORED_BLUR_PATTERN = /^data:image\/[a-z]+;base64,[A-Za-z0-9+/]+=*$/;
 
-/**
- * Blur placeholder that Strapi computed when the image was uploaded (stored in provider_metadata
- * by backend/src/utils/upload-blur.ts), or undefined when there is none. No network request.
- */
+/** The placeholder Strapi stored in provider_metadata on upload, or undefined (no request) */
 export function getStoredBlurDataURL(image: Pick<IImage, "provider_metadata">): string | undefined {
-  // Provider JSON: don't trust its shape
   const blurDataURL: unknown = image.provider_metadata?.blurDataURL;
   return typeof blurDataURL === "string" && STORED_BLUR_PATTERN.test(blurDataURL)
     ? blurDataURL
     : undefined;
 }
 
-/**
- * Blur placeholder for a Strapi image: the one stored by Strapi, otherwise built from its smallest
- * generated format. Strapi only generates formats smaller than the original (none for small images
- * and SVGs).
- */
+/** Blur placeholder for a Strapi image: the stored one, otherwise built from its smallest format */
 export async function getStrapiBlurDataURL(
   image: Pick<IImage, "url" | "formats" | "provider_metadata">,
 ) {
@@ -91,9 +78,8 @@ export async function getStrapiBlurDataURL(
 }
 
 /**
- * Adds a blur placeholder to each item with an image (items that already have one keep it). Call it
- * on the items that are rendered (after pagination), never on whole lists, sitemaps or
- * generateStaticParams.
+ * Adds a blur placeholder to items that have none. Only for rendered items (after pagination),
+ * never whole lists, sitemaps or generateStaticParams.
  */
 export function withBlurDataURLs<T extends { blurDataURL?: string }>(
   items: T[],

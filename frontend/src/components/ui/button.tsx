@@ -4,16 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// M3 common buttons: pill shaped, label-large, hover/focus/press from the state layer (currentColor
-// over the container), focus ring 3px with a 2px gap, disabled = on-surface at 38% on a 12% container.
-// Icons (<Icon>, sized through the inherited --icon-size) are 18dp, 24dp in the medium and icon buttons.
-// touch-target: 48dp hit area on touch screens for the 32/40dp sizes.
+// M3 common buttons. Icons follow the inherited --icon-size: 18dp, 24dp in medium and icon buttons.
 const buttonVariants = cva(
   "state-layer touch-target inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full type-label-large transition-shadow duration-200 ease-standard outline-primary focus-visible:outline-3 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:text-on-surface/38 [--icon-size:18px] [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Filled: the highest emphasis, one per view
+        // Filled: highest emphasis, one per view
         default:
           "bg-primary text-on-primary hover:shadow-elevation-1 disabled:bg-on-surface/12 disabled:shadow-none",
         // Filled tonal: medium emphasis
@@ -31,12 +28,10 @@ const buttonVariants = cva(
         sm: "h-8 px-4",
         // M3 medium button (56dp), for a page's main call to action
         lg: "h-14 px-6 type-title-medium [--icon-size:24px]",
-        // M3 icon button container: 40dp, 24dp icon
         icon: "size-10 [--icon-size:24px] [&_svg]:size-6",
       },
     },
     compoundVariants: [
-      // Text buttons have less padding than the contained ones
       { variant: "ghost", size: "default", className: "px-3" },
       { variant: "ghost", size: "sm", className: "px-3" },
       { variant: "link", size: "default", className: "px-0" },

@@ -3,19 +3,10 @@
 import { useInsertionEffect, useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 
-// Browser Back/Forward between a blog list page and an article: lets the cover and title morph
-// like they do on a link click. React commits a navigation started in a `popstate` event
-// synchronously (so the browser can restore the scroll position against the new page), and a
-// synchronous commit runs no view transition. Here such a popstate is held back from Next's
-// listener and replayed a task later (not a microtask: React reads `window.event`, which is still
-// the original popstate then), so the restore becomes an ordinary transition and the
-// <ViewTransition> pairs (components/view-transitions.tsx) animate.
-// The browser restores the scroll position before popstate, which would scroll the old page, so
-// while this is active it restores Back/Forward scroll positions itself (scrollRestoration
-// "manual"), together with the new page.
-// Needs the View Transitions and Navigation APIs; anything else keeps the browser's behaviour, and
-// reduced motion keeps the instant swap. Remove this component and its <HistoryMorph /> to drop
-// the feature.
+// Back/Forward between the blog list and an article morphs the cover and title like a link click.
+// React commits a popstate navigation synchronously (no view transition), so the popstate is held
+// back from Next's listener and replayed a task later (not a microtask: React reads `window.event`).
+// Owns Back/Forward scroll restoration ("manual"): the browser would scroll the old page first.
 
 const BLOG_LIST = /^\/blog(?:\/[1-9]\d*)?$/;
 const BLOG_ARTICLE = /^\/blog\/.+-[0-9a-f]{8,12}$/;
@@ -32,8 +23,8 @@ const isMorphTraversal = (from: string, to: string) =>
   (BLOG_ARTICLE.test(from) && BLOG_LIST.test(to)) ||
   (BLOG_LIST.test(from) && BLOG_ARTICLE.test(to));
 
-// Scroll positions per history entry key, kept in sessionStorage so a reload or a Back into this
-// site from another document finds them too (the browser doesn't restore "manual" entries)
+// Scroll positions per history entry key, in sessionStorage so a reload or a Back from another
+// document finds them too
 const STORAGE_KEY = "history-scroll";
 const MAX_ENTRIES = 50;
 let scrollByEntry: Map<string, number> | null = null;
@@ -51,7 +42,7 @@ function savedScrolls() {
         }
       }
     } catch {
-      // Storage blocked or unreadable: positions last for this document only
+      // Storage blocked or unreadable: in-memory only
     }
   }
   return scrollByEntry;
@@ -73,9 +64,9 @@ function saveScroll(key: string, y: number) {
 }
 
 // Module state: one instance, mounted once in the root layout
-// Scroll position of the entry a Back/Forward press goes to, applied with its page
+// Scroll position of the Back/Forward destination, applied with its page
 let pendingScroll: number | null = null;
-// The page on screen: its path and history entry (ahead of it while a replay is pending)
+// The page on screen (the location runs ahead of it while a replay is pending)
 let currentPath = "";
 let currentKey: string | undefined;
 let replaying = false;
@@ -84,9 +75,8 @@ let pendingReplay: ReturnType<typeof setTimeout> | undefined;
 export default function HistoryMorph() {
   const pathname = usePathname();
 
-  // Both run while React swaps the page (inside the view transition's update, out of sight).
-  // The scroll position goes back before React checks which shared elements are in the viewport
-  // (only those pair up); the min-height keeps the old page from clamping it meanwhile.
+  // Scroll before React checks which shared elements are in the viewport (only those pair up);
+  // the min-height keeps the old page from clamping the position meanwhile.
   useInsertionEffect(() => {
     if (pendingScroll === null) return;
     document.documentElement.style.minHeight = `${pendingScroll + window.innerHeight}px`;
@@ -101,8 +91,7 @@ export default function HistoryMorph() {
     pendingScroll = null;
   }, [pathname]);
 
-  // A layout effect: a reload or a Back from another document gets its position before the
-  // hydrated page paints again
+  // A layout effect, so a reload gets its scroll position before the hydrated page paints
   useLayoutEffect(() => {
     const navigation = getNavigation();
     if (!navigation || typeof document.startViewTransition !== "function") return;
@@ -118,8 +107,6 @@ export default function HistoryMorph() {
       window.scrollTo(0, loadScroll);
     }
 
-    // Fires before every navigation: remember where this entry was left, and for Back/Forward
-    // where the destination was
     const onNavigate = (event: Event) => {
       const { navigationType, destination } = event as NavigateEventLike;
       // Next replaces the entry's state after every commit: same entry, mid-swap scroll position
@@ -129,7 +116,6 @@ export default function HistoryMorph() {
       pendingScroll =
         navigationType === "traverse" ? (savedScrolls().get(destination.key) ?? null) : null;
     };
-    // Leaving the document some other way (address bar, closing the tab)
     const onPageHide = () => {
       const key = currentKey ?? navigation.currentEntry?.key;
       if (key) saveScroll(key, window.scrollY);
@@ -138,16 +124,13 @@ export default function HistoryMorph() {
     // Capture phase: runs before Next's own popstate listener on window
     const onPopState = (event: PopStateEvent) => {
       if (replaying) return;
-      // A newer Back/Forward press replaces a replay that hasn't run yet
       clearTimeout(pendingReplay);
       if (location.pathname === currentPath) {
-        // The page on screen already (a #heading entry, or a press that cancelled a pending
-        // replay): nothing re-renders, so restore right away
+        // Same page (a #heading entry or a cancelled replay): nothing re-renders, restore now
         if (pendingScroll !== null) window.scrollTo(0, pendingScroll);
         pendingScroll = null;
         return;
       }
-      // Otherwise Next commits the page now and the layout effect above restores the scroll
       if (reducedMotion.matches || !isMorphTraversal(currentPath, location.pathname)) return;
       event.stopImmediatePropagation();
       const { state } = event;

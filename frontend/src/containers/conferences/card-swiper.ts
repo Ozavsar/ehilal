@@ -1,6 +1,5 @@
-// The conference card carousel: Swiper and its styles, imported by gallery.tsx only once a card's
-// carousel is needed, so neither is part of the page's first load. Swiper takes over the slides and
-// arrows React already rendered.
+// The conference card carousel, imported by gallery.tsx only once needed (not in the first load).
+// Swiper takes over the slides and arrows React already rendered.
 import Swiper from "swiper";
 import { A11y, Navigation } from "swiper/modules";
 import "swiper/css";

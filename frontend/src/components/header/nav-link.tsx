@@ -6,10 +6,8 @@ import { useSettledAfterLoad } from "@/hooks/use-idle-after-load";
 
 type NavLinkProps = Omit<ComponentProps<typeof Link>, "prefetch">;
 
-// The nav is on every page, and by default its links prefetch all six routes (RSC payloads and
-// page chunks) as soon as they are visible, competing with the page's own LCP image and scripts.
-// Here they prefetch once the page has settled after load, or earlier on intent (pointer over the
-// link, keyboard focus, touch), so a tap or click still navigates without waiting for the server.
+// Prefetches once the page has settled after load, or earlier on intent (hover, focus, touch), so
+// the nav's links don't compete with the page's LCP image and scripts.
 export default function NavLink(props: NavLinkProps) {
   const settled = useSettledAfterLoad();
   const [intent, setIntent] = useState(false);

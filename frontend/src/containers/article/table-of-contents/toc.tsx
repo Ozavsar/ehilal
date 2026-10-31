@@ -19,7 +19,7 @@ export function focusHeading(id: string) {
   document.getElementById(id)?.focus({ preventScroll: true });
 }
 
-// M3 list of in-page links: the current section gets the secondary-container pill
+// M3 list of in-page links
 function TOCList({ tree, activeId, onLinkClick, depth }: TOCProps & { depth: number }) {
   const router = useRouter();
 

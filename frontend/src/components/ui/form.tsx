@@ -83,8 +83,7 @@ FormItem.displayName = "FormItem";
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
-    /** M3 required field: an asterisk after the label. Visual only, the control's `required`
-     * tells assistive tech. */
+    /** An asterisk after the label; visual only, the control's `required` tells assistive tech */
     required?: boolean;
   }
 >(({ className, required, children, ...props }, ref) => {
@@ -93,7 +92,6 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      // M3: the label takes the primary colour while its field has focus, the error colour on error
       className={cn(error ? "text-error" : "group-focus-within/field:text-primary", className)}
       htmlFor={formItemId}
       {...props}
@@ -115,7 +113,7 @@ const FormControl = React.forwardRef<
     <Slot
       ref={ref}
       id={formItemId}
-      // The error message is only rendered (and referenced) while there is an error
+      // The error message exists only while there is an error
       aria-describedby={error ? formMessageId : undefined}
       aria-invalid={!!error}
       {...props}

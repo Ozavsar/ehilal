@@ -23,10 +23,7 @@ const getConferencesPage = cache((pageNum: number) =>
   getAllConferences(ITEMS_PER_PAGE * (pageNum - 1), ITEMS_PER_PAGE),
 );
 
-/**
- * The requested page, or notFound() for invalid and out-of-range pages.
- * Strapi failures propagate to error.tsx, so ISR keeps the last good version instead of caching a 404.
- */
+/** The requested page, or notFound() for invalid and out-of-range pages. */
 async function getPageOrNotFound(page: string) {
   if (!PAGE_PARAM_PATTERN.test(page)) {
     notFound();
@@ -47,7 +44,6 @@ export default async function ConferencesPage(props: { params: Promise<{ page: s
   const { page } = await props.params;
   const { conferences, pageNum, totalPages } = await getPageOrNotFound(page);
 
-  // Placeholders only for the cover photo of the conferences on this page
   const pageConferences = await withCoverPlaceholders(conferences);
 
   return (

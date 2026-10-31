@@ -4,9 +4,8 @@ import { absoluteUrl, FEED_PATH } from "@/lib/metadata";
 import { getSiteSettings } from "@/lib/services";
 import { getAllArticles } from "@/lib/services/blog";
 
-// RSS 2.0 feed of every article (Medium + Substack), newest first, for feed readers and the
-// services that discover new posts through feeds. Refreshed hourly like the article lists; a
-// failure throws, so ISR keeps serving the last good feed.
+// RSS 2.0 feed of every article (Medium + Substack), newest first; a failure throws, so ISR keeps
+// serving the last good feed
 export const revalidate = 3600;
 
 const XML_ESCAPES: Record<string, string> = {

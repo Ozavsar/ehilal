@@ -7,13 +7,9 @@ import type {
   INotFoundPage,
 } from "@/types";
 
-// Each request names the fields it renders (Strapi adds id and documentId). Page titles,
-// descriptions and social copy come from config/seo.ts, not from Strapi.
+// Each request names the fields it renders; SEO copy comes from config/seo.ts, not from Strapi
 const PAGE_TITLE_FIELDS = ["page_title", "page_title_background", "updatedAt"];
 
-/**
- * Get home page content
- */
 export async function getHomePageContent() {
   const response = await fetchAPI<IStrapiResponse<IStrapiHomePage>>(
     "/home-page",
@@ -23,9 +19,6 @@ export async function getHomePageContent() {
   return response.data;
 }
 
-/**
- * Get contact page content
- */
 export async function getContactPageContent() {
   const response = await fetchAPI<IStrapiResponse<IStrapiContactPage>>(
     "/contact-page",
@@ -37,9 +30,6 @@ export async function getContactPageContent() {
   return response.data;
 }
 
-/**
- * Get page titles by page name
- */
 export async function getPageTitle(pageName: string, tags?: string[]) {
   const response = await fetchAPI<IStrapiResponse<IPageTitle>>(
     `/${pageName}`,
@@ -51,9 +41,6 @@ export async function getPageTitle(pageName: string, tags?: string[]) {
   return response.data;
 }
 
-/**
- * Get Not Found page content
- */
 export async function getNotFoundPageContent() {
   const response = await fetchAPI<IStrapiResponse<INotFoundPage>>(
     "/not-found-page",

@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSiteSettings, getThemePalette } from "@/lib/services";
 
-// Prerendered, then refreshed daily; the Site Settings and theme webhooks refresh it through the
-// tags of its requests
+// The Site Settings and theme webhooks refresh it through the tags of its requests
 export const revalidate = 86400;
 
 // Same dark scheme as the icons (app/icon.tsx)

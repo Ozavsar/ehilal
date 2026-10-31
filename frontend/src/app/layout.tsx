@@ -29,8 +29,7 @@ import { siteJsonLd } from "@/lib/metadata";
 import { paletteToCss } from "@/lib/palette";
 import type { IImage, ISiteSettings } from "@/types";
 
-// `geist/font/mono` with preload off: only article code blocks use it, so the browser fetches the
-// file on pages that render one instead of every page preloading it.
+// Not preloaded: only article code blocks use it, so only pages that render one download it
 const geistMono = localFont({
   src: "../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2",
   variable: "--font-geist-mono",
@@ -50,9 +49,8 @@ const geistMono = localFont({
   ],
 });
 
-// Material Symbols Rounded, the subset of the glyphs in components/icon-names.ts (`yarn icons:subset`).
-// Preloaded: the navigation shows icons above the fold. `display: block` and no fallback face, so a
-// slow font paints nothing rather than the ligature names; a failed one is handled below.
+// Material Symbols subset (`yarn icons:subset`). `display: block` and no fallback face, so a slow
+// font paints nothing rather than the ligature names
 const materialSymbols = localFont({
   src: "./fonts/material-symbols-rounded.woff2",
   variable: "--font-icon",
@@ -63,18 +61,16 @@ const materialSymbols = localFont({
   fallback: [],
 });
 
-// When the icon font fails to load (blocked, 404), hide the glyph boxes instead of showing their
-// ligature names. Runs after `load`, when the @font-face rule is parsed and its load has settled.
+// A failed icon font (blocked, 404) hides the glyphs instead of showing ligature names; runs after
+// `load`, once the font's load has settled
 const iconFontGuard = `(()=>{const f=${JSON.stringify(`24px ${materialSymbols.style.fontFamily}`)};const off=()=>document.documentElement.classList.add("icons-unavailable");const run=()=>document.fonts.load(f,"home").then(r=>{if(!r.length)off()},off);document.readyState==="complete"?run():addEventListener("load",run,{once:true})})()`;
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Falls back to the defaults in config/site.ts, so a Strapi outage can't fail every page from here
   const site = await getSiteSettings();
   const defaultTitle = `${site.siteName} | ${site.jobTitle}`;
   const { defaultOgImage } = site;
 
   return {
-    // Resolves relative URLs of file-based metadata (app/icon.tsx, app/apple-icon.tsx)
     metadataBase: new URL(SITE_URL),
     title: {
       template: `%s | ${site.siteName}`,
@@ -82,7 +78,6 @@ export async function generateMetadata(): Promise<Metadata> {
     },
 
     description: site.siteDescription,
-    // Indexable by default; dev.*, previews and local builds also get the X-Robots-Tag header
     ...(!IS_PRODUCTION_SITE && { robots: { index: false, follow: false } }),
     openGraph: {
       title: defaultTitle,
@@ -131,8 +126,7 @@ export async function generateViewport(): Promise<Viewport> {
 const isHttpUrl = (url: string | null | undefined): url is string =>
   !!url && /^https?:\/\/\S+$/i.test(url.trim());
 
-// The site owner's profiles elsewhere, for the Person's `sameAs` (Knowledge Panel matching). The
-// Strapi social links when set, the known profiles otherwise; never fails the layout.
+// Profiles for the Person's `sameAs`: Strapi social links, else the known ones; never throws
 async function getProfileUrls(site: ISiteSettings): Promise<string[]> {
   const links = await getSocialMediaLinks().catch((error: unknown) => {
     unstable_rethrow(error);
@@ -178,7 +172,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Falls back to the default palette, so a Strapi outage can't take the whole site down from here
   const [palette, site, { isEnabled: isPreview }] = await Promise.all([
     getThemePalette(),
     getSiteSettings(),
@@ -197,14 +190,12 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* The --m3-* colour roles globals.css maps to Tailwind colours. Safe to inline: every
-            value passed the palette schema's hex check. */}
+        {/* Safe to inline: every value passed the palette schema's hex check */}
         <style id="m3-palette" dangerouslySetInnerHTML={{ __html: paletteToCss(palette) }} />
         <script id="icon-font-guard" dangerouslySetInnerHTML={{ __html: iconFontGuard }} />
         {/* Person + WebSite on every page; pages add their own nodes that point to them by @id */}
         <JsonLd data={siteJsonLd(site, profileUrls, portrait)} />
       </head>
-      {/* The page clears the fixed navigation: the rail on the left from sm, the bar at the bottom below */}
       <body
         className="type-body-large max-sm:pb-nav-bar sm:pl-rail relative flex min-h-screen flex-col antialiased"
         suppressHydrationWarning
@@ -214,7 +205,6 @@ export default async function RootLayout({
           <HistoryMorph />
           <Header />
           {children}
-          {/* Strapi Preview (Draft Mode): change the draft palette live */}
           {isPreview && (
             <ThemePreviewBar
               seed={palette.source.seed}

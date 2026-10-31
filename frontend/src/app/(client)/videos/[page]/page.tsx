@@ -14,10 +14,7 @@ export const dynamicParams = true;
 // Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
 const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
 
-/**
- * The requested page, or notFound() for invalid and out-of-range pages.
- * A Strapi failure propagates to error.tsx, so ISR keeps the last good version instead of caching a 404.
- */
+/** The requested page, or notFound() for invalid and out-of-range pages. */
 async function getPageOrNotFound(page: string) {
   if (!PAGE_PARAM_PATTERN.test(page)) {
     notFound();
@@ -29,7 +26,7 @@ async function getPageOrNotFound(page: string) {
   const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
 
   if (pageNum > totalPages) {
-    // Without the YouTube videos the list is shorter, so a page that normally exists would 404 (and be cached)
+    // Without YouTube the list is shorter: throw rather than cache a 404 for a page that exists
     if (!isComplete) {
       throw new Error(`Videos page ${pageNum} is unavailable while YouTube videos can't be loaded`);
     }
@@ -47,7 +44,6 @@ export default async function VideosPage(props: { params: Promise<{ page: string
   const { page } = await props.params;
   const { videos, pageNum, totalPages } = await getPageOrNotFound(page);
 
-  // Placeholders only for the videos on this page
   const pageVideos = await withBlurDataURLs(videos, (video) => video.thumbnailURL);
 
   return (

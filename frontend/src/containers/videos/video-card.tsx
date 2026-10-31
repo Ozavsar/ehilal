@@ -18,9 +18,8 @@ export default function VideoCard({
   isFeatured,
   priority = false,
 }: IUnifiedVideo & { priority?: boolean }) {
-  // Turkish or English, for screen reader pronunciation
   const lang = detectLanguage(`${title} ${description ?? ""}`);
-  // publish_date is an ISO string; pin the time zone so the day doesn't depend on the server
+  // Pin the time zone so the day doesn't depend on the server
   const publishDate = new Date(publish_date);
   const formattedDate = isNaN(publishDate.getTime())
     ? null
@@ -31,25 +30,20 @@ export default function VideoCard({
         timeZone: "Europe/Istanbul",
       });
 
-  // The title is the card's one link for keyboard and screen reader users; the thumbnail and the
-  // footer button are pointer-only copies of it. Without a URL nothing links.
   const thumbnail = (
     <>
       <Image
         src={thumbnailURL || "/images/blog/default-blog.jpg"}
-        // Decorative: the title right below names the card
         alt=""
         blurDataURL={blurDataURL}
         placeholder={blurDataURL ? "blur" : "empty"}
         className="ease-standard object-cover duration-300 select-none group-hover:scale-105 motion-safe:transition-transform"
         fill
-        // The first card is the LCP candidate on the list page
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
         sizes={LIST_CARD_IMAGE_SIZES}
         draggable={false}
       />
-      {/* Hover cue */}
       <span
         aria-hidden="true"
         className="bg-scrim/40 ease-standard absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100"

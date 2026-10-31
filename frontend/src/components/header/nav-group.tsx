@@ -8,26 +8,20 @@ import { isNavItemActive, type NavDestination } from "@/config/constants/app-rou
 import { cn } from "@/lib/utils";
 import NavLink from "./nav-link";
 
-// Hover intent (mouse only): open after a short rest on the item, close a moment after the pointer
-// leaves both the item and the menu, so it can cross the gap between them
+// Hover intent (mouse only); the close delay lets the pointer cross the gap to the menu
 const OPEN_DELAY = 80;
 const CLOSE_DELAY = 200;
-// Space between the navigation item and the menu
 const GAP = 8;
 
 interface NavGroupProps {
   items: NavDestination[];
-  /** The item's slot and label, the same as the other destinations' */
   children: ReactNode;
   className?: string;
 }
 
 /**
- * A navigation item that opens a menu of destinations (a disclosure: a button and a list of links).
- * The menu is a popover in the top layer, so the rail's scroll box can't clip it, and it brings
- * Escape, click-outside and focus order (Tab moves from the item into the menu) from the browser.
- * It opens to the right of the rail and above the bottom bar. Mouse users get it on hover; a click
- * keeps a hovered menu open, and a click, tap or Enter toggles it otherwise.
+ * A navigation item that opens a menu of destinations. The menu is a top-layer popover, so the
+ * rail's scroll box can't clip it; it opens on hover for a mouse, on click, tap or Enter otherwise.
  */
 export default function NavGroup({ items, children, className }: NavGroupProps) {
   const pathname = usePathname();
@@ -35,7 +29,7 @@ export default function NavGroup({ items, children, className }: NavGroupProps) 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // Opened by hovering: closes when the pointer leaves; a click turns it into a clicked-open menu
+  // A hover-opened menu closes when the pointer leaves; a click keeps it open
   const openedByHover = useRef(false);
 
   const isOpen = () => menuRef.current?.matches(":popover-open") ?? false;
@@ -44,7 +38,7 @@ export default function NavGroup({ items, children, className }: NavGroupProps) 
     if (isOpen()) menuRef.current?.hidePopover();
   };
 
-  // Placed just before it opens, next to the item as it is laid out now (bar or rail)
+  // Placed just before it opens, next to the item as currently laid out (bar or rail)
   useEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
@@ -79,7 +73,6 @@ export default function NavGroup({ items, children, className }: NavGroupProps) 
     };
   }, []);
 
-  // A navigation (also Back/Forward) closes it
   useEffect(() => {
     if (menuRef.current?.matches(":popover-open")) menuRef.current.hidePopover();
   }, [pathname]);
@@ -109,7 +102,7 @@ export default function NavGroup({ items, children, className }: NavGroupProps) 
         onPointerEnter={hoverOpen}
         onPointerLeave={hoverClose}
         onClick={(event) => {
-          // The menu is already open from hovering: keep it (popoverTarget would toggle it shut)
+          // Already open from hovering: keep it (popoverTarget would toggle it shut)
           if (openedByHover.current && isOpen()) {
             event.preventDefault();
             openedByHover.current = false;
@@ -138,7 +131,6 @@ export default function NavGroup({ items, children, className }: NavGroupProps) 
                 <NavLink
                   href={href}
                   aria-current={isActive ? "page" : undefined}
-                  // M3 fade through of the page content (app/template.tsx), like the other destinations
                   transitionTypes={[NAV_TOP]}
                   onClick={close}
                   className={cn(

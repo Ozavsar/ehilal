@@ -5,14 +5,13 @@ import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 
 interface AnimatedImageProps {
-  /** Still frame shown until the reader plays the animation */
   poster: string;
   posterSrcSet?: string;
   sizes?: string;
   /** The animation itself (a GIF can weigh tens of megabytes): only requested on play */
   src: string;
   alt: string;
-  // Rendered pixel size, reserves the box before the poster loads (no layout shift)
+  // Rendered pixel size: reserves the box before the poster loads
   width?: number;
   height?: number;
   playLabel: string;
@@ -20,9 +19,8 @@ interface AnimatedImageProps {
   className?: string;
 }
 
-// Click-to-play facade for animated GIFs: nothing moves and nothing heavy loads until the reader
-// asks for it, and a playing animation can be paused again (WCAG 2.2.2). The poster stays on
-// screen until the animation has downloaded (the browser swaps the image once it is ready).
+// Click-to-play facade for animated GIFs: nothing heavy loads until played, and a playing
+// animation can be paused again (WCAG 2.2.2)
 export default function AnimatedImage({
   poster,
   posterSrcSet,
@@ -64,7 +62,7 @@ export default function AnimatedImage({
         className={cn(
           "state-layer bg-primary text-on-primary shadow-elevation-2 absolute flex items-center justify-center rounded-full",
           "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
-          playing ? "touch-target end-3 bottom-3 size-10" : "inset-0 m-auto size-14",
+          playing ? "touch-target inset-e-3 bottom-3 size-10" : "inset-0 m-auto size-14",
         )}
       >
         <Icon name={playing ? "pause" : "play_arrow"} />

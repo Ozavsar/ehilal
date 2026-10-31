@@ -1,13 +1,11 @@
 import { z } from "zod";
 
-// Server-only environment. Never import this from a Client Component: the secrets aren't in the
-// browser bundle, so validation would throw there.
+// Server-only: secrets aren't in the browser bundle, so validation would throw in client code
 
-// The deploy workflow writes unset secrets as empty lines (e.g. `CONTACT_TO_EMAIL=`), so blank means unset
+// The deploy workflow writes unset secrets as empty lines (`CONTACT_TO_EMAIL=`): blank means unset
 const read = (value: string | undefined) => value?.trim() || undefined;
 
 const serverEnvSchema = z.object({
-  // Required: every page reads Strapi with this token
   BEARER_TOKEN: z.string().min(1),
   NEXT_PUBLIC_STRAPI_API_URL: z
     .string()
@@ -25,7 +23,6 @@ const serverEnvSchema = z.object({
   PREVIEW_ALLOWED_ORIGINS: z.string().optional(),
 });
 
-// Each variable is read literally so NEXT_PUBLIC_* values can be inlined at build time
 const parsed = serverEnvSchema.safeParse({
   BEARER_TOKEN: read(process.env.BEARER_TOKEN),
   NEXT_PUBLIC_STRAPI_API_URL: read(process.env.NEXT_PUBLIC_STRAPI_API_URL),
@@ -48,7 +45,7 @@ const strapiApiUrl = (parsed.data.NEXT_PUBLIC_STRAPI_API_URL ?? "http://127.0.0.
   "",
 );
 
-/** Origins of the Strapi admin, which frames the site in its preview: the API's and PREVIEW_ALLOWED_ORIGINS. */
+/** Strapi admin origins that frame the preview: the API's and PREVIEW_ALLOWED_ORIGINS */
 const previewParentOrigins = [
   strapiApiUrl,
   ...(parsed.data.PREVIEW_ALLOWED_ORIGINS ?? "").split(","),

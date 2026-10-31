@@ -7,8 +7,7 @@ import { getAllArticles } from "@/lib/services/blog";
 import { getAllVideos } from "@/lib/services/videos";
 import type { IStrapiBasePage, IStrapiCollectionResponse, IStrapiResponse } from "@/types";
 
-// Prerendered at build, refreshed hourly like the article lists. The Strapi requests carry their
-// content's cache tags, so a Strapi webhook (/api/revalidate) refreshes it as well.
+// The Strapi requests carry their content's cache tags, so Strapi webhooks refresh it as well
 export const revalidate = 3600;
 
 type Timestamp = Pick<IStrapiBasePage, "updatedAt">;
@@ -59,9 +58,8 @@ const entry = (path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
 });
 
 /**
- * Every indexable page: home, contact, page 1 of each list (at its bare path; pages 2..N carry no
- * content of their own) and the articles readable on this site. Videos, courses and conferences have
- * no detail pages here. Courses come from Udemy without dates, so their list has no <lastmod>.
+ * Every indexable page: home, contact, page 1 of each list (pages 2..N carry no content of their
+ * own) and the articles readable on this site.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [home, siteSettings, contact, articles, conferences, strapiVideos, videoList] =

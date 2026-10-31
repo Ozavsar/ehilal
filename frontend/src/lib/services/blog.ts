@@ -16,8 +16,7 @@ const SOURCES = [
 
 const toTime = (iso: string) => Date.parse(iso) || 0;
 
-// Medium + Substack, newest first. A failing source is logged and skipped (complete: false);
-// throws only when every source fails. cache() shares the result within one request.
+// Medium + Substack, newest first. A failing source is skipped (complete: false); throws if both do
 const loadArticles = cache(async () => {
   const errors: unknown[] = [];
   const lists = await Promise.all(
@@ -43,9 +42,7 @@ export async function getAllArticles(): Promise<IBlogPreview[]> {
   return (await loadArticles()).articles;
 }
 
-// The list behind an article page's links to other articles (related posts, series, links in the
-// text): empty instead of throwing when every source fails (already logged), so the article
-// itself still renders.
+// For an article's links to other articles: empty instead of throwing, so the article still renders
 export async function getArticlesForLinks(): Promise<IBlogPreview[]> {
   try {
     return await getAllArticles();
@@ -74,8 +71,7 @@ export async function getArticlesPage(page: number) {
   };
 }
 
-// Readable article for a /blog/<slug> segment. Segments without a valid Medium id return null
-// without a network request. Shared by generateMetadata and the page (one Medium call per request).
+// Article for a /blog/<slug> segment; an invalid Medium id returns null without a request
 export const getArticleBySlug = cache(async (slug: string): Promise<IBlog | null> => {
   const postId = getMediumPostId(slug);
   return postId ? getSingleArticle(postId) : null;

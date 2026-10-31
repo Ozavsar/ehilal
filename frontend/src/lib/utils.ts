@@ -7,10 +7,8 @@ const M3_TYPE_ROLES = ["display", "headline", "title", "body", "label"].flatMap(
   ["large", "medium", "small"].map((size) => `${role}-${size}`),
 );
 
-// The custom @theme tokens in globals.css. Unknown names would otherwise be read as colours
-// (text-backdrop would drop text-on-surface-variant, shadow-elevation-1 a shadow colour).
-// "2xs" already counts as a size. The Material 3 colour roles (text-on-surface,
-// bg-surface-container-high, border-outline-variant) need no entry: unknown values are colours.
+// Custom @theme tokens from globals.css: unregistered names count as colours (text-backdrop would
+// drop text-on-surface-variant). The M3 colour roles need no entry.
 const twMerge = extendTailwindMerge<"m3-type">({
   extend: {
     theme: {
@@ -57,8 +55,7 @@ const twMerge = extendTailwindMerge<"m3-type">({
     classGroups: {
       "m3-type": [{ type: M3_TYPE_ROLES }],
     },
-    // A role sets size, line height, tracking and weight: it replaces those classes before it
-    // (text-on-surface, a colour, survives). A weight or leading class after a role still applies.
+    // A type role replaces earlier size/weight/leading/tracking classes; later ones still apply
     conflictingClassGroups: {
       "m3-type": ["font-size", "font-weight", "leading", "tracking"],
     },

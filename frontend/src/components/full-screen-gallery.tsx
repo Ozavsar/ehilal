@@ -15,9 +15,9 @@ export interface IGalleryImage {
   src: string;
   alt: string;
   blurDataURL?: string;
-  // Shared with the thumbnail that opened it, so the photo morphs between the two (view transition)
+  // Shared with the thumbnail that opened it, for the photo morph
   transitionName?: string;
-  // Original size: the image box then fits the photo exactly (a clean morph), else it fills the slide
+  // Original size: the box then fits the photo exactly (a clean morph), else it fills the slide
   width?: number | null;
   height?: number | null;
 }
@@ -43,17 +43,12 @@ export default function FullScreenGallery({
   morph = false,
 }: FullScreenGalleryProps) {
   const slideSpeed = useSlideSpeed();
-  // Radix Dialog handles Escape, focus trap, scroll lock and the dialog role; --z-modal sits above
-  // the header, the drawer and the article TOC button.
-  // data-lenis-prevent stops Lenis from scrolling the page behind the dialog.
+  // data-lenis-prevent stops Lenis from scrolling the page behind the dialog
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
-      {/* An explicit container renders the portal in the same commit as the dialog (Radix waits a
-          layout effect for document.body otherwise), so a view transition sees the photo enter.
-          This component only renders on the client. */}
+      {/* An explicit container renders the portal in the same commit as the dialog, so a view
+          transition sees the photo enter (client-only component) */}
       <Dialog.Portal container={document.body}>
-        {/* M3 fade: the scrim fades in, the gallery fades in while it scales up (or the photo
-            morphs out of its thumbnail) */}
         <Dialog.Overlay className="bg-scrim animate-m3-scrim-enter fixed inset-0 z-(--z-modal)" />
         <Dialog.Content
           aria-describedby={undefined}
@@ -70,8 +65,7 @@ export default function FullScreenGallery({
         >
           <Dialog.Title className="sr-only">{title}</Dialog.Title>
           <Dialog.Close
-            // M3 standard icon button (48dp touch target). Fixed roles keep the same light tone in
-            // both themes, readable on the black scrim
+            // Fixed roles: the same light tone in both themes, readable on the scrim
             className="state-layer text-primary-fixed-dim outline-primary-fixed-dim absolute top-4 right-4 z-(--z-floating) inline-flex size-12 cursor-pointer items-center justify-center rounded-full focus-visible:outline-3 focus-visible:outline-offset-2"
             aria-label="Close full screen image"
           >
@@ -92,7 +86,6 @@ export default function FullScreenGallery({
                 {/* Without a transitionName this boundary never animates */}
                 <ViewTransition name={image.transitionName} share="photo-morph" default="none">
                   {image.width && image.height ? (
-                    // Contained by max size, so the box is the photo itself
                     <Image
                       src={image.src}
                       alt={image.alt}
@@ -108,7 +101,6 @@ export default function FullScreenGallery({
                     <Image
                       src={image.src}
                       alt={image.alt}
-                      // Each slide fills the viewport: pick the srcset entry by viewport width and DPR
                       fill
                       sizes="100vw"
                       blurDataURL={image.blurDataURL}

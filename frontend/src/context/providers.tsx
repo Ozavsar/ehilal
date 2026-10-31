@@ -8,15 +8,13 @@ import { ThemeProvider } from "next-themes";
 import { useIdleAfterLoad, whenIdleAfterLoad } from "@/hooks/use-idle-after-load";
 import "lenis/dist/lenis.css";
 
-// Decorative, so it isn't part of the first bundle: the chunk loads once the page is idle
 const RocketCursor = dynamic(() => import("@/components/rocket-cursor"), { ssr: false });
 
 function DeferredRocketCursor() {
   return useIdleAfterLoad() ? <RocketCursor /> : null;
 }
 
-// Lenis smooth wheel scrolling on the window, loaded once the page is idle (until then and with
-// reduced motion the page scrolls natively). Keyboard, scrollbar and touch scrolling are native either way.
+// Lenis smooth wheel scrolling, loaded once the page is idle; native scrolling under reduced motion
 function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
@@ -56,9 +54,8 @@ function SmoothScroll() {
     };
   }, []);
 
-  // Next scrolls a new page to the top natively, but wheel inertia still running in Lenis would
-  // drag it back down. stop() + start() (Lenis' public reset) drops the inertia and re-reads the
-  // real scroll position; a layout effect runs before Lenis' next frame.
+  // Lenis' wheel inertia would drag a new page back down: stop() + start() drops it and re-reads
+  // the scroll position (a layout effect runs before Lenis' next frame)
   useLayoutEffect(() => {
     const lenis = lenisRef.current;
     if (!lenis) return;

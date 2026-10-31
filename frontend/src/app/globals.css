@@ -8,12 +8,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Colours: the Material 3 roles arrive as --m3-* variables from the root layout (palette from
-     Strapi, see lib/palette.ts), light on :root and dark on .dark. Use them through the --color-*
-     tokens below (bg-surface, text-on-surface-variant, ...). */
+  /* Colours: the --m3-* roles come from the root layout's palette <style>; use --color-* tokens */
 
-  /* M3 durations, for keyframes and component CSS. In class names use the bare numbers, which
-     are the same values: duration-200 (short4), duration-300 (medium2), duration-400 (medium4) */
+  /* M3 durations; in class names use the bare numbers (duration-200 = short4) */
   --duration-short1: 50ms;
   --duration-short2: 100ms;
   --duration-short3: 150ms;
@@ -37,14 +34,12 @@
   --state-pressed: 0.12;
   --state-dragged: 0.16;
 
-  /* Stacking scale, low to high. Use through z-(--z-*) or var(--z-*), never a bare number.
-     Most layers share the root stacking context with third-party ones (swiper containers sit
-     at 1, sonner at --z-toast), so the gaps between the values matter, not just their order. */
+  /* Stacking scale: use z-(--z-*), never a bare number. The gaps matter too: third-party layers
+     (swiper at 1, sonner) share the root stacking context. */
   --z-behind: -10; /* decorative backdrops: home stripe, page-title word, button hover fill */
   --z-pagination: 9;
   --z-raised: 10; /* content lifted over a sibling backdrop (badges, card content, 404 content) */
   --z-header: 21; /* fixed header: navigation rail / bar and the theme toggle */
-  /* Decorative rocket cursor: over content and the header, under floating controls and overlays */
   --z-cursor-trail: 30; /* rocket cursor fumes */
   --z-cursor: 31; /* rocket cursor */
   --z-floating: 50; /* floating controls: article Contents FAB, gallery close */
@@ -54,12 +49,12 @@
 }
 
 @theme inline {
-  /* Fonts: next/font (geist) defines the variables on <html> in the root layout */
+  /* Fonts: next/font defines the variables on <html> */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Material 3 colour roles (bg-primary, text-on-primary, bg-surface-container-low, border-outline-variant, ...).
-     Register them nowhere else: tailwind-merge treats any unknown bg-/text-/border- value as a colour */
+  /* Material 3 colour roles. Not in the twMerge config: tailwind-merge already reads unknown
+     bg-/text-/border- values as colours */
   --color-primary: var(--m3-primary);
   --color-on-primary: var(--m3-on-primary);
   --color-primary-container: var(--m3-primary-container);
@@ -108,8 +103,7 @@
   --color-scrim: var(--m3-scrim);
   --color-surface-tint: var(--m3-surface-tint);
 
-  /* Keyframe animations (keyframes below). Inline, so a component can retune the fade timing on
-     the element itself: [--m3-enter-duration:200ms] [--m3-exit-duration:100ms] (menus) */
+  /* Animations; the fade timing can be retuned per element: [--m3-enter-duration:200ms] */
   --animate-hero-in: hero-in var(--duration-long2) var(--ease-emphasized-decelerate) both;
   /* Home hero: colour band, accent line, word-by-word text and the waving hand */
   --animate-hero-band: hero-band var(--duration-extra-long2) var(--ease-emphasized-decelerate) both;
@@ -146,8 +140,7 @@
     var(--ease-emphasized) both;
 }
 
-/* Material 3 foundations: window size classes, shape, elevation, easing, layout. Register new
-   names in the twMerge config in lib/utils.ts too. */
+/* Material 3 foundations; register new names in the twMerge config (lib/utils.ts) too */
 @theme {
   /* Window size classes: sm medium (600), md expanded (840), lg large (1200), xl extra-large (1600) */
   --breakpoint-*: initial;
@@ -195,18 +188,15 @@
   --container-content: 1200px;
 }
 
-/* Decorative word behind page titles (TitleSection): outside the M3 type scale on purpose. Register
-   new names in the twMerge config in lib/utils.ts, otherwise cn() can mistake them for colours. */
+/* Decorative sizes outside the M3 type scale (page-title word, 404 digits). Register new names in
+   lib/utils.ts, otherwise cn() can mistake them for colours. */
 @theme {
   --text-backdrop: 110px;
-  /* The 404 digits: a decorative numeral larger than the M3 display roles */
   --text-numeral: clamp(6rem, 3rem + 10vw, 10rem);
   --tracking-backdrop: 5px;
 }
 
-/* M3 type scale: size, line height, tracking and weight of each role (the family stays Geist Sans,
-   inherited; add font-mono for code). Utilities, not text-* tokens: tailwind-merge reads an unknown
-   text-* as a colour. Registered as one class group in lib/utils.ts. */
+/* M3 type scale. Utilities, not text-* tokens: tailwind-merge reads unknown text-* as a colour */
 @utility type-display-large {
   font-size: 3.5625rem;
   line-height: 4rem;
@@ -310,9 +300,7 @@
   }
 }
 
-/* M3 touch target: on touch screens a control under 48dp (40dp icon buttons, 32dp small buttons,
-   pagination) still takes taps on a 48 x 48dp area centred on it. The element must be positioned
-   (.state-layer is). */
+/* M3 touch target: a 48 x 48dp tap area on touch screens; the element must be positioned */
 @utility touch-target {
   @media (pointer: coarse) {
     &::before {
@@ -327,9 +315,8 @@
   }
 }
 
-/* M3 state layer: currentColor (the "on" colour of the surface) over the element's background and
-   under its content, 8% hover / 12% focus-visible / 12% pressed. A component, so position
-   utilities (absolute, fixed) on the same element still win over its position: relative. */
+/* M3 state layer: currentColor under the content. In components, so position utilities on the same
+   element still win over its position: relative. */
 @layer components {
   .state-layer {
     position: relative;
@@ -363,10 +350,8 @@
     opacity: 0;
   }
 
-  /* Material Symbols (components/icon.tsx). The span holds a ligature name, so everything that
-     could change the text (uppercase, tracking, wrapping) is reset; the 1em box keeps the layout
-     stable while the font loads (display: block paints nothing until then). Size via
-     --icon-size (inherited, so a parent can size every icon inside it), fill via --icon-fill. */
+  /* Material Symbols (components/icon.tsx): the text resets keep the ligature name intact, the 1em
+     box holds the layout while the font loads. Size via --icon-size, fill via --icon-fill. */
   .material-symbols {
     display: inline-block;
     flex-shrink: 0;
@@ -412,8 +397,7 @@
   }
 }
 
-/* Home hero entrance. Transform only: the image is visible from its first frame, so the
-   animation doesn't delay LCP (opacity 0 would) */
+/* Home hero entrance. Transform only: opacity 0 would delay LCP */
 @keyframes hero-in {
   from {
     transform: rotate(-6deg) translateX(-40px);
@@ -436,11 +420,8 @@
   }
 }
 
-/* Home hero: from 840px its colour band covers the whole height of the transparent navigation rail
-   (containers/home), so the rail's items and the theme toggle read in the band's on-colour: on
-   primary in the light theme, on primary-container in the dark one (where the active indicator
-   turns light too). Scoped to the items, not the <nav>: the Learn menu (a popover beside the
-   items) keeps the page's colours. The colour utilities read the --m3-* roles directly (@theme inline). */
+/* From md the home hero's colour band runs under the transparent rail, so the rail items take the
+   band's on-colour. Scoped to the items, not the <nav>: the Learn menu keeps the page's colours. */
 @media (width >= theme(--breakpoint-md)) {
   body:has(main[data-hero-band])
     :is([data-nav-anchor] > nav > :is(a, button), [data-nav-anchor] > button) {
@@ -460,9 +441,7 @@
   }
 }
 
-/* Fades in while rising into place (--hero-rise). Opacity and translate only: the compositor runs
-   them, so they stay smooth while the page hydrates (an animated blur filter can't be composited
-   and stuttered on the main thread). */
+/* Opacity and translate only: composited, so smooth during hydration (animated blur stuttered) */
 @keyframes hero-rise {
   from {
     opacity: 0;
@@ -490,8 +469,8 @@
   }
 }
 
-/* M3 transition patterns (material-components-android timings). They animate the independent
-   scale/translate properties, so a positioning transform on the same element survives. */
+/* M3 transition patterns. Independent scale/translate properties, so a positioning transform on
+   the same element survives. */
 @keyframes m3-fade-enter {
   from {
     opacity: 0;
@@ -631,8 +610,8 @@
   }
 }
 
-/* Reduced motion: M3 keeps opacity-only motion. These later definitions replace the moving
-   keyframes above, so every animate-m3-* (and the hero) is safe without per-element variants. */
+/* Reduced motion: these later definitions replace the moving keyframes with opacity only, so every
+   animate-m3-* (and the hero) is safe without per-element variants. */
 @media (prefers-reduced-motion: reduce) {
   @keyframes hero-in {
     from,
@@ -741,16 +720,13 @@
   }
 }
 
-/* Page view transitions: React <ViewTransition> boundaries (components/view-transitions.tsx) give
-   these classes to the page parts they animate. Clicks during a transition reach the live page. */
+/* Page view transitions (components/view-transitions.tsx); clicks during one reach the live page */
 ::view-transition {
   pointer-events: none;
 }
 
-/* The navigation rail / bar stays a still layer above the content in page transitions, so only
-   the content moves and its live new state shows the active indicator sliding. Not in the theme
-   toggle's transition (type "theme"), whose circular reveal covers the whole page, nor in the
-   photo gallery's (type "gallery"), which opens above the navigation. */
+/* The navigation stays a still layer above the content in page transitions; not in the theme
+   reveal or the gallery, which both cover it */
 :root:active-view-transition:not(:active-view-transition-type(theme, gallery)) [data-nav-anchor] {
   view-transition-name: site-nav;
 }
@@ -765,8 +741,7 @@
   animation: none;
 }
 
-/* Fade through (navigation destinations): the old page fades out (short2), then the new one fades
-   in and grows from 92% around the middle of the viewport (short4) */
+/* Fade through (navigation destinations): old page out (short2), then the new one in from 92% */
 ::view-transition-old(.fade-through) {
   animation: m3-fade-exit var(--duration-short2) var(--ease-emphasized-accelerate) both;
 }
@@ -776,8 +751,7 @@
     var(--duration-short2) both;
 }
 
-/* Shared axis X (list pages): forward enters from the right, back from the left. Both grids stay
-   in the new grid's place (no travel between scroll positions), only the axis slide moves them. */
+/* Shared axis X (list pages): forward from the right, back from the left; the groups stay put */
 ::view-transition-group(.axis-x-forward),
 ::view-transition-group(.axis-x-back) {
   animation: none;
@@ -795,24 +769,20 @@
   --m3-axis-distance: -30px;
 }
 
-/* Container transform (blog card → article): the shared elements move and resize while the old
-   and new snapshots crossfade */
+/* Container transform (blog card → article) */
 ::view-transition-group(.morph) {
   animation-duration: var(--duration-long2);
   animation-timing-function: var(--ease-emphasized);
 }
 
-/* Conference photo ⇄ full-screen gallery: the same container transform, above the gallery's
-   scrim */
+/* Conference photo ⇄ full-screen gallery, above the gallery's scrim */
 ::view-transition-group(.photo-morph) {
   z-index: var(--z-raised);
   animation-duration: var(--duration-long2);
   animation-timing-function: var(--ease-emphasized);
 }
-/* Only the full-screen photo is shown while the box moves: covering the box, it is the thumbnail's
-   centre crop at the card end, so the thumbnail snapshot would only add a double exposure. By
-   transition type, not class: the thumbnail's snapshot doesn't carry the class in Chrome. The photo
-   is the only named element in these transitions (React hides the root's). */
+/* Only the full-screen photo shows while the box moves (the thumbnail would double-expose). By
+   transition type, not class: the thumbnail's snapshot doesn't carry the class in Chrome. */
 :root:active-view-transition-type(gallery)::view-transition-old(*),
 :root:active-view-transition-type(gallery)::view-transition-new(*) {
   height: 100%;
@@ -827,9 +797,8 @@
   animation: none;
 }
 
-/* Card → article: the rest of the article comes in once the morph has landed, top to bottom
-   (--reveal-order steps of 50ms). Only the first style of an element rendered during that
-   transition starts hidden, so a direct page load shows the article at once. */
+/* Card → article: the rest comes in after the morph, top to bottom (--reveal-order × 50ms); only
+   during that transition, so a direct page load shows the article at once */
 [data-article-reveal] {
   transition-property: opacity, translate;
   transition-duration: var(--duration-medium3);
@@ -843,9 +812,7 @@
   }
 }
 
-/* Reduced motion: the keyframes above lose their movement (see the keyframe overrides), the
-   shared elements crossfade in their new place instead of travelling there, and the article
-   reveal only fades */
+/* Reduced motion: shared elements crossfade in place, the article reveal only fades */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(.morph),
   ::view-transition-group(.photo-morph) {
@@ -856,9 +823,8 @@
   }
 }
 
-/* Swiper's CSS is imported by the gallery components and loads after this file. It positions the
-   arrows with .swiper-horizontal selectors, so matching both classes keeps these overrides ahead of
-   it whatever the stylesheet order. The arrows are full-height click areas 10px from the edges. */
+/* Swiper's CSS loads after this file: matching both classes outranks its .swiper-horizontal
+   selectors whatever the stylesheet order */
 .swiper.swiper-horizontal .swiper-button-prev,
 .swiper.swiper-horizontal .swiper-button-next {
   --swiper-navigation-sides-offset: 10px;
@@ -866,14 +832,13 @@
   @apply text-primary-fixed-dim top-0 bottom-0 m-0 h-full w-16 max-sm:w-12;
 }
 
-/* Inline SVG chevron (Swiper 12+), sized like the former icon font glyph */
+/* Swiper's inline SVG chevron */
 .swiper.swiper-horizontal .swiper-button-prev svg,
 .swiper.swiper-horizontal .swiper-button-next svg {
   @apply h-7.25 w-auto shrink-0 sm:h-8.5;
 }
 
-/* Article typography (@tailwindcss/typography) on the M3 roles. Unlayered, so it wins over the
-   plugin's .prose and .prose-invert colours; the roles already switch with .dark. */
+/* Article colours on the M3 roles. Unlayered, so it wins over the plugin's .prose colours. */
 .prose {
   --tw-prose-body: var(--m3-on-surface-variant);
   --tw-prose-headings: var(--m3-on-surface);
@@ -894,9 +859,8 @@
   --tw-prose-td-borders: var(--m3-outline-variant);
 }
 
-/* Article type on the M3 roles, spacing in 4dp steps. Unlayered like the colours above, so it also
-   replaces the plugin's prose-sm/base/lg sizes, and wins over utilities on elements inside .prose:
-   put .not-prose on a custom block that needs its own type classes. */
+/* Article type on the M3 roles. Unlayered, so it also wins over utilities inside .prose: put
+   .not-prose on a custom block that needs its own type classes. */
 .prose {
   @apply type-body-large;
 }
@@ -917,8 +881,7 @@
   @apply type-headline-medium;
   margin-block: 0 1.5rem;
 }
-/* The article's section headings: Medium's large / small headings, rendered as h2 / h3 under the
-   <h1> title (medium-renderer.tsx), so they keep the title-large / title-medium roles */
+/* Medium's large / small headings, rendered as h2 / h3 under the <h1> (medium-renderer.tsx) */
 .prose :where(h2):not(:where(.not-prose, .not-prose *)) {
   @apply type-title-large;
   margin-block: 2rem 0.75rem;

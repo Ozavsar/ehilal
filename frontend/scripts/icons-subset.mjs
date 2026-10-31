@@ -1,13 +1,7 @@
 /**
- * Downloads the Material Symbols Rounded subset that contains exactly the glyphs listed in
- * `src/components/icon-names.ts` and writes it to `src/app/fonts/material-symbols-rounded.woff2`,
- * with a manifest of the icons it holds next to it.
- *
- *   yarn icons:subset            rebuild the font after changing the registry
- *   yarn icons:subset --check    fail (no network) when the font no longer matches the registry
- *
- * Axes: optical size 24, weight 400 and grade 0 are fixed; FILL stays variable (0..1) so <Icon
- * filled> and fill transitions work on the same file.
+ * Downloads the Material Symbols Rounded subset for `src/components/icon-names.ts` into
+ * src/app/fonts/ (woff2 + manifest). `--check` fails, without network, when the font no longer
+ * matches the registry. FILL stays variable (0..1) so <Icon filled> works with the same file.
  */
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -72,8 +66,7 @@ async function build(names) {
   }
   const css = await cssResponse.text();
 
-  // A subset is served from a query-string URL (/l/font?kit=…), not a .woff2 path, so match the
-  // url() and check the format separately
+  // Subsets come from a query-string URL (/l/font?kit=…), so the format is checked separately
   const fontUrl = css.match(/src:\s*url\((https:\/\/[^)]+)\)/)?.[1];
   if (!fontUrl || !/format\(['"]?woff2/.test(css)) {
     throw new Error(`No woff2 source in the Google Fonts response:\n${css.slice(0, 300)}`);

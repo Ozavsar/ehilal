@@ -40,13 +40,13 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        // M3 bottom sheet: surface-container-low, 28dp top corners, elevation 1, at most 640dp wide
+        // M3 bottom sheet
         "bg-surface-container-low text-on-surface shadow-elevation-1 fixed inset-x-0 bottom-0 z-(--z-overlay) mx-auto mt-24 flex h-auto w-full max-w-160 flex-col rounded-t-xl",
         className,
       )}
       {...props}
     >
-      {/* M3 drag handle: 32x4dp, 22dp from the top edge */}
+      {/* M3 drag handle */}
       <div
         aria-hidden="true"
         className="bg-on-surface-variant/40 mx-auto mt-5.5 h-1 w-8 shrink-0 rounded-full"

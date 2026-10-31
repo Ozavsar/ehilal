@@ -2,10 +2,8 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-// M3 filled card: tonal elevation (a container tone, no shadow), 12dp corners that clip the media
-// at the top (`isolate` keeps the clip while a thumbnail scales). `interactive` (list cards whose
-// content links somewhere): while a link or button inside is hovered or focused, an on-surface
-// state layer (8% / 12%) covers the card under its content. Plain container cards leave it off.
+// M3 filled card (`isolate` keeps the media clip while a thumbnail scales). `interactive`: a
+// card-wide state layer while a link or button inside is hovered or focused.
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { interactive?: boolean }
@@ -25,7 +23,7 @@ const Card = React.forwardRef<
 ));
 Card.displayName = "Card";
 
-// Media slot at the top of the card; the card's overflow-hidden rounds its top corners
+// Media slot at the top of the card
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn("flex flex-col overflow-hidden", className)} {...props} />

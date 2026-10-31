@@ -4,14 +4,15 @@ import { MEDIUM_USER_ID } from "@/config/constants";
 import { getCleanSlug } from "@/lib/utils";
 import { BlogSource, type IBlog, type IBlogPreview, type IMediumParagraph } from "@/types";
 
-export const REVALIDATE = 60 * 60; // 1 hour
+export const REVALIDATE = 60 * 60;
 
+// Medium's internal, undocumented GraphQL API
 const GRAPHQL_URL = "https://medium.com/_/graphql";
 const MEDIUM_IMAGE_URL = "https://miro.medium.com/v2";
 const PAGE_SIZE = 10;
 // Guards the paging loop against a cursor that never ends
 const MAX_LIST_PAGES = 20;
-// Medium post ids are lowercase hex: 12 characters, fewer when they start with zeros (e.g. 958f3fd6de6)
+// Medium post ids are lowercase hex: 12 characters, fewer when they start with zeros
 const POST_ID_PATTERN = /^[0-9a-f]{8,12}$/;
 
 const HEADERS = {
@@ -253,8 +254,7 @@ export function getMediumPostId(slug: string): string | null {
   return POST_ID_PATTERN.test(postId) ? postId : null;
 }
 
-/** Post id of a link to a Medium post (medium.com/@user/<slug>-<id>, medium.com/<publication>/
- * <slug>-<id>, <user>.medium.com/<slug>-<id>, medium.com/p/<id>), else null */
+/** Post id of a link to a medium.com or <user>.medium.com post, else null */
 export function getMediumPostIdFromUrl(url: URL): string | null {
   if (url.hostname !== "medium.com" && !url.hostname.endsWith(".medium.com")) return null;
   const lastPart = url.pathname.split("/").filter(Boolean).pop();
@@ -299,9 +299,8 @@ async function fetchAllArticlePreviews(): Promise<IBlogPreview[]> {
 }
 
 /**
- * Every post the user published, newest first, without blur placeholders. The list takes one
- * request per 10 posts, so it is cached as a whole across requests (fetches inside unstable_cache
- * are not cached on their own). Errors aren't cached; a failed refresh keeps the previous list.
+ * Every post, newest first. One request per 10 posts, so the list is cached as a whole; a failed
+ * refresh keeps the previous list.
  */
 export const getAllArticlePreviews = unstable_cache(
   fetchAllArticlePreviews,
@@ -309,8 +308,7 @@ export const getAllArticlePreviews = unstable_cache(
   { revalidate: REVALIDATE, tags: ["articles"] },
 );
 
-// Returns null for unknown ids, posts without a body and posts by other authors.
-// Throws on network/HTTP failures and unexpected response shapes.
+// null when there is no post to render; throws when Medium fails or answers unexpectedly
 export async function getSingleArticle(postId: string): Promise<IBlog | null> {
   const json = await queryMedium(POST_QUERY, { postId }, ["articles", `article-${postId}`]);
 

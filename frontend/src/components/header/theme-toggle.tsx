@@ -8,17 +8,13 @@ import { useThemeTransition } from "@/hooks/use-theme-transition";
 import { cn } from "@/lib/utils";
 
 const REVEAL_STYLE_ID = "theme-reveal";
-// The latest toggle: only its reveal removes the style, a newer one has taken it over
+// Only the latest toggle's reveal removes the style
 let latestReveal = 0;
 
-// The circle ends this far past the farthest corner of the window. Ending on the corner, the
-// slowing edge held that corner in the old theme for half the reveal (on compact windows the
-// start of the navigation bar, opposite the toggle); past it, the edge leaves the screen still
-// moving, and a snapshot a little larger than the window (mobile toolbars) is covered too.
+// Past the farthest corner, so the slowing edge doesn't hold a corner in the old theme
 const REVEAL_OVERSHOOT = 1.1;
 
-// Circular reveal of the new theme out of the button (View Transitions). useThemeTransition skips
-// the transition, so this style does nothing, under reduced motion or without browser support.
+// Circular reveal of the new theme out of the button (inert when useThemeTransition skips it)
 function setRevealStyle(x: number, y: number) {
   const radius =
     REVEAL_OVERSHOOT * Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
@@ -40,9 +36,8 @@ function setRevealStyle(x: number, y: number) {
 }
 
 /**
- * M3 standard icon button that switches between the light and dark theme. The icon and the
- * accessible name follow the `dark` class on <html> through CSS, so the server HTML is already
- * right (no mount check, no layout shift); the icon shows the theme the button switches to.
+ * Light/dark theme icon button. The icon and the label follow the `dark` class through CSS, so
+ * the server HTML is right without a mount check.
  */
 export default function ThemeToggle({ className }: { className?: string }) {
   const { setTheme } = useTheme();
@@ -55,8 +50,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
     // The applied theme, not next-themes' `theme`, which can be "system"
     const isDark = document.documentElement.classList.contains("dark");
     const transition = startTransition(() => setTheme(isDark ? "light" : "dark"));
-    // Kept until the reveal is over: removed mid-reveal (a fixed timer on a slow phone), the old
-    // theme came back and crossfaded out instead
+    // Removed only once the reveal is over, or the old theme comes back mid-reveal
     const cleanUp = () => {
       if (reveal === latestReveal) style.remove();
     };

@@ -7,9 +7,8 @@ import BackToBlog from "./back-to-blog";
 
 export const ARTICLE_TITLE_ID = "article-title";
 
-// M3 small top app bar, sticky over the article: "Back to blog" while the article title is on screen;
-// once the title scrolls under the bar, the bar turns surface-container (M3 on-scroll colour), the
-// back button shrinks to its icon and the article title takes the headline slot.
+// Sticky M3 small top app bar; once the article title scrolls under it, the back button shrinks to
+// its icon and the title takes the headline slot
 export default function ArticleTopBar({ title, lang }: { title: string; lang?: string }) {
   const [scrolled, setScrolled] = useState(false);
 

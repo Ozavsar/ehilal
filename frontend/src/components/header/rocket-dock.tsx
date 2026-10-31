@@ -8,11 +8,7 @@ import { cn } from "@/lib/utils";
 const ROCKET_PATH =
   "M16 0C16 0 25 4.08 25 21C25 25.98 22.92 32.14 21.8 35H10.2C9.08 32.14 7 25.98 7 21C7 4.08 16 0 16 0ZM20 17C20 14.8 18.2 13 16 13C13.8 13 12 14.8 12 17C12 19.2 13.8 21 16 21C18.2 21 20 19.2 20 17ZM7.38 36.04C6.42 33.58 4.34 27.7 4.04 22.3L1.78 23.8C0.66 24.56 0 25.8 0 27.14V39L7.38 36.04ZM32 39V27.14C32 25.8 31.34 24.56 30.22 23.82L27.96 22.32C27.66 27.7 25.56 33.6 24.62 36.06L32 39Z";
 
-/**
- * The rocket illustration (32×44 viewBox), shared with the rocket cursor: a primary body with a
- * primary-container window, so it follows the theme and the palette. `ghost` draws a faint
- * silhouette instead.
- */
+/** The rocket illustration, shared with the rocket cursor. `ghost` draws a faint silhouette. */
 export function RocketGlyph({ className, ghost = false }: { className?: string; ghost?: boolean }) {
   return (
     <svg viewBox="0 0 32 44" aria-hidden="true" className={className}>
@@ -34,10 +30,8 @@ const RING_LENGTH = 100;
 const clampLean = (offset: number) => Math.max(-MAX_LEAN, Math.min(MAX_LEAN, offset * MAGNET));
 
 /**
- * The rocket's landing pad at the bottom of the navigation rail. Hovering it for a second, or a
- * click/Enter/Space, parks the rocket here (it stops following the pointer) and the same again
- * launches it. Shown only where the rocket cursor runs (ROCKET_QUERY in hooks/use-rocket-dock,
- * written out as Tailwind variants so the server HTML already has the right layout).
+ * The rocket's landing pad in the navigation rail: a 1 s hover or a click parks or launches it.
+ * Shown via ROCKET_QUERY written out as Tailwind variants, so the server HTML has the right layout.
  */
 export default function RocketDock() {
   const phase = useRocketPhase();
@@ -54,7 +48,6 @@ export default function RocketDock() {
     if (pad) pad.style.translate = x || y ? `${x}px ${y}px` : "";
   };
 
-  // The ring shows only while a hold runs (or drains)
   const showRing = (visible: boolean) => {
     ringRef.current?.ownerSVGElement?.toggleAttribute("data-charging", visible);
   };
@@ -149,7 +142,7 @@ export default function RocketDock() {
           }}
           className="ease-standard absolute inset-0 transition-[translate] duration-300"
         >
-          {/* M3 circular progress (track + indicator) around the pad while the hold runs */}
+          {/* Hold progress ring */}
           <svg
             viewBox="0 0 72 72"
             aria-hidden="true"
@@ -179,7 +172,6 @@ export default function RocketDock() {
               aria-hidden="true"
               className="ease-standard absolute inset-0 bg-current opacity-0 transition-opacity duration-150 group-hover:opacity-8 group-focus-visible:opacity-12 group-active:opacity-12"
             />
-            {/* The parking spot: a ghost of the rocket, covered by the rocket once it's parked */}
             <RocketGlyph ghost className="col-start-1 row-start-1 h-11 w-8" />
             {phase === "parked" && <RocketGlyph className="col-start-1 row-start-1 h-11 w-8" />}
           </span>

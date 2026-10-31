@@ -20,7 +20,7 @@ const SUCCESS_MESSAGE = "Thanks! Your message has been sent.";
 const SEND_ERROR_MESSAGE =
   "Sorry, your message could not be sent. Please try again later or reach out by email.";
 
-// In-memory limiter; enough for the single PM2 process. Kept on globalThis so dev reloads don't reset it.
+// In-memory limiter for the single PM2 process, on globalThis so dev reloads don't reset it
 const store = globalThis as typeof globalThis & { contactSubmissions?: Map<string, number[]> };
 const submissions = (store.contactSubmissions ??= new Map<string, number[]>());
 
@@ -43,8 +43,7 @@ function isRateLimited(ip: string) {
 
 async function getClientIp() {
   const headerList = await headers();
-  // x-real-ip is set by the reverse proxy; otherwise use the last x-forwarded-for hop,
-  // which is the one our own proxy appended (earlier hops can be spoofed by the client)
+  // x-real-ip comes from our proxy; else the last x-forwarded-for hop (earlier ones are spoofable)
   const lastForwardedHop = headerList.get("x-forwarded-for")?.split(",").at(-1)?.trim();
   return headerList.get("x-real-ip")?.trim() || lastForwardedHop || "unknown";
 }
@@ -87,13 +86,12 @@ export async function sendContactMessage(
   const data = parsed.data;
 
   try {
-    // Theme colors and recipient come from Strapi; the mail still goes out with fallbacks if Strapi is unreachable
+    // The mail still goes out, with fallbacks, when Strapi is unreachable
     const [palette, contactPage] = await Promise.all([
       getThemePalette(),
       getContactPageContent().catch(() => null),
     ]);
 
-    // Recipient is managed in Strapi (Contact Page); CONTACT_TO_EMAIL is only the fallback
     const to = contactPage?.form_recipient_email || env.CONTACT_TO_EMAIL;
     if (!to) {
       console.error(

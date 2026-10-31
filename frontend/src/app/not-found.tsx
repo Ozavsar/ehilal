@@ -24,7 +24,7 @@ export default async function NotFound() {
   return <NotFoundView image={content?.image} />;
 }
 
-// No canonical or social tags: the page answers 404 for any path, and Next.js marks it noindex
+// No canonical or social tags: this page answers every unknown path
 export const metadata: Metadata = {
   title: PAGE_SEO.NOT_FOUND.title,
   description: PAGE_SEO.NOT_FOUND.description,

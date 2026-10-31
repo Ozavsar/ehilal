@@ -50,7 +50,6 @@ export default function CourseCard({
   numReviews,
   priority = false,
 }: ICourse & { priority?: boolean }) {
-  // Turkish or English, for screen reader pronunciation
   const lang = detectLanguage(`${title} ${headline}`);
 
   return (
@@ -68,13 +67,11 @@ export default function CourseCard({
             // No course-specific placeholder exists, share the blog one
             src={thumbnailURL || "/images/blog/default-blog.jpg"}
             alt=""
-            // 16:9 like the rendered box; the card is one column of the course grid
             width={640}
             height={360}
             sizes={COURSE_CARD_IMAGE_SIZES}
             blurDataURL={blurDataURL}
             placeholder={blurDataURL ? "blur" : "empty"}
-            // The first card is the LCP candidate on the list page
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
             draggable={false}
@@ -110,7 +107,7 @@ export default function CourseCard({
         </div>
       </CardContent>
       <CardFooter className="mt-auto p-4">
-        {/* Pointer-only copy of the title link, the card's one link for keyboard and screen readers */}
+        {/* Pointer-only copy of the title link */}
         <Button asChild className="w-full">
           <a href={udemyURL} target="_blank" rel="noopener noreferrer" tabIndex={-1} aria-hidden>
             View on Udemy

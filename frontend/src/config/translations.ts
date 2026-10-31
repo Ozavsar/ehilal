@@ -1,9 +1,7 @@
 import type { ContentLanguage } from "@/lib/language";
 
-// Medium posts published in both languages, as [Turkish post id, English post id]. Paired by hand
-// on 31.10.2026 from titles, headings and dates (not by title alone: "Web3 Nedir?" and "Overview
-// of Web3" are different articles). A new translation needs a line here; the article pages then
-// link to each other (hreflang and a visible link).
+// Medium posts published in both languages, as [Turkish post id, English post id], paired by hand
+// (not by title alone: "Web3 Nedir?" and "Overview of Web3" are different articles)
 const TRANSLATION_PAIRS: [tr: string, en: string][] = [
   ["78cbb82ef631", "29e671566db9"], // Blockchain'e giriş rehberi
   ["62dfda5df6fb", "1288132ff56e"], // Dünyadan regülasyonlar ve örnek davalar #1

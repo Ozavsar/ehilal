@@ -1,5 +1,4 @@
-// Every Material Symbol the site renders. The icon font is a subset of exactly these glyphs, so a
-// name has to be added here (then `yarn icons:subset`) before <Icon> can use it.
+// The icon font is a subset of exactly these glyphs: add a name here, then run `yarn icons:subset`.
 // Keep the list sorted, one double-quoted name per line: scripts/icons-subset.mjs parses it.
 export const ICON_NAMES = [
   "arrow_back",

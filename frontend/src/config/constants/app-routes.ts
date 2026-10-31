@@ -1,7 +1,6 @@
 import type { IconName } from "@/components/icon-names";
 
-// Page 1 of a list lives at the bare path (next.config rewrites it to /x/1), pages 2..N at /x/<n>.
-// The blog also uses /blog/<slug> for articles.
+// Page 1 of a list lives at the bare path (next.config rewrites it to /x/1), pages 2..N at /x/<n>
 const listHref =
   (path: string) =>
   (page: number | string = 1): string =>
@@ -70,8 +69,7 @@ const destination = (key: keyof typeof INTERNAL_ROUTES): NavDestination => ({
 export const MENUS = {
   // Every destination (the 404 page lists them)
   NAV: (Object.keys(INTERNAL_ROUTES) as (keyof typeof INTERNAL_ROUTES)[]).map(destination),
-  // The navigation bar/rail: talks, videos and courses share "Learn", so the bar keeps to M3's
-  // 3–5 destinations
+  // The bar/rail: talks, videos and courses share "Learn" to keep to M3's 3–5 destinations
   MAIN: [
     destination("HOME"),
     destination("BLOG"),

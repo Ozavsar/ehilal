@@ -27,7 +27,7 @@ export const contactFormSchema = z.object({
       CONTACT_LIMITS.email.max,
       `Email should not exceed ${CONTACT_LIMITS.email.max} characters.`,
     )
-    // z.email() would check the untrimmed value, so trim first and pipe the result into it
+    // Piped so z.email() checks the trimmed value
     .pipe(z.email("Please enter a valid email address.")),
   subject: z
     .string()

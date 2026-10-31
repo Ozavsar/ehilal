@@ -14,7 +14,6 @@ export default async function Home() {
     notFound();
   }
 
-  // Built from a small Strapi format; undefined (no placeholder) if the image host fails
   const blurDataURL = await getStrapiBlurDataURL(content.hero_image);
 
   return (
@@ -27,6 +26,6 @@ export default async function Home() {
 }
 
 export function generateMetadata(): Promise<Metadata> {
-  // The title names the site already; the default OG image (Site Settings) is the home page's card
+  // The title already names the site; the OG image is the Site Settings default
   return buildMeta({ ...HOME_SEO, path: "/", absoluteTitle: true });
 }

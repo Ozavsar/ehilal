@@ -1,6 +1,4 @@
-// Browser-side palette generation for the theme preview bar: the light and dark schemes exactly as
-// the Strapi generator (backend/src/utils/m3-palette.ts) writes them — same roles, spec version and
-// standard contrast. Only the preview bar imports it, on demand, so it stays out of the site bundle.
+// The theme preview bar's in-browser copy of backend/src/utils/m3-palette.ts; import on demand only
 import {
   Hct,
   MaterialDynamicColors,

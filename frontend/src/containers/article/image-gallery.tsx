@@ -23,7 +23,7 @@ export function ImageGalleryProvider({
   title: string;
   children: ReactNode;
 }) {
-  // Index of the image opened in full screen, null when closed
+  // null when closed
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -70,7 +70,6 @@ export function ZoomButton({ index, label, className, children }: ZoomButtonProp
       )}
     >
       {children}
-      {/* Hover cue and keyboard focus indicator, same as the card thumbnails */}
       <span
         aria-hidden="true"
         className="bg-scrim/40 ease-standard absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
@@ -86,15 +85,14 @@ export function ZoomButton({ index, label, className, children }: ZoomButtonProp
 interface ZoomableImageProps {
   index: number; // position in the provider's images
   src: string;
-  // Medium CDN sizes of the image and the width it renders at, so the browser picks the right one
   srcSet?: string;
   sizes?: string;
   alt: string;
   label: string;
-  // Rendered pixel size, reserves the image's box before it loads (no layout shift)
+  // Rendered pixel size: reserves the box before the image loads
   width?: number;
   height?: number;
-  // Lead image at the top of the article: load it eagerly at high priority, the rest lazily
+  // Lead image at the top of the article: eager at high priority
   lead?: boolean;
   className?: string;
 }

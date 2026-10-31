@@ -4,15 +4,14 @@ import { SITE_URL } from "@/config/site";
 import { getMediumPostIdFromUrl } from "@/lib/services/medium";
 import type { IMediumMarkup } from "@/types";
 
-// Where a link in the article goes: a page of this site (client-side navigation) or another site
-// (new tab). Null for schemes that shouldn't be links (javascript: and the like).
+// A page of this site or another site (new tab); null for schemes that shouldn't be links
+// (javascript: and the like)
 export type ResolvedLink = { href: string; internal: boolean } | null;
 
 export interface InlineLinkOptions {
   /** Medium post id → this site's /blog/<slug> path, for the posts it republishes */
   postPaths: ReadonlyMap<string, string>;
-  /** The article's own post id and its heading ids by Medium paragraph name: links to a section of
-   * the article itself become in-page links */
+  /** The article's own post id and its heading ids by Medium paragraph name, for in-page links */
   postId: string;
   headingIds: ReadonlyMap<string, string>;
   /** Screen reader suffix of links that open a new tab, in the article's language */
@@ -45,8 +44,7 @@ export function resolveLink(href: string, options: InlineLinkOptions): ResolvedL
   return { href: url.href, internal: false };
 }
 
-/** A link of the article text: same tab within the site (not prefetched, an article can link a
- * lot), a new tab elsewhere, as the site's external links do */
+/** Same tab within the site (not prefetched: an article can link a lot), a new tab elsewhere */
 export function ArticleLink({
   link,
   options,
@@ -98,10 +96,8 @@ function outerFirst(a: Range, b: Range) {
   return (MARKUP_ORDER[a.type] ?? 0) - (MARKUP_ORDER[b.type] ?? 0) || a.start - b.start;
 }
 
-// Medium ranges may nest or overlap. The text is cut at every range boundary; each piece is
-// wrapped in the ranges that cover it (outerFirst) and consecutive pieces share their common
-// outer elements. An overlap closes the inner element at the boundary and opens it again on the
-// other side, so the result is always properly nested.
+// Medium ranges may nest or overlap: the text is cut at every range boundary and each piece is
+// wrapped in the ranges that cover it, so the result is always properly nested
 function buildMarkupTree(text: string, markups: IMediumMarkup[]): MarkupNode {
   const seen = new Set<string>();
   const ranges = markups

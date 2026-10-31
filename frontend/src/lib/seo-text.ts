@@ -1,6 +1,4 @@
-// Search-result text derived from Medium articles: titles without emoji that fit the 60 characters
-// results show, and a description from the article itself when its Medium subtitle is a greeting,
-// a disclaimer or a cut-off first sentence.
+// Search-result titles and descriptions derived from Medium articles
 
 import { articleFallbackDescription } from "@/config/seo";
 import type { ContentLanguage } from "@/lib/language";
@@ -10,17 +8,17 @@ export const MAX_TITLE_LENGTH = 60;
 const MIN_DESCRIPTION_LENGTH = 110;
 const MAX_DESCRIPTION_LENGTH = 155;
 
-// Emoji and other pictographs (☻ ♫ 📌 …), with their joiners and variation selectors
+// Emoji and other pictographs, with their joiners and variation selectors
 const SYMBOLS = /[\p{Extended_Pictographic}\p{So}\u{200D}\u{FE0F}\u{20E3}]/gu;
 
 /** Text without emoji, with single spaces */
 export const stripSymbols = (text: string) =>
   text.replace(SYMBOLS, " ").replace(/\s+/g, " ").trim();
 
-/** Up to `max` characters, cut at a word boundary (no ellipsis), keeping a trailing "#n" part number */
+/** Up to `max` characters, cut at a word boundary (no ellipsis) */
 function cutAtWord(text: string, max: number): string {
   if (text.length <= max) return text;
-  // Series parts differ only in their number at the end: keep it, or their titles would be equal
+  // Keep a trailing "#n" part number, or the titles of a series' parts would be equal
   const part = text.match(/\s*#\s*\d+\s*$/)?.[0].trim();
   const room = part ? max - part.length - 1 : max;
   const cut = text.slice(0, room + 1);
@@ -34,15 +32,11 @@ function cutAtWord(text: string, max: number): string {
 export const fitTitle = (title: string) =>
   cutAtWord(stripSymbols(title).replace(/\s*(…|\.{3})$/, ""), MAX_TITLE_LENGTH);
 
-// A paragraph that says nothing about the article: a greeting, a disclaimer, a label ("Önemli
-// Çıkarımlar:"), a bare link
-// Stretched greetings too ("Merhabaaa", "Selllaaam")
+// The greeting and filler patterns are tuned to the author's writing (stretched "Merhabaaa" too)
 const GREETING =
   /^(h+e+l+o+|h+i+|h+e+y+|dear|greetings|welcome|m+e+r+h+a+b+a+(l+a+r+)?|s+e+l+a+m+(l+a+r+)?|herkese merhaba|arkadaşlar merhaba|sevgili|değerli (arkadaşlarım|okuyucularım)|hoş geldiniz)\b[^.!?,\n]{0,45}[.!?,]+/iu;
 
-// Sentences about the author or the post rather than its subject, as her openings go: "Ben Elif
-// Hilal!", "thank you for reading my articles", "I have been planning to write this for a long
-// time", disclaimers
+// Sentences about the author or the post rather than its subject, and disclaimers
 const FILLER = [
   /\b(ben|benim adım|my name is|i am|i'm|i’m)\b.{0,20}\belif hilal\b|\bhilal ben\b/iu,
   /\bbir avukatım\b|\bi am a lawyer\b|senedir blockchain|been with blockchain|working on blockchain for years|senelerdir .*çalışıyorum/iu,
@@ -62,7 +56,7 @@ const FILLER = [
 const GREETING_WITH_ADDRESS =
   /^(m+e+r+h+a+b+a+\S*|s+e+l+a+m+\S*|h+e+l+o+|h+i+)\s+(değerli|sevgili|my dear|dear)\s+(okuyucularım|arkadaşlarım|readers|friends)\b[,!.]*/iu;
 
-// An emoji often ends a sentence in her writing ("…beklerim 😊 Bu içerik…"): keep the break
+// An emoji often ends a sentence in her writing: keep the break
 const SYMBOL_SENTENCE_END = new RegExp(`(?<![.!?])\\s*${SYMBOLS.source}+\\s+(?=\\p{Lu})`, "gu");
 
 function usableText(text: string): string {
@@ -73,7 +67,7 @@ function usableText(text: string): string {
     .replace(GREETING, "")
     .trim();
   if (/^https?:\/\//.test(value)) return "";
-  // A short line ending in a colon introduces a list, it doesn't describe anything
+  // A short line ending in a colon introduces a list
   if (value.endsWith(":") && value.length < 60) return "";
   const sentences = value
     .split(/(?<=[.!?])\s+/)
@@ -82,11 +76,11 @@ function usableText(text: string): string {
   return rest.length >= 20 ? rest : "";
 }
 
-// A description reads as a sentence: capital first letter (Turkish rules for Turkish: i → İ)
+// Turkish rules for Turkish text (i → İ)
 const capitalize = (text: string, language: ContentLanguage) =>
   text.charAt(0).toLocaleUpperCase(language === "tr" ? "tr" : "en") + text.slice(1);
 
-/** Up to 155 characters: whole sentences when they fill at least 110, otherwise cut at a word with "…" */
+/** Up to 155 characters: whole sentences when they fill 110, otherwise cut at a word with "…" */
 function fitDescription(text: string): string {
   if (text.length <= MAX_DESCRIPTION_LENGTH) return text;
   const window = text.slice(0, MAX_DESCRIPTION_LENGTH);
@@ -102,10 +96,8 @@ interface ArticleText {
 }
 
 /**
- * The meta description of an article. Medium's subtitle when it reads as one; otherwise the
- * opening of the body (paragraphs and quotes, skipping greetings, self-introductions, disclaimers
- * and labels); for an
- * article with neither, a sentence in the article's language.
+ * An article's meta description: Medium's subtitle when it reads as one, otherwise the opening of
+ * the body, otherwise a fallback sentence in the article's language.
  */
 export function articleDescription(
   article: ArticleText,

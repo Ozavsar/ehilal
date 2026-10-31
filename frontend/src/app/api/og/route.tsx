@@ -6,8 +6,7 @@ import { getThemePalette } from "@/lib/services";
 
 const MAX_TITLE_LENGTH = 80;
 
-// The site's typeface (Geist Sans), read once per server process. Satori takes TTF, not WOFF2. Without
-// it the title falls back to the renderer's built-in font, so a missing file only costs the brand font.
+// Geist Sans Bold, read once per server process (Satori takes TTF, not WOFF2)
 const geistBold = readFile(
   join(process.cwd(), "node_modules/geist/dist/fonts/geist-sans/Geist-Bold.ttf"),
 ).catch((error: unknown) => {
@@ -29,7 +28,7 @@ function truncateTitle(title: string | null) {
   return `${truncated.trimEnd()}…`;
 }
 
-// Only the first letter: CSS `capitalize` would also turn Turkish conjunctions ("ve", "ile") into "Ve", "İle"
+// Only the first letter: CSS `capitalize` would turn Turkish "ve", "ile" into "Ve", "İle"
 const capitalizeFirst = (title: string) => title.charAt(0).toLocaleUpperCase("en") + title.slice(1);
 
 export async function GET(request: Request) {
@@ -39,7 +38,6 @@ export async function GET(request: Request) {
     const theme = url.searchParams.get("theme") === "light" ? "light" : "dark";
     const title = truncateTitle(url.searchParams.get("title"));
 
-    // Falls back to the default palette when Strapi is unreachable
     const { schemes } = await getThemePalette();
     const themeColor = schemes[theme].primary;
     const bgColor = schemes[theme].surface;

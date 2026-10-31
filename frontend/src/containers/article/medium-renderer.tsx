@@ -28,7 +28,7 @@ const BODY_IMAGE_WIDTHS = [360, 744, 1080, 1488];
 export const giphyUrl = (id: string, file: "480w_s.jpg" | "giphy.webp") =>
   `https://media.giphy.com/media/${id}/${file}`;
 
-// Rendered pixel size of a body image: its source size (when Medium reports it), at most the column
+// Rendered pixel size of a body image: its source size, at most the column
 function getBodyImageSize(metadata: IMediumParagraph["metadata"]) {
   const { originalWidth, originalHeight } = metadata ?? {};
   if (!originalWidth || !originalHeight) return {};
@@ -36,8 +36,8 @@ function getBodyImageSize(metadata: IMediumParagraph["metadata"]) {
   return { width, height: Math.round((originalHeight * width) / originalWidth) };
 }
 
-// Medium resizes and converts on its CDN (it never upscales: widths stop at the source width).
-// `prefix` "da:true/" asks for a still frame of an animated image.
+// Medium resizes and converts on its CDN (never upscales). `prefix` "da:true/" asks for a still
+// frame of an animated image.
 function getBodyImageSources(metadata: NonNullable<IMediumParagraph["metadata"]>, prefix = "") {
   const { id, originalWidth } = metadata;
   const widths = originalWidth
@@ -54,7 +54,6 @@ function getBodyImageSources(metadata: NonNullable<IMediumParagraph["metadata"]>
   return {
     src: url(width),
     srcSet: widths.map((w) => `${url(w)} ${w}w`).join(", "),
-    // The column, or less for an image narrower than the column
     sizes:
       width < COLUMN_WIDTH
         ? `(min-width: 600px) min(${width}px, calc(100vw - 144px)), min(${width}px, calc(100vw - 32px))`
@@ -62,10 +61,8 @@ function getBodyImageSources(metadata: NonNullable<IMediumParagraph["metadata"]>
   };
 }
 
-// Medium embeds GIFs through embedly: ...?src=https%3A%2F%2Fgiphy.com%2Fembed%2F<id>%2Ftwitter%2Fiframe
-// Google's document viewer (drive.google.com/viewerng/viewer, docs.google.com/viewer?url=…) can't be
-// framed reliably: with third-party cookies blocked or "download PDFs" on, the browser downloads a file
-// called "viewer" instead. Such embeds become a link to the document itself.
+// Google's document viewer can't be framed reliably (browsers may download a file called "viewer"),
+// so such embeds become a link to the document itself
 function getViewerDocument(iframeSrc: string) {
   let url: URL;
   try {
@@ -89,12 +86,13 @@ function getViewerDocument(iframeSrc: string) {
   return { href: target, name: name || "Document" };
 }
 
+// Medium embeds GIFs through embedly: ...?src=https%3A%2F%2Fgiphy.com%2Fembed%2F<id>%2Ftwitter%2Fiframe
 export function getGiphyId(iframeSrc: string) {
   return iframeSrc.match(/giphy\.com(?:\/|%2F)embed(?:\/|%2F)([A-Za-z0-9]+)/i)?.[1] ?? null;
 }
 
-// A link preview card (Medium "mixtape" embed). Its text is "<title>\n<description><domain>": the
-// title is the bold range, the description the italic one, the domain whatever follows them.
+// Medium "mixtape" link preview. Its text is "<title>\n<description><domain>": the title is the
+// bold range, the description the italic one, the domain whatever follows them.
 function getLinkPreview(p: IMediumParagraph) {
   const link = p.markups.find((m) => m.type === "A" && m.href);
   if (!link?.href) return null;
@@ -122,9 +120,8 @@ function getLinkPreview(p: IMediumParagraph) {
 
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
 
-// Medium stores the title, and the subtitle when there is one, as the first heading paragraphs.
-// They move into the article header, so they aren't repeated in the body or listed in the TOC.
-// A long post title comes back cut with "…", so the paragraph only has to start with it.
+// Moves Medium's leading title (and subtitle) headings into the article header. A long post title
+// comes back cut with "…", so the paragraph only has to start with it.
 function splitHeader(paragraphs: IMediumParagraph[], title: string, subtitle: string) {
   const [first, second] = paragraphs;
   const isHeading = (p: IMediumParagraph | undefined): p is IMediumParagraph =>
@@ -140,8 +137,8 @@ function splitHeader(paragraphs: IMediumParagraph[], title: string, subtitle: st
   return { title: first.text, subtitle: null, body: paragraphs.slice(1) };
 }
 
-// The preview image (the blog card thumbnail) is the article cover. Medium usually repeats it as
-// the first body image; that one then moves into the cover, with its caption, instead of showing twice.
+// The preview image is the cover; Medium usually repeats it as the first body image, which then
+// moves into the cover with its caption
 function splitCover(body: IMediumParagraph[], previewImage: IBlog["previewImage"]) {
   if (!previewImage) return { cover: null, body };
   const leadIndex = body.findIndex((p) => p.type === "IMG");
@@ -192,7 +189,6 @@ interface MediumRendererProps {
   paragraphs: IMediumParagraph[];
   mediumUrl: string;
   isLocked: boolean;
-  /** The article's language (lib/language.ts), as in the page metadata */
   language: ContentLanguage;
   author: string;
   publishedAt?: string;
@@ -200,8 +196,7 @@ interface MediumRendererProps {
   translation: ArticleTranslation | null;
   /** Medium post id → /blog/<slug> of the posts the site republishes, for links in the text */
   postPaths: ReadonlyMap<string, string>;
-  /** Image ids Medium can't resize or convert, animated GIFs (getUnconvertedMediumImages): they
-   * start as a still frame (one in the CCIP guide is 22 MB) */
+  /** Animated GIF ids Medium can't resize or convert: they start as a still frame */
   animatedImages: ReadonlySet<string>;
   /** Embedded media taken down at the source (a GIF removed from Giphy): left out */
   removedMedia: ReadonlySet<string>;
@@ -245,8 +240,7 @@ export default function MediumRenderer({
   );
   // Medium's body headings are H3/H4: the outline continues from the <h1> title at h2
   const headingShift = headings.length ? Math.min(...headings.map((h) => h.level)) - 2 : 0;
-  // Image alt: the alt text entered on Medium, else the caption (IMG paragraph text). The cover and
-  // the still images open the gallery; animated GIFs play in place instead.
+  // Alt: Medium's alt text, else the caption. Animated GIFs play in place instead of opening here.
   const images: IGalleryImage[] = [
     ...(cover
       ? [{ id: "cover", src: `${MEDIUM_IMAGE_URL}/resize:fit:1400/${cover.id}`, alt: cover.alt }]
@@ -286,8 +280,7 @@ export default function MediumRenderer({
         const level = Math.min(Math.max(Number(p.type[1]) - headingShift, 2), 6);
         const Heading = `h${level}` as "h2" | "h3" | "h4" | "h5" | "h6";
         return (
-          // Clear of the fixed title bar on compact screens when a TOC link scrolls here.
-          // Focusable from script only: a TOC link moves focus here (no ring, it isn't a control).
+          // TOC links scroll here (clear of the top bar) and move focus here (no ring: not a control)
           <Heading
             key={p.name}
             id={headingIds.get(p.name)}
@@ -394,7 +387,6 @@ export default function MediumRenderer({
         if (!p.iframe) return null;
         const { iframeSrc, title: frameTitle, iframeWidth, iframeHeight } = p.iframe.mediaResource;
         const giphyId = getGiphyId(iframeSrc);
-        // Giphy's embed player scrolls inside the frame and shows other GIFs on hover
         const document = getViewerDocument(iframeSrc);
         if (document) {
           return (
@@ -419,6 +411,7 @@ export default function MediumRenderer({
           );
         }
         if (giphyId && removedMedia.has(giphyUrl(giphyId, "480w_s.jpg"))) return null;
+        // Not Giphy's embed player: it scrolls inside the frame and shows other GIFs on hover
         if (giphyId) {
           return figure(
             p,
@@ -459,7 +452,6 @@ export default function MediumRenderer({
     <ImageGalleryProvider images={images} title="Article images">
       <ArticleTopBar title={header.title} lang={language} />
       <ArticleLayout headingTree={buildHeadingTree(headings)} lang={language}>
-        {/* Everything in the column is in the article's language */}
         <div lang={language} className="w-full max-w-[70ch] min-w-0">
           <article>
             <header className="mb-8 flex flex-col gap-3 sm:mb-12 sm:gap-4">

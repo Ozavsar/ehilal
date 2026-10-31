@@ -1,10 +1,8 @@
-// Language detection for content the sources don't label: Medium/Substack articles and YouTube
-// videos are written in Turkish or English. Used for `lang` attributes, og:locale and JSON-LD
-// inLanguage. Pure and synchronous, so client and server components can both call it.
+// Turkish/English detection for content the sources don't label. Pure, so client code can use it.
 
 export type ContentLanguage = "tr" | "en";
 
-// Letters English text doesn't use. Ö and Ü also occur in German, which the site doesn't publish.
+// Letters English text doesn't use
 const TURKISH_LETTERS = /[çğıöşüÇĞİÖŞÜ]/g;
 
 // Frequent function words that are not also English words
@@ -54,12 +52,12 @@ const ENGLISH_WORDS = new Set([
   "that",
 ]);
 
-// The opening of an article decides as well as the whole body, at a fraction of the work
+// The opening decides as well as the whole body
 const MAX_SAMPLE_LENGTH = 4000;
 
 /**
- * "tr" when the text reads as Turkish, otherwise "en" (the site language). A Turkish letter counts
- * once and a function word twice, so an English sentence with a Turkish name in it stays English.
+ * "tr" when the text reads as Turkish, otherwise "en". Function words count twice as much as
+ * Turkish letters, so an English sentence with a Turkish name in it stays English.
  */
 export function detectLanguage(text: string): ContentLanguage {
   const sample = text.slice(0, MAX_SAMPLE_LENGTH);
@@ -76,10 +74,7 @@ export function detectLanguage(text: string): ContentLanguage {
   return turkishLetters + 2 * turkishWords > 2 * englishWords ? "tr" : "en";
 }
 
-/**
- * Language of a Medium article, from its title, subtitle and body. The article page's metadata and
- * its `lang` attribute both use this, so they always agree.
- */
+/** Language of a Medium article; its metadata and `lang` attribute both use this, so they agree */
 export function detectArticleLanguage(article: {
   title: string;
   subtitle: string;
@@ -93,5 +88,4 @@ export function detectArticleLanguage(article: {
   return detectLanguage(text);
 }
 
-/** Open Graph locale (`og:locale`) for a content language */
 export const OG_LOCALES: Record<ContentLanguage, string> = { tr: "tr_TR", en: "en_US" };

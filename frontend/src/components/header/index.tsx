@@ -3,20 +3,10 @@ import NavigationLinks from "./navigation-links";
 import RocketDock from "./rocket-dock";
 import ThemeToggle from "./theme-toggle";
 
-// One box for every window size: an M3 navigation bar at the bottom below 600px (sm) and a
-// navigation rail on the left edge from 600px, with the theme toggle at its bottom. The box is the
-// stacking context the active indicator slides in. Below 600px the theme toggle sits in a slim
-// top row instead: in the page flow (the first block in <body>), so it scrolls away and never
-// covers a title, which fixed in the corner it would.
-// Background: the page scrolls under the bar, so the bar is a translucent surface container that
-// blurs what is behind it, keeping its labels readable over text and photos. The rail is
-// transparent: on the home page the hero's colour band runs under it from 840px, and its items
-// then take the band's on-colours (app/globals.css, `data-hero-band`); elsewhere only the page
-// surface is behind it.
-// Entrance: the bar/rail slides in from its edge with a @starting-style transition (Tailwind
-// `starting:`), visible without JS and still for reduced-motion users.
-// data-nav-anchor: page view transitions leave the bar/rail in place (app/globals.css), so only
-// the content animates and the active indicator keeps its own slide.
+// One box for every window size: a navigation bar at the bottom below 600px, a rail from 600px.
+// Below 600px the theme toggle sits in a top row in the page flow, so it never covers a title.
+// The rail is transparent: the home hero's colour band runs under it (`data-hero-band`).
+// data-nav-anchor keeps the bar/rail out of page view transitions (app/globals.css).
 export default function Header() {
   return (
     <header>

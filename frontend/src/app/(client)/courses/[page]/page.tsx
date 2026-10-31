@@ -14,10 +14,7 @@ export const dynamicParams = true;
 // Only canonical page numbers are valid ("01", "1abc" etc. would be duplicate pages)
 const PAGE_PARAM_PATTERN = /^[1-9]\d*$/;
 
-/**
- * The requested page, or notFound() for invalid and out-of-range pages.
- * A Udemy failure propagates to error.tsx, so ISR keeps the last good version instead of caching a 404.
- */
+/** The requested page, or notFound() for invalid and out-of-range pages. */
 async function getPageOrNotFound(page: string) {
   if (!PAGE_PARAM_PATTERN.test(page)) {
     notFound();
@@ -43,7 +40,6 @@ export default async function CoursesPage(props: { params: Promise<{ page: strin
   const { page } = await props.params;
   const { courses, pageNum, totalPages } = await getPageOrNotFound(page);
 
-  // Placeholders only for the courses on this page
   const pageCourses = await withBlurDataURLs(courses, (course) => course.thumbnailURL);
 
   return (

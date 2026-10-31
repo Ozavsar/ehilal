@@ -17,7 +17,7 @@ interface MobileTOCDrawerProps {
   returnFocusRef: RefObject<HTMLButtonElement | null>;
 }
 
-// Bottom sheet content: the Drawer primitive brings the surface, handle and scrim
+// The TOC in a bottom sheet
 export default function MobileTOCDrawer({
   open,
   onOpenChange,
@@ -57,7 +57,6 @@ export default function MobileTOCDrawer({
             <DrawerTitle lang={lang} className="text-on-surface type-title-large">
               {title}
             </DrawerTitle>
-            {/* M3 standard icon button */}
             <DrawerClose
               aria-label="Close"
               className="state-layer touch-target text-on-surface-variant focus-visible:outline-primary flex size-10 shrink-0 items-center justify-center rounded-full focus-visible:outline-2"

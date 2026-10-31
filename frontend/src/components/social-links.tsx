@@ -27,7 +27,6 @@ export default async function SocialLinks() {
     ];
 
   return (
-    // M3 standard icon buttons: 40dp container, 24dp icon in on-surface-variant, state layer
     <ul className="flex flex-wrap justify-center gap-2 self-center">
       {socialLinkContents.flatMap(({ href, icon, title }) =>
         href

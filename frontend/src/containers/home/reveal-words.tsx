@@ -14,10 +14,8 @@ interface RevealWordsProps {
 const WAVING_HAND = /^\u{1F44B}/u;
 
 /**
- * Word-by-word entrance for the home hero, in CSS only: the words are in the server HTML and
- * animate without JS (opacity only under reduced motion). Screen readers get the text once from
- * the sr-only copy; the split copy is hidden from them, as some read every inline-block word as a
- * separate item. A 👋 waves once it is in place.
+ * Word-by-word entrance for the home hero, CSS only. Screen readers get the sr-only copy: some
+ * read every inline-block word as a separate item.
  */
 export function RevealWords({ text, delay = 0, step = 20, wordClassName }: RevealWordsProps) {
   const words = text.split(/\s+/).filter(Boolean);

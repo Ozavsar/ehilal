@@ -18,11 +18,8 @@ interface IPaginationProps {
   currentPage: number;
 }
 
-// Server component: the list route comes in as a prop instead of usePathname(). The links keep
-// Next's default scroll, so a new page opens at the top instead of where the old one was left.
-// Each link tags its navigation forward or back, for the list's M3 shared axis transition.
+// Server component: the list route comes in as a prop instead of usePathname()
 export default function Pagination({ route, totalPages, currentPage }: IPaginationProps) {
-  // Page 1 is the bare list path (/blog), pages 2..N are /blog/<n>
   const createPageURL = (pageNumber: number) => INTERNAL_ROUTES[route].href(pageNumber);
 
   const allPages = generatePagination(currentPage, totalPages);
@@ -61,8 +58,6 @@ export default function Pagination({ route, totalPages, currentPage }: IPaginati
   );
 }
 
-// 40dp circles like M3 icon buttons (48dp touch targets): the current page is the selected
-// (secondary-container) one, the others carry a state layer.
 const itemClassName =
   "touch-target relative type-label-large flex size-10 items-center justify-center rounded-full outline-primary focus-visible:outline-3 focus-visible:outline-offset-2";
 

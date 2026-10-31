@@ -64,7 +64,7 @@ export default function FormSection({ className = "" }: { className?: string }) 
 
   const showToast = (type: "success" | "error", message: string) => {
     setToasterMounted(true);
-    // The Toaster replays toasts created before it subscribed, so the order of the two loads doesn't matter
+    // The Toaster replays earlier toasts, so the two loads may finish in any order
     import("sonner")
       .then(({ toast }) => toast[type](message))
       // Without the chunk the status line below still reports the result
@@ -89,7 +89,6 @@ export default function FormSection({ className = "" }: { className?: string }) 
         form.reset(defaultValues);
       } else {
         showToast("error", result.message);
-        // Show server-side validation errors next to the matching fields
         const fieldErrors = Object.entries(result.fieldErrors ?? {}) as [
           ContactFormField,
           string[],
@@ -115,23 +114,20 @@ export default function FormSection({ className = "" }: { className?: string }) 
   };
 
   return (
-    // @starting-style fade-up (Tailwind `starting:`): visible without JS, still for reduced motion
     <section
       className={cn(
         "ease-emphasized-decelerate transition-[opacity,translate] duration-500 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0",
         className,
       )}
     >
-      {/* The form in a card, so it reads as one pane beside the channel list card. Not an interactive
-          card: the card-wide state layer stays off while the button is hovered or focused */}
+      {/* Not an interactive card: no card-wide state layer while the button is hovered or focused */}
       <Card className="p-4 sm:p-6">
         <Form {...form}>
           <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-            {/* M3: explain the asterisk once, before the fields */}
             <p className="type-body-small text-on-surface-variant">
               Fields marked with an asterisk (*) are required.
             </p>
-            {/* Name and email side by side when the form is wide enough (single pane or large) */}
+            {/* Name and email side by side when the form is wide enough */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
               {inputFields.map((field) => (
                 <FormField
@@ -216,8 +212,7 @@ export default function FormSection({ className = "" }: { className?: string }) 
           </form>
         </Form>
       </Card>
-      {/* Visual only: the status line above is what screen readers announce. inert keeps the toast out of
-          the accessibility tree and focus order (aria-hidden alone would leave the focusable toast reachable) */}
+      {/* Visual only: the status line is announced. inert, not aria-hidden: the toast is focusable. */}
       {toasterMounted && (
         <div inert>
           <Toaster />

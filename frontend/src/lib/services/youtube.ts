@@ -4,11 +4,10 @@ import type { IVideoPreview } from "@/types";
 
 // YouTube Data API v3 over plain fetch, so responses go through the Next.js data cache
 const API_URL = "https://www.googleapis.com/youtube/v3";
-const REVALIDATE = 60 * 60; // 1 hour
+const REVALIDATE = 60 * 60;
 // Same tag as the Strapi videos, so the Strapi webhook refreshes the whole list
 const CACHE_TAGS = ["videos"];
 const PAGE_SIZE = 50; // API maximum for playlistItems and videos
-// Uploads are followed through nextPageToken up to this many pages (200 videos)
 const MAX_UPLOAD_PAGES = 4;
 
 const thumbnailSchema = z.object({ url: z.string() }).nullish();
@@ -44,7 +43,6 @@ const videosSchema = z.object({
 
 type Thumbnails = z.infer<typeof thumbnailsSchema>;
 
-// Falls back from the largest size down
 const pickThumbnailURL = (thumbnails: Thumbnails): string =>
   thumbnails?.maxres?.url ??
   thumbnails?.standard?.url ??
@@ -85,12 +83,9 @@ async function youtubeGet<T>(
   return parsed.data;
 }
 
-/**
- * The channel's uploads, newest first (up to MAX_UPLOAD_PAGES pages). Throws when YouTube can't be read.
- */
+/** The channel's uploads, newest first. Throws when YouTube can't be read. */
 export async function getUploadedVideos(channelId: string): Promise<IVideoPreview[]> {
-  // A channel's uploads playlist id is its id with "UU" in place of the leading "UC", so no
-  // channels.list request is needed to look it up
+  // The uploads playlist id is the channel id with "UU" for "UC" (no channels.list request)
   if (!channelId.startsWith("UC")) throw new Error(`Unexpected YouTube channel id: ${channelId}`);
   const uploadsPlaylistId = `UU${channelId.slice(2)}`;
 
@@ -119,7 +114,6 @@ export async function getUploadedVideos(channelId: string): Promise<IVideoPrevie
         title: snippet.title ?? "",
         description: snippet.description ?? "",
         thumbnailURL: pickThumbnailURL(snippet.thumbnails),
-        // Keep the ISO string; formatting happens where the date is displayed
         publishedAt: snippet.publishedAt ?? "",
       });
     }
@@ -131,9 +125,7 @@ export async function getUploadedVideos(channelId: string): Promise<IVideoPrevie
   return videos;
 }
 
-/**
- * Thumbnail URL per video id, fetched in batches of 50 ids per request. Unknown ids are left out.
- */
+/** Thumbnail URL per video id, 50 ids per request. Unknown ids are left out. */
 export async function getYoutubeThumbnails(videoIds: string[]): Promise<Map<string, string>> {
   const ids = [...new Set(videoIds)];
   const thumbnails = new Map<string, string>();

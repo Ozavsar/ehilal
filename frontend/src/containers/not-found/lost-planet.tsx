@@ -5,10 +5,7 @@ import { cn } from "@/lib/utils";
 import type { IImage } from "@/types";
 import styles from "./orbit.module.css";
 
-/**
- * The "0" of the 404: a planet in the palette's containers on a dashed orbit that the site's rocket
- * circles. The Strapi not-found image fills the planet; without one it shows craters. Decorative.
- */
+/** The "0" of the 404: a planet (the Strapi not-found image, else craters) circled by the rocket */
 export function LostPlanet({ image }: { image: IImage | null | undefined }) {
   const blurDataURL = image ? getStoredBlurDataURL(image) : undefined;
   // object-cover fills the disc's height with a landscape image, so it renders wider than the disc
@@ -18,7 +15,7 @@ export function LostPlanet({ image }: { image: IImage | null | undefined }) {
     <span className="relative block size-48 shrink-0 sm:size-64 lg:size-80">
       <span className="border-outline-variant absolute inset-4 rounded-full border-2 border-dashed" />
 
-      {/* A tertiary-container rim around a primary-container disc (100px, 144px from sm, 192px from lg) */}
+      {/* The disc is 100px, 144px from sm, 192px from lg (the image `sizes` below) */}
       <span className="bg-tertiary-container absolute inset-10 rounded-full p-1.5 sm:inset-12 sm:p-2 lg:inset-14">
         <span className="bg-primary-container relative block size-full overflow-hidden rounded-full">
           {image ? (
@@ -42,8 +39,7 @@ export function LostPlanet({ image }: { image: IImage | null | undefined }) {
         </span>
       </span>
 
-      {/* The orbit turns; the rocket sits on its path, nose in the direction of travel. The surface
-          disc behind it hides the dashes between its fins. */}
+      {/* The surface disc behind the rocket hides the orbit's dashes between its fins */}
       <span className={cn("absolute inset-4", styles.orbit)}>
         <span className="bg-surface absolute top-0 left-1/2 grid size-10 -translate-1/2 rotate-90 place-items-center rounded-full lg:size-12">
           <RocketGlyph className="h-8 w-6 lg:h-10 lg:w-7" />

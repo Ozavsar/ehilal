@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DEFAULT_PALETTE, paletteToCss } from "@/lib/palette-css";
 import "./globals.css";
 
-// Replaces the root layout when it fails, so nothing here may depend on Strapi (theme, header, providers)
+// Replaces the failed root layout: nothing here may depend on Strapi (theme, header, providers)
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
     console.error(error);
@@ -14,7 +14,6 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
   return (
     <html lang="en" className="dark">
       <head>
-        {/* The root layout's palette <style> is gone with it: use the default palette */}
         <style dangerouslySetInnerHTML={{ __html: paletteToCss(DEFAULT_PALETTE) }} />
       </head>
       <body className="type-body-large min-h-screen antialiased">

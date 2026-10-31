@@ -6,9 +6,7 @@ import { stripSymbols } from "@/lib/seo-text";
 import { getSiteSettings } from "@/lib/services";
 import { getAllArticles } from "@/lib/services/blog";
 
-// llms.txt (llmstxt.org): a plain summary of who the site is about and where things are, for AI
-// assistants and tools that read it. Search engines ignore it. Refreshed hourly with the articles;
-// without them it still lists the pages.
+// llms.txt (llmstxt.org): a plain-text summary of the site for AI assistants
 export const revalidate = 3600;
 
 // The newest articles readable on this site

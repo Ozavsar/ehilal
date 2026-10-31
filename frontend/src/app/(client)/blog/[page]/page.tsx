@@ -30,15 +30,12 @@ import type { IBlog } from "@/types";
 
 export const dynamicParams = true;
 
-// The segment is either a list page number or an article slug ("<title>-<medium post id>").
-// Only canonical page numbers are valid ("01", "1.5", "1e0" etc. would be duplicate pages).
+// A list page number or an article slug ("<title>-<medium post id>"); "01", "1e0" etc. are neither
 const parsePageNumber = (segment: string) => (/^[1-9]\d*$/.test(segment) ? Number(segment) : NaN);
 
-// The generated card with the article title on it
 const getArticleCard = (article: IBlog) =>
   ogCardImage(stripSymbols(article.title), stripSymbols(article.title));
 
-// The cover at 1200px wide, or the generated card for posts without one
 const getArticleImage = (article: IBlog) =>
   article.previewImage?.id
     ? {
@@ -50,22 +47,21 @@ const getArticleImage = (article: IBlog) =>
 const countWords = (article: IBlog) =>
   article.paragraphs.reduce((sum, { text }) => sum + (text.match(/\S+/g)?.length ?? 0), 0);
 
-// The post query has no dates, the (cached) article list does. Empty when the list can't load.
+// The post query has no dates; the (cached) article list does
 const getArticleDates = cache(
   async (slug: string): Promise<{ publishedAt?: string; updatedAt?: string }> => {
     try {
       const preview = (await getAllArticles()).find((article) => article.slug === slug);
       return { publishedAt: preview?.publishedAt || undefined, updatedAt: preview?.updatedAt };
     } catch (error) {
-      // Every source failed (already logged): the article renders without dates
+      // Every source failed (already logged): no dates
       unstable_rethrow(error);
       return {};
     }
   },
 );
 
-// The article in the other language (config/translations.ts), when it is in the (cached) list too.
-// Null when it has none or the list can't load.
+// The article in the other language (config/translations.ts), if the (cached) list has it
 const getArticleTranslation = cache(async (postId: string): Promise<ArticleTranslation | null> => {
   const translation = getTranslation(postId);
   if (!translation) return null;
@@ -81,7 +77,7 @@ const getArticleTranslation = cache(async (postId: string): Promise<ArticleTrans
         }
       : null;
   } catch (error) {
-    // Every source failed (already logged): no link to the translation
+    // Every source failed (already logged): no translation link
     unstable_rethrow(error);
     return null;
   }
@@ -133,8 +129,7 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
   const pageNum = parsePageNumber(page);
 
   if (isNaN(pageNum)) {
-    // Unknown ids return null; a Medium network/HTTP failure throws so error.tsx handles it and
-    // ISR keeps serving the last good version instead of caching a redirect or a 404
+    // Unknown ids → null; a Medium failure throws so ISR keeps the last good page, not a 404
     const article = await getArticleBySlug(page);
     if (!article) {
       notFound();
@@ -150,7 +145,6 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
     notFound();
   }
 
-  // Placeholders only for the articles on this page
   const [articles, title] = await Promise.all([
     withBlurDataURLs(result.items, (article) => article.thumbnailURL),
     orNotFound(getPageTitle("blog-page", ["blog-title"])),
@@ -171,21 +165,20 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
   );
 }
 
-// Only the list pages are built ahead. Articles render on their first request and are then cached
-// (ISR): one Medium request per article from parallel build workers gets throttled (503), and a
-// failed prerender fails the whole build, which has no last good version to fall back to.
+// Only list pages are prebuilt: per-article Medium requests from parallel build workers get
+// throttled (503) and one failed prerender fails the whole build. Articles render on first request.
 export async function generateStaticParams() {
   try {
     const articles = await getAllArticles();
     const pageCount = Math.max(1, Math.ceil(articles.length / ITEMS_PER_PAGE));
     return Array.from({ length: pageCount }, (_, i) => ({ page: (i + 1).toString() }));
   } catch {
-    // Every source is down (already logged): render the pages on demand instead of failing the build
+    // Every source is down (already logged): render on demand instead of failing the build
     return [];
   }
 }
 
-// Pages that 404 get no canonical or social tags (Next.js marks them noindex)
+// 404s get no canonical or social tags
 const notFoundMeta = ({
   title,
   description,
@@ -206,7 +199,7 @@ export async function generateMetadata({
   const pageNum = parsePageNumber(page);
   const isArticle = isNaN(pageNum);
 
-  // Invalid segments 404 in the page; don't fetch anything for them
+  // Invalid segments 404 without a network request
   if (isArticle && !getMediumPostId(page)) {
     return notFoundMeta(PAGE_SEO.ARTICLE_NOT_FOUND);
   }
@@ -225,7 +218,7 @@ export async function generateMetadata({
       ]);
       const path = INTERNAL_ROUTES.BLOG.href(article.slug);
       const language = detectArticleLanguage(article);
-      // Self-canonical: the site's copy is the one to rank (the Medium original isn't linked as canonical)
+      // Self-canonical: the site's copy should rank, not the Medium original
       return buildMeta({
         title: article.title,
         description: articleDescription(article, language, siteName),
@@ -234,7 +227,6 @@ export async function generateMetadata({
         image: getArticleImage(article),
         language,
         article: { publishedTime: dates.publishedAt, modifiedTime: dates.updatedAt },
-        // Turkish and English versions point at each other
         ...(translation && {
           languages: { [language]: path, [translation.language]: translation.path },
         }),

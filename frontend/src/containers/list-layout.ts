@@ -1,20 +1,15 @@
-// Shared layout of the list pages (blog, videos, courses, conferences). The card image `sizes` is
-// derived from these classes and the navigation rail (96px from 600px up): change them together.
+// Shared layout of the list pages. The card image `sizes` derive from these classes and the 96px
+// rail: change them together.
 
 /** `container`: window margins (16px compact, 24px from medium) around the 1200px content column */
 export const LIST_PAGE_CLASS_NAME = "container flex flex-col gap-8 pb-8 sm:pb-12";
 
-/** One column compact, two from medium (600px), three from large (1200px); gaps 16px / 24px.
- * Three columns at 840px would leave ~220px cards next to the rail, too narrow for the titles
- * (md:grid-cols-2 overrides MotionGrid's default). */
+/** 1 / 2 (from 600px) / 3 (from 1200px) columns. md:grid-cols-2 overrides MotionGrid's default:
+ * three columns at 840px would be too narrow for the titles. */
 export const LIST_GRID_CLASS_NAME = "gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-2 lg:grid-cols-3";
 
 /**
- * Rendered width of a card (and its full-bleed image) in that grid:
- * - compact: viewport minus 2 x 16px margins
- * - medium and expanded: (viewport - 96px rail - 2 x 24px margins - 24px gap) / 2
- * - large and up: (viewport - 96px rail - 2 x 24px margins - 2 x 24px gaps) / 3, until the
- *   1200px content column is full at 1344px: (1200px - 2 x 24px) / 3 = 384px
+ * Card width: (100vw - rail - margins - gaps) / columns, 384px once the content column is full.
  * calc() instead of a bare "100vw" keeps next/image from dropping the srcset widths below 640px.
  */
 export const LIST_CARD_IMAGE_SIZES =

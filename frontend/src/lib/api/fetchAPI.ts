@@ -2,11 +2,9 @@ import qs from "qs";
 import { notFound, unstable_rethrow } from "next/navigation";
 import { env } from "@/config/env";
 
-const DEFAULT_REVALIDATE = 60 * 60 * 24; // 24 hours
+const DEFAULT_REVALIDATE = 60 * 60 * 24;
 
-/**
- * A failed Strapi request. `status` is the HTTP status, or undefined when Strapi couldn't be reached.
- */
+/** A failed Strapi request; `status` is undefined when Strapi couldn't be reached */
 class ApiError extends Error {
   readonly status: number | undefined;
   readonly path: string;
@@ -19,14 +17,10 @@ class ApiError extends Error {
   }
 }
 
-// "The content doesn't exist" (Strapi answers 404 for missing or unpublished single types),
-// as opposed to Strapi being down or failing
+// Strapi answers 404 for missing or unpublished single types
 const isNotFoundError = (error: unknown) => error instanceof ApiError && error.status === 404;
 
-/**
- * Turns a Strapi 404 into the not-found page. Any other failure propagates to error.tsx, so ISR keeps
- * serving the last good version instead of caching a 404.
- */
+/** Strapi 404 → notFound(); other failures propagate so ISR keeps serving the last good version */
 export async function orNotFound<T>(request: Promise<T>): Promise<T> {
   try {
     return await request;
@@ -50,7 +44,7 @@ export async function fetchAPI<T>(
     revalidate?: number;
   } = {},
 ): Promise<T> {
-  // `cache: "no-store"` together with a revalidate time is a conflict Next.js ignores, so only cached requests get one
+  // no-store plus a revalidate time is a conflict Next.js ignores: only cached requests get one
   const cache = options.cache ?? "force-cache";
   const mergedOptions: RequestInit = {
     headers: {

@@ -1,10 +1,8 @@
 import { ViewTransition, type CSSProperties, type ReactNode } from "react";
 
-// Page transitions (React <ViewTransition>, View Transitions API). Links tag a navigation with a
-// type (<Link transitionTypes>) and each boundary below animates only for its own types
-// (`default: "none"`), so browser back/forward, refreshes and Suspense reveals swap instantly.
-// The animations are the ::view-transition rules in app/globals.css; without browser support the
-// pages just swap.
+// Page transitions (React <ViewTransition>). Each boundary animates only for its own transition
+// types (`default: "none"`), so back/forward, refreshes and Suspense reveals swap instantly.
+// The animations are the ::view-transition rules in app/globals.css.
 
 /** Between the destinations of the navigation rail / bar */
 export const NAV_TOP = "nav-top";
@@ -35,9 +33,8 @@ export function FadeThroughTransition({ children }: { children: ReactNode }) {
   );
 }
 
-/** M3 shared axis X: a list grid moving to the next or previous page. A shared name rather than
- * enter/exit: React doesn't start enter/exit animations for a boundary this deep in a page that
- * only changes its route param, but it does pair names. One list grid per page. */
+/** M3 shared axis X between list pages. A shared name, not enter/exit: React runs no enter/exit
+ * for a boundary this deep when only the route param changes. One list grid per page. */
 export function SharedAxisXTransition({ children }: { children: ReactNode }) {
   return (
     <ViewTransition name="list-grid" share={SHARED_AXIS_X} default="none">
@@ -63,8 +60,7 @@ export function ArticleMorph({
   );
 }
 
-/** Props for a part of the article that comes in after the card → article morph, in this order
- * (app/globals.css, [data-article-reveal]) */
+/** Props for an article part revealed after the card → article morph, in this order */
 export const articleReveal = (order: number) => ({
   "data-article-reveal": "",
   style: { "--reveal-order": order } as CSSProperties,

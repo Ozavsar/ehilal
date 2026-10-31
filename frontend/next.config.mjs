@@ -2,15 +2,13 @@ import { PHASE_PRODUCTION_BUILD } from "next/constants.js";
 import withPlaiceholder from "@plaiceholder/next";
 import bundleAnalyzer from "@next/bundle-analyzer";
 
-// `yarn analyze` (or ANALYZE=true) writes the client/server/edge bundle treemaps to .next/analyze/.
-// The script name is checked so it works without setting an env var (cmd/PowerShell syntax differs).
+// Bundle treemaps in .next/analyze/; checking the script name avoids per-shell env var syntax
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true" || process.env.npm_lifecycle_event === "analyze",
   openAnalyzer: false,
 });
 
-// Origins that may frame the site: the Strapi admin (Strapi Preview opens the site in an iframe) and
-// PREVIEW_ALLOWED_ORIGINS (comma separated) when the admin runs on another origin than the API
+// Origins that may frame the site for Strapi Preview: the Strapi origin + PREVIEW_ALLOWED_ORIGINS
 function frameAncestors() {
   const candidates = [
     process.env.NEXT_PUBLIC_STRAPI_API_URL,
@@ -28,24 +26,22 @@ function frameAncestors() {
   return ["'self'", ...origins].join(" ");
 }
 
-// A full CSP is intentionally not set yet (YouTube iframes, remote images and inline theme styles
-// need an allow-list); roll it out as Content-Security-Policy-Report-Only first. frame-ancestors
-// replaces X-Frame-Options, which can't allow the Strapi admin.
+// frame-ancestors instead of X-Frame-Options, which can't allow the Strapi admin. No full CSP yet:
+// YouTube iframes, remote images and inline theme styles need an allow-list first.
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Content-Security-Policy", value: `frame-ancestors ${frameAncestors()}` },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-  // No includeSubDomains/preload: they are hard to undo and would also bind admin./other subdomains
+  // No includeSubDomains/preload: hard to undo and would also bind admin. and other subdomains
   { key: "Strict-Transport-Security", value: "max-age=63072000" },
 ];
 
-// Page 1 of each list is served at the bare path; /x/1 permanently redirects there.
-// Redirects run before rewrites and only match the incoming URL, so the pair cannot loop.
+// Page 1 is served at the bare path and /x/1 redirects there; redirects only match the incoming
+// URL, so the pair cannot loop
 const LIST_SECTIONS = ["blog", "videos", "courses", "conferences"];
 
-// Only the live site may be indexed (app/robots.ts checks the same hosts). Everything else (dev.*,
-// previews, local builds) sends a noindex header on every response, API, image and XML ones included.
+// Only the live site may be indexed (same hosts as app/robots.ts); other hosts get noindex
 const PRODUCTION_HOSTS = ["ehilal.net", "www.ehilal.net"];
 function isProductionSite() {
   try {
@@ -56,14 +52,13 @@ function isProductionSite() {
   }
 }
 
-// The old sitemap index pointed at these; app/sitemap.ts now lists every URL at /sitemap.xml
+// Old per-section sitemaps, redirected to the single /sitemap.xml
 const LEGACY_SITEMAPS = ["main", "blog", "videos", "courses", "conferences"];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
-  // `yarn dev` only: lets a phone on the local network open the dev server by its LAN address
-  // (http://192.168.x.y:3000); Next blocks dev resources for other origins than localhost
+  // `yarn dev` only: lets devices on the LAN open the dev server
   allowedDevOrigins: ["192.168.*.*"],
   async headers() {
     const headers = isProductionSite()
@@ -91,13 +86,11 @@ const nextConfig = {
         source: `/${section}`,
         destination: `/${section}/1`,
       })),
-      // Feed readers and some crawlers still ask for /favicon.ico; serve the generated 48 px PNG
-      // (app/icon.tsx). Not an app/favicon.ico file: that would be static and miss the theme colours.
+      // Crawlers still ask for /favicon.ico; a static app/favicon.ico would miss the palette
       { source: "/favicon.ico", destination: "/icon/48" },
     ];
   },
   images: {
-    // AVIF first (smallest), WebP for browsers without AVIF support
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
@@ -139,13 +132,10 @@ export default function config(phase) {
     withPlaiceholder({
       ...nextConfig,
       compiler: {
-        // Safety net for production builds (server and client code alike): drop console.log/info/debug
-        // and friends, keep console.error/warn for real failures. Dev keeps every call.
         removeConsole: phase === PHASE_PRODUCTION_BUILD ? { exclude: ["error", "warn"] } : false,
       },
       webpack(webpackConfig) {
-        // @material/material-color-utilities 0.4.0 is an ES module whose imports lack the ".js"
-        // extension, which webpack refuses for "type": "module" packages (the theme preview bar uses it)
+        // @material/material-color-utilities 0.4.0's ESM imports lack ".js", which webpack rejects
         webpackConfig.module.rules.push({
           test: /[\\/]@material[\\/]material-color-utilities[\\/]/,
           resolve: { fullySpecified: false },

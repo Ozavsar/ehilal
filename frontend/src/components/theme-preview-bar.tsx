@@ -45,9 +45,8 @@ interface ThemePreviewBarProps {
 }
 
 /**
- * Floating toolbar shown in Draft Mode (Strapi Preview): the seed colour and variant can be changed
- * and the whole site recolours live, in this browser only. "Send to Strapi" hands the choice to the
- * theme's edit view, where it is saved and published as usual.
+ * Draft Mode toolbar: recolours the site live from a seed colour and variant (this browser only);
+ * "Send to Strapi" hands the choice to the theme's edit view.
  */
 export default function ThemePreviewBar({
   seed: draftSeed,
