@@ -3,18 +3,22 @@ import { cn } from "@/lib/utils";
 interface TitleSectionProps {
   text: string;
   backgroundText: string;
+  /** A line under the title, part of the heading: what the page is about, in search terms */
+  subtitle?: string;
   /** Heading level; pass "h1" where the page has no other h1 */
   as?: "h1" | "h2";
 }
 
 // The list pages' title: one heading for every window size (display role sizes, uppercase and
 // black weight), the last word in the primary colour, and from sm a large faded word behind it
-// (decorative, hidden from assistive tech).
+// (decorative, hidden from assistive tech). The subtitle (config/seo.ts) gives the short CMS title
+// the topic searchers look for, inside the same heading.
 // Entrances are @starting-style transitions (Tailwind `starting:`): they run when the element is
 // first rendered, need no client JS, and are skipped for reduced-motion users.
 export default function TitleSection({
   text,
   backgroundText,
+  subtitle,
   as: Heading = "h2",
 }: TitleSectionProps) {
   const words = text.trim().split(" ");
@@ -26,7 +30,7 @@ export default function TitleSection({
       <span
         aria-hidden="true"
         className={cn(
-          "text-outline-variant text-backdrop tracking-backdrop absolute top-1/2 left-1/2 z-(--z-behind) -translate-1/2 font-extrabold whitespace-nowrap uppercase opacity-25 select-none max-sm:hidden",
+          "text-outline-variant text-backdrop tracking-backdrop absolute top-1/2 left-1/2 z-(--z-behind) -translate-1/2 font-extrabold whitespace-nowrap uppercase opacity-15 select-none max-sm:hidden",
           "ease-emphasized-decelerate transition-[opacity,scale] duration-1000 motion-reduce:transition-none starting:scale-110 starting:opacity-0",
         )}
       >
@@ -42,6 +46,14 @@ export default function TitleSection({
         )}
       >
         {plainWord} <span className={cn(plainWord && "text-primary")}>{lastWord}</span>
+        {subtitle && (
+          <>
+            <span className="sr-only">: </span>
+            <span className="type-title-medium md:type-title-large text-on-surface-variant mx-auto mt-3 block max-w-2xl text-balance normal-case">
+              {subtitle}
+            </span>
+          </>
+        )}
       </Heading>
     </section>
   );

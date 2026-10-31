@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { BlogSource, type IBlog, type IBlogPreview } from "@/types";
 import {
@@ -40,6 +41,18 @@ const loadArticles = cache(async () => {
 
 export async function getAllArticles(): Promise<IBlogPreview[]> {
   return (await loadArticles()).articles;
+}
+
+// The list behind an article page's links to other articles (related posts, series, links in the
+// text): empty instead of throwing when every source fails (already logged), so the article
+// itself still renders.
+export async function getArticlesForLinks(): Promise<IBlogPreview[]> {
+  try {
+    return await getAllArticles();
+  } catch (error) {
+    unstable_rethrow(error);
+    return [];
+  }
 }
 
 // One list page, or null when the page doesn't exist

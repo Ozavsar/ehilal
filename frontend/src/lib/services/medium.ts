@@ -54,6 +54,9 @@ const LIST_QUERY = `
             }
             firstPublishedAt
             latestPublishedAt
+            tags {
+              normalizedTagSlug
+            }
           }
           pagingInfo {
             next {
@@ -74,17 +77,28 @@ const POST_QUERY = `
         id
         title
         mediumUrl
+        isLocked
         creator {
           id
         }
         content {
+          isLockedPreviewOnly
           bodyModel {
             paragraphs {
               name
               text
               type
+              markups {
+                type
+                start
+                end
+                href
+                anchorType
+                userId
+              }
               metadata {
                 id
+                alt
                 originalWidth
                 originalHeight
               }
@@ -92,6 +106,8 @@ const POST_QUERY = `
                 mediaResource {
                   iframeSrc
                   title
+                  iframeWidth
+                  iframeHeight
                 }
               }
             }
@@ -124,6 +140,7 @@ const listResponseSchema = z.object({
             firstPublishedAt: z.number(),
             // Last time the post was (re)published; Medium's updatedAt also moves on stats changes
             latestPublishedAt: z.number().nullish(),
+            tags: z.array(z.object({ normalizedTagSlug: z.string() })).nullish(),
           }),
         ),
         pagingInfo: z.object({
@@ -141,20 +158,36 @@ const postEnvelopeSchema = z.object({
   }),
 });
 
+const markupSchema = z.object({
+  type: z.string(),
+  start: z.number(),
+  end: z.number(),
+  href: z.string().nullish(),
+  anchorType: z.string().nullish(),
+  userId: z.string().nullish(),
+});
+
 const paragraphSchema = z.object({
   name: z.string(),
   text: z.string().nullish(),
   type: z.string(),
+  markups: z.array(markupSchema).nullish(),
   metadata: z
     .object({
       id: z.string(),
+      alt: z.string().nullish(),
       originalWidth: z.number().nullish(),
       originalHeight: z.number().nullish(),
     })
     .nullish(),
   iframe: z
     .object({
-      mediaResource: z.object({ iframeSrc: z.string(), title: z.string().nullish() }),
+      mediaResource: z.object({
+        iframeSrc: z.string(),
+        title: z.string().nullish(),
+        iframeWidth: z.number().nullish(),
+        iframeHeight: z.number().nullish(),
+      }),
     })
     .nullish(),
 });
@@ -166,9 +199,12 @@ const postResponseSchema = z.object({
       id: z.string(),
       title: z.string(),
       mediumUrl: z.string(),
+      isLocked: z.boolean().nullish(),
       creator: z.object({ id: z.string() }).nullish(),
       content: z
         .object({
+          // Member-only posts: true when only the opening paragraphs came back
+          isLockedPreviewOnly: z.boolean().nullish(),
           bodyModel: z.object({ paragraphs: z.array(paragraphSchema) }).nullish(),
         })
         .nullish(),
@@ -217,6 +253,14 @@ export function getMediumPostId(slug: string): string | null {
   return POST_ID_PATTERN.test(postId) ? postId : null;
 }
 
+/** Post id of a link to a Medium post (medium.com/@user/<slug>-<id>, medium.com/<publication>/
+ * <slug>-<id>, <user>.medium.com/<slug>-<id>, medium.com/p/<id>), else null */
+export function getMediumPostIdFromUrl(url: URL): string | null {
+  if (url.hostname !== "medium.com" && !url.hostname.endsWith(".medium.com")) return null;
+  const lastPart = url.pathname.split("/").filter(Boolean).pop();
+  return lastPart ? getMediumPostId(lastPart) : null;
+}
+
 async function fetchAllArticlePreviews(): Promise<IBlogPreview[]> {
   const previews: IBlogPreview[] = [];
   let from: string | null = null;
@@ -242,6 +286,7 @@ async function fetchAllArticlePreviews(): Promise<IBlogPreview[]> {
           ? new Date(post.latestPublishedAt).toISOString()
           : undefined,
         slug: getMediumArticleSlug(post.mediumUrl),
+        tags: post.tags?.map((tag) => tag.normalizedTagSlug) ?? [],
       })),
     );
 
@@ -294,9 +339,18 @@ export async function getSingleArticle(postId: string): Promise<IBlog | null> {
       name: p.name,
       text: p.text ?? "",
       type: p.type,
+      markups: (p.markups ?? []).map((markup) => ({
+        type: markup.type,
+        start: markup.start,
+        end: markup.end,
+        href: markup.href ?? null,
+        anchorType: markup.anchorType ?? null,
+        userId: markup.userId ?? null,
+      })),
       metadata: p.metadata
         ? {
             id: p.metadata.id,
+            alt: p.metadata.alt?.trim() ?? "",
             originalWidth: p.metadata.originalWidth ?? undefined,
             originalHeight: p.metadata.originalHeight ?? undefined,
           }
@@ -306,9 +360,12 @@ export async function getSingleArticle(postId: string): Promise<IBlog | null> {
             mediaResource: {
               iframeSrc: p.iframe.mediaResource.iframeSrc,
               title: p.iframe.mediaResource.title ?? null,
+              iframeWidth: p.iframe.mediaResource.iframeWidth ?? undefined,
+              iframeHeight: p.iframe.mediaResource.iframeHeight ?? undefined,
             },
           }
         : null,
     })),
+    isLocked: !!post.isLocked && post.content?.isLockedPreviewOnly !== false,
   };
 }

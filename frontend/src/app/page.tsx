@@ -3,27 +3,24 @@ import { notFound } from "next/navigation";
 import JsonLd from "@/components/json-ld";
 import HomeContainer from "@/containers/home";
 import { HOME_SEO } from "@/config/seo";
-import { getSiteSettings } from "@/lib/services";
 import { getHomePageContent } from "@/lib/services/pages";
 import { getStrapiBlurDataURL } from "@/lib/getImage";
-import { getStrapiURL, orNotFound } from "@/lib/api/fetchAPI";
+import { orNotFound } from "@/lib/api/fetchAPI";
 import { buildMeta, profilePageJsonLd } from "@/lib/metadata";
 
 export default async function Home() {
-  const [content, site] = await Promise.all([orNotFound(getHomePageContent()), getSiteSettings()]);
+  const content = await orNotFound(getHomePageContent());
   if (!content) {
     notFound();
   }
 
   // Built from a small Strapi format; undefined (no placeholder) if the image host fails
   const blurDataURL = await getStrapiBlurDataURL(content.hero_image);
-  // The S3 upload provider returns absolute URLs, the local one /uploads/... paths
-  const heroUrl = content.hero_image?.url;
-  const imageUrl = heroUrl?.startsWith("/") ? getStrapiURL(heroUrl) : heroUrl;
 
   return (
     <>
-      <JsonLd data={profilePageJsonLd(site, imageUrl)} />
+      {/* The Person it is about (photo included) is in the root layout */}
+      <JsonLd data={profilePageJsonLd(content.updatedAt || undefined)} />
       <HomeContainer content={{ ...content, hero_image: { ...content.hero_image, blurDataURL } }} />
     </>
   );

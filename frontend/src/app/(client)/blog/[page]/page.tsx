@@ -7,7 +7,8 @@ import JsonLd from "@/components/json-ld";
 import TitleSection from "@/components/title-section";
 import { ITEMS_PER_PAGE } from "@/config/constants";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
-import { LIST_SEO, PAGE_SEO, articleFallbackDescription, listPageSeo } from "@/config/seo";
+import { LIST_SEO, PAGE_SEO, listPageSeo } from "@/config/seo";
+import { getTranslation, type ArticleTranslation } from "@/config/translations";
 import { getSiteSettings } from "@/lib/services";
 import { getAllArticles, getArticleBySlug, getArticlesPage } from "@/lib/services/blog";
 import { getMediumPostId } from "@/lib/services/medium";
@@ -15,6 +16,7 @@ import { getPageTitle } from "@/lib/services/pages";
 import { orNotFound } from "@/lib/api/fetchAPI";
 import { withBlurDataURLs } from "@/lib/getImage";
 import { detectArticleLanguage } from "@/lib/language";
+import { articleDescription, stripSymbols } from "@/lib/seo-text";
 import {
   blogPostingJsonLd,
   breadcrumbJsonLd,
@@ -32,14 +34,21 @@ export const dynamicParams = true;
 // Only canonical page numbers are valid ("01", "1.5", "1e0" etc. would be duplicate pages).
 const parsePageNumber = (segment: string) => (/^[1-9]\d*$/.test(segment) ? Number(segment) : NaN);
 
+// The generated card with the article title on it
+const getArticleCard = (article: IBlog) =>
+  ogCardImage(stripSymbols(article.title), stripSymbols(article.title));
+
 // The cover at 1200px wide, or the generated card for posts without one
 const getArticleImage = (article: IBlog) =>
   article.previewImage?.id
     ? {
         url: `https://miro.medium.com/v2/resize:fit:1200/${article.previewImage.id}`,
-        alt: article.previewImage.alt || article.title,
+        alt: article.previewImage.alt || stripSymbols(article.title),
       }
-    : ogCardImage(article.title, article.title);
+    : getArticleCard(article);
+
+const countWords = (article: IBlog) =>
+  article.paragraphs.reduce((sum, { text }) => sum + (text.match(/\S+/g)?.length ?? 0), 0);
 
 // The post query has no dates, the (cached) article list does. Empty when the list can't load.
 const getArticleDates = cache(
@@ -55,18 +64,48 @@ const getArticleDates = cache(
   },
 );
 
+// The article in the other language (config/translations.ts), when it is in the (cached) list too.
+// Null when it has none or the list can't load.
+const getArticleTranslation = cache(async (postId: string): Promise<ArticleTranslation | null> => {
+  const translation = getTranslation(postId);
+  if (!translation) return null;
+  try {
+    const other = (await getAllArticles()).find(
+      (article) => article.slug && getMediumPostId(article.slug) === translation.id,
+    );
+    return other?.slug
+      ? {
+          language: translation.language,
+          title: other.title,
+          path: INTERNAL_ROUTES.BLOG.href(other.slug),
+        }
+      : null;
+  } catch (error) {
+    // Every source failed (already logged): no link to the translation
+    unstable_rethrow(error);
+    return null;
+  }
+});
+
 async function ArticlePage({ article }: { article: IBlog }) {
-  const [site, dates] = await Promise.all([getSiteSettings(), getArticleDates(article.slug)]);
+  const [site, dates, translation] = await Promise.all([
+    getSiteSettings(),
+    getArticleDates(article.slug),
+    getArticleTranslation(article.id),
+  ]);
   const path = INTERNAL_ROUTES.BLOG.href(article.slug);
+  const language = detectArticleLanguage(article);
   const structuredData = jsonLdGraph(
     blogPostingJsonLd({
       path,
       headline: article.title,
-      description: article.subtitle || articleFallbackDescription(article.title, site.siteName),
-      imageUrl: getArticleImage(article).url,
+      description: articleDescription(article, language, site.siteName),
+      imageUrls: [getArticleImage(article).url, getArticleCard(article).url],
+      basedOnUrl: article.mediumUrl,
+      wordCount: countWords(article),
       datePublished: dates.publishedAt,
       dateModified: dates.updatedAt,
-      language: detectArticleLanguage(article),
+      language,
       site,
     }),
     breadcrumbJsonLd([
@@ -78,7 +117,13 @@ async function ArticlePage({ article }: { article: IBlog }) {
   return (
     <>
       <JsonLd data={structuredData} />
-      <ArticleContainer article={article} />
+      <ArticleContainer
+        article={article}
+        language={language}
+        publishedAt={dates.publishedAt}
+        updatedAt={dates.updatedAt}
+        translation={translation}
+      />
     </>
   );
 }
@@ -115,7 +160,12 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
   return (
     <>
       <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.BLOG, pageNum))} />
-      <TitleSection as="h1" text={title.page_title} backgroundText={title.page_title_background} />
+      <TitleSection
+        as="h1"
+        text={title.page_title}
+        backgroundText={title.page_title_background}
+        subtitle={LIST_SEO.BLOG.subtitle}
+      />
       <BlogContainer articles={articles} currentPage={pageNum} totalPages={result.totalPages} />
     </>
   );
@@ -168,19 +218,26 @@ export async function generateMetadata({
         return notFoundMeta(PAGE_SEO.ARTICLE_NOT_FOUND);
       }
 
-      const [{ siteName }, dates] = await Promise.all([
+      const [{ siteName }, dates, translation] = await Promise.all([
         getSiteSettings(),
         getArticleDates(article.slug),
+        getArticleTranslation(article.id),
       ]);
+      const path = INTERNAL_ROUTES.BLOG.href(article.slug);
+      const language = detectArticleLanguage(article);
       // Self-canonical: the site's copy is the one to rank (the Medium original isn't linked as canonical)
       return buildMeta({
         title: article.title,
-        description: article.subtitle || articleFallbackDescription(article.title, siteName),
-        path: INTERNAL_ROUTES.BLOG.href(article.slug),
+        description: articleDescription(article, language, siteName),
+        path,
         type: "article",
         image: getArticleImage(article),
-        language: detectArticleLanguage(article),
+        language,
         article: { publishedTime: dates.publishedAt, modifiedTime: dates.updatedAt },
+        // Turkish and English versions point at each other
+        ...(translation && {
+          languages: { [language]: path, [translation.language]: translation.path },
+        }),
       });
     }
 

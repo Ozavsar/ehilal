@@ -50,14 +50,35 @@ export interface IVideoPreview {
   publishedAt: string; // ISO 8601, "" if unknown
 }
 
+// Inline formatting of a Medium paragraph: [start, end) in UTF-16 code units of its text. Ranges
+// may nest or overlap. A: a link (anchorType LINK) or a mention of a Medium user (USER, userId).
+export interface IMediumMarkup {
+  type: string; // "A" | "STRONG" | "EM" | "CODE"; others are ignored
+  start: number;
+  end: number;
+  href: string | null;
+  anchorType: string | null;
+  userId: string | null;
+}
+
 // Fields of a Medium body paragraph that the article renderer uses
 export interface IMediumParagraph {
   name: string;
   text: string;
   type: string;
-  // originalWidth/originalHeight: pixel size of the source image (image paragraphs)
-  metadata: { id: string; originalWidth?: number; originalHeight?: number } | null;
-  iframe: { mediaResource: { iframeSrc: string; title: string | null } } | null;
+  markups: IMediumMarkup[];
+  // originalWidth/originalHeight: pixel size of the source image; alt: the alt text entered on
+  // Medium, "" if none (image paragraphs)
+  metadata: { id: string; alt: string; originalWidth?: number; originalHeight?: number } | null;
+  // iframeWidth/iframeHeight: the embed's frame size, when Medium knows it
+  iframe: {
+    mediaResource: {
+      iframeSrc: string;
+      title: string | null;
+      iframeWidth?: number;
+      iframeHeight?: number;
+    };
+  } | null;
 }
 
 // Medium article rendered on /blog/<slug>, returned by getSingleArticle
@@ -69,6 +90,8 @@ export interface IBlog {
   mediumUrl: string;
   previewImage: { id: string; alt: string | null } | null;
   paragraphs: IMediumParagraph[];
+  // Member-only post: Medium returns only its opening paragraphs to the site
+  isLocked: boolean;
 }
 
 export interface ICourse {
@@ -239,6 +262,8 @@ export interface IBlogPreview {
   updatedAt?: string; // ISO 8601, last republished (Medium); undefined if unknown
   // /blog/<slug> segment for articles readable on this site (Medium); null for ones that only link out (Substack)
   slug: string | null;
+  // Medium tag slugs ("ccip", "chain-link"); undefined for Substack
+  tags?: string[];
 }
 
 export enum BlogSource {

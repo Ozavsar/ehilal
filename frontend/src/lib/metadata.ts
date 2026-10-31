@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { SITE_URL } from "@/config/site";
 import { HOME_SEO, PERSON_KNOWS_ABOUT, type PageSeo } from "@/config/seo";
 import { OG_LOCALES, type ContentLanguage } from "@/lib/language";
+import { fitTitle, MAX_TITLE_LENGTH, stripSymbols } from "@/lib/seo-text";
 import { getSiteSettings } from "@/lib/services";
-import type { ISiteSettings } from "@/types";
+import type { ICourse, IImage, ISiteSettings } from "@/types";
 
 interface OgImage {
   url: string;
@@ -30,10 +31,12 @@ interface BuildMetaOptions {
   language?: ContentLanguage;
   /** Article pages: article:published_time / modified_time */
   article?: { publishedTime?: string; modifiedTime?: string };
+  /** The same page in each language, this one included (hreflang); English is the x-default */
+  languages?: Partial<Record<ContentLanguage, string>>;
 }
 
-// Search results cut titles at about 60 characters
-const MAX_TITLE_LENGTH = 60;
+/** The article RSS feed (app/feed.xml), announced in every page's <head> */
+export const FEED_PATH = "/feed.xml";
 
 export const absoluteUrl = (path: string) =>
   `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
@@ -49,24 +52,28 @@ export const ogCardImage = (text: string, alt: string): OgImage => ({
 export async function buildMeta({
   title,
   description,
-  ogTitle = title,
+  ogTitle,
   path,
   absoluteTitle = false,
   type = "website",
   image,
   language = "en",
   article,
+  languages,
 }: BuildMetaOptions): Promise<Metadata> {
   const site = await getSiteSettings();
   const url = absoluteUrl(path);
+  // Article titles come from Medium: no emoji in results, cut to what results show
+  const pageTitle = fitTitle(title);
   const ogImage = image || {
     ...site.defaultOgImage,
     alt: site.defaultOgImage.alt || `${site.siteName} Open Graph Image`,
   };
   const twitterImageAlt =
     (image ? image.alt : site.defaultOgImage.alt) || `${site.siteName} Twitter Card Image`;
+  const socialTitle = ogTitle ?? stripSymbols(title);
   const common = {
-    title: ogTitle,
+    title: socialTitle,
     description,
     url,
     siteName: site.siteName,
@@ -76,9 +83,9 @@ export async function buildMeta({
 
   return {
     title:
-      absoluteTitle || `${title} | ${site.siteName}`.length > MAX_TITLE_LENGTH
-        ? { absolute: title }
-        : title,
+      absoluteTitle || `${pageTitle} | ${site.siteName}`.length > MAX_TITLE_LENGTH
+        ? { absolute: pageTitle }
+        : pageTitle,
     description,
 
     openGraph:
@@ -93,7 +100,7 @@ export async function buildMeta({
         : { ...common, type: "website" },
     twitter: {
       card: "summary_large_image",
-      title: ogTitle,
+      title: socialTitle,
       description,
       site: site.twitterHandle,
       siteId: site.twitterUserId,
@@ -103,6 +110,15 @@ export async function buildMeta({
     },
     alternates: {
       canonical: url,
+      ...(languages && {
+        languages: {
+          ...Object.fromEntries(
+            Object.entries(languages).map(([code, href]) => [code, absoluteUrl(href)]),
+          ),
+          ...(languages.en && { "x-default": absoluteUrl(languages.en) }),
+        },
+      }),
+      types: { "application/rss+xml": [{ url: FEED_PATH, title: `${site.siteName} — Articles` }] },
     },
   };
 }
@@ -127,39 +143,77 @@ type JsonLdNode = Record<string, unknown>;
 export const PERSON_ID = `${SITE_URL}/#person`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
+// The companies' own @id (their sites' Organization JSON-LD uses "<origin>#organization"), so
+// search engines join the nodes of both sites; ours when the URL isn't one
+const organizationId = (url: string, fallback: string) => {
+  try {
+    return `${new URL(url).origin}#organization`;
+  } catch {
+    return `${SITE_URL}/#${fallback}`;
+  }
+};
+
 /** Wraps nodes in one document with a single @context */
 export const jsonLdGraph = (...nodes: JsonLdNode[]) => ({
   "@context": "https://schema.org",
   "@graph": nodes,
 });
 
-/** The site owner and the website, for the root layout. `sameAs`: her profiles on other sites. */
-export function siteJsonLd(site: ISiteSettings, sameAs: string[]) {
+/**
+ * The site owner, the companies she co-founded and the website, for the root layout. `sameAs`: her
+ * profiles on other sites; `portrait`: the home page photo (absolute URL), when Strapi has one.
+ */
+export function siteJsonLd(
+  site: ISiteSettings,
+  sameAs: string[],
+  portrait?: Pick<IImage, "url" | "width" | "height">,
+) {
+  const karakodId = organizationId(site.karakodUrl, "karakod");
+  const legalifiId = organizationId(site.legalifiUrl, "legalifi");
   return jsonLdGraph(
     {
       "@type": "Person",
       "@id": PERSON_ID,
       name: site.siteName,
       url: absoluteUrl("/"),
-      jobTitle: site.jobTitle,
-      description: HOME_SEO.description,
-      worksFor: [
-        {
-          "@type": "Organization",
-          name: "Karakod",
-          url: site.karakodUrl,
-          sameAs: [site.karakodLinkedinUrl],
+      ...(portrait && {
+        image: {
+          "@type": "ImageObject",
+          url: portrait.url,
+          ...(portrait.width &&
+            portrait.height && { width: portrait.width, height: portrait.height }),
         },
-        { "@type": "Organization", name: "Legalifi", url: site.legalifiUrl },
-      ],
+      }),
+      jobTitle: site.jobTitle,
+      hasOccupation: { "@type": "Occupation", name: site.jobTitle },
+      description: HOME_SEO.description,
+      worksFor: [{ "@id": karakodId }, { "@id": legalifiId }],
       knowsAbout: PERSON_KNOWS_ABOUT,
+      // She writes in both (the blog has Turkish and English articles)
+      knowsLanguage: ["tr", "en"],
       sameAs: [...new Set(sameAs)],
+    },
+    {
+      "@type": "Organization",
+      "@id": karakodId,
+      name: "Karakod",
+      url: site.karakodUrl,
+      sameAs: [site.karakodLinkedinUrl],
+      founder: { "@id": PERSON_ID },
+    },
+    {
+      "@type": "Organization",
+      "@id": legalifiId,
+      name: "Legalifi",
+      url: site.legalifiUrl,
+      founder: { "@id": PERSON_ID },
     },
     {
       "@type": "WebSite",
       "@id": WEBSITE_ID,
       url: absoluteUrl("/"),
       name: site.siteName,
+      alternateName: new URL(SITE_URL).hostname,
       description: site.siteDescription,
       inLanguage: "en",
       author: { "@id": PERSON_ID },
@@ -168,8 +222,8 @@ export function siteJsonLd(site: ISiteSettings, sameAs: string[]) {
   );
 }
 
-/** Home page: a profile page about the Person, with her photo */
-export function profilePageJsonLd(site: ISiteSettings, imageUrl: string | undefined) {
+/** Home page: a profile page about the Person (the root layout's node, photo included) */
+export function profilePageJsonLd(dateModified: string | undefined) {
   return jsonLdGraph({
     "@type": "ProfilePage",
     "@id": `${absoluteUrl("/")}#webpage`,
@@ -177,14 +231,9 @@ export function profilePageJsonLd(site: ISiteSettings, imageUrl: string | undefi
     name: HOME_SEO.title,
     description: HOME_SEO.description,
     inLanguage: "en",
+    ...(dateModified && { dateModified }),
     isPartOf: { "@id": WEBSITE_ID },
-    // Same @id as the root layout's Person: parsers merge the two nodes
-    mainEntity: {
-      "@type": "Person",
-      "@id": PERSON_ID,
-      name: site.siteName,
-      ...(imageUrl && { image: imageUrl }),
-    },
+    mainEntity: { "@id": PERSON_ID },
   });
 }
 
@@ -212,11 +261,41 @@ export function listBreadcrumbJsonLd(
   ]);
 }
 
+/**
+ * A list page's Udemy courses, taught by the Person. No rich result (Google's course list needs
+ * course pages on this site, Course info was retired in 2025): it tells search engines who the
+ * instructor is. `firstPosition`: the first course's place in the whole list (page 2 goes on).
+ */
+export function courseListJsonLd(
+  courses: Pick<ICourse, "title" | "headline" | "udemyURL">[],
+  firstPosition = 1,
+): JsonLdNode {
+  return {
+    "@type": "ItemList",
+    itemListElement: courses.map((course, index) => ({
+      "@type": "ListItem",
+      position: firstPosition + index,
+      item: {
+        "@type": "Course",
+        name: course.title,
+        ...(course.headline && { description: course.headline }),
+        url: course.udemyURL,
+        provider: { "@type": "Organization", name: "Udemy", sameAs: "https://www.udemy.com/" },
+        instructor: { "@id": PERSON_ID },
+      },
+    })),
+  };
+}
+
 interface BlogPostingOptions {
   path: string;
   headline: string;
   description: string;
-  imageUrl: string;
+  /** The cover (or the generated card) first, then the other sizes */
+  imageUrls: string[];
+  /** The Medium original the article is republished from */
+  basedOnUrl: string;
+  wordCount: number;
   datePublished?: string;
   dateModified?: string;
   language: ContentLanguage;
@@ -228,7 +307,9 @@ export function blogPostingJsonLd({
   path,
   headline,
   description,
-  imageUrl,
+  imageUrls,
+  basedOnUrl,
+  wordCount,
   datePublished,
   dateModified,
   language,
@@ -239,9 +320,12 @@ export function blogPostingJsonLd({
     "@type": "BlogPosting",
     "@id": `${url}#article`,
     url,
-    headline,
+    headline: stripSymbols(headline),
     description,
-    image: [imageUrl],
+    image: [...new Set(imageUrls)],
+    // Not sameAs: the Medium post is the original this page is based on, not the same page
+    isBasedOn: basedOnUrl,
+    wordCount,
     ...(datePublished && { datePublished }),
     ...((dateModified || datePublished) && { dateModified: dateModified || datePublished }),
     inLanguage: language,

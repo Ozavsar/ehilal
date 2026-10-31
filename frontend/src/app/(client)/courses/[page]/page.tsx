@@ -4,7 +4,7 @@ import { ITEMS_PER_PAGE } from "@/config/constants";
 import { getAllCourses } from "@/lib/services/udemy";
 import { withBlurDataURLs } from "@/lib/getImage";
 import { Metadata } from "next";
-import { buildPageMeta, jsonLdGraph, listBreadcrumbJsonLd } from "@/lib/metadata";
+import { buildPageMeta, courseListJsonLd, jsonLdGraph, listBreadcrumbJsonLd } from "@/lib/metadata";
 import { INTERNAL_ROUTES } from "@/config/constants/app-routes";
 import { LIST_SEO, listPageSeo } from "@/config/seo";
 import JsonLd from "@/components/json-ld";
@@ -48,7 +48,12 @@ export default async function CoursesPage(props: { params: Promise<{ page: strin
 
   return (
     <>
-      <JsonLd data={jsonLdGraph(listBreadcrumbJsonLd(INTERNAL_ROUTES.COURSES, pageNum))} />
+      <JsonLd
+        data={jsonLdGraph(
+          listBreadcrumbJsonLd(INTERNAL_ROUTES.COURSES, pageNum),
+          courseListJsonLd(courses, (pageNum - 1) * ITEMS_PER_PAGE + 1),
+        )}
+      />
       <CourseContainer
         courses={pageCourses}
         pageNumber={pageNum.toString()}

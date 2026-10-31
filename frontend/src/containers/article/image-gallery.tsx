@@ -86,6 +86,9 @@ export function ZoomButton({ index, label, className, children }: ZoomButtonProp
 interface ZoomableImageProps {
   index: number; // position in the provider's images
   src: string;
+  // Medium CDN sizes of the image and the width it renders at, so the browser picks the right one
+  srcSet?: string;
+  sizes?: string;
   alt: string;
   label: string;
   // Rendered pixel size, reserves the image's box before it loads (no layout shift)
@@ -93,14 +96,28 @@ interface ZoomableImageProps {
   height?: number;
   // Lead image at the top of the article: load it eagerly at high priority, the rest lazily
   lead?: boolean;
+  className?: string;
 }
 
-export function ZoomableImage({ index, src, alt, label, width, height, lead }: ZoomableImageProps) {
+export function ZoomableImage({
+  index,
+  src,
+  srcSet,
+  sizes,
+  alt,
+  label,
+  width,
+  height,
+  lead,
+  className,
+}: ZoomableImageProps) {
   return (
-    <ZoomButton index={index} label={label}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- Medium CDN image, sized by its URL */}
+    <ZoomButton index={index} label={label} className={className}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- Medium CDN image, resized and converted by its URL */}
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         width={width}
         height={height}

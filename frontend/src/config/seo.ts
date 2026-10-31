@@ -1,5 +1,6 @@
 import { SUBSTACK_USERNAME, YOUTUBE_CHANNEL_HANDLE } from "@/config/constants";
 import { SITE_URL } from "@/config/site";
+import type { ContentLanguage } from "@/lib/language";
 
 // Page titles, descriptions and social titles. Written here on purpose rather than in Strapi: the
 // CMS keeps the site identity (Site Settings: name, job title, default OG image), the copy that
@@ -14,6 +15,8 @@ export interface PageSeo {
   ogTitle: string;
   /** Text of the generated /api/og card */
   cardTitle: string;
+  /** Visible line under the page's (CMS) title, inside its <h1>: the topic in search terms */
+  subtitle?: string;
 }
 
 export interface ListPageSeo extends PageSeo {
@@ -42,6 +45,7 @@ export const LIST_SEO = {
       `Page ${page} of the articles by Elif Hilal Kara on Web3 regulation, RWA tokenization, AI and legal tech, and the Karakod LC³ Gündem newsletter issues.`,
     ogTitle: "Articles on Law, Web3 and AI by Elif Hilal Kara",
     cardTitle: "Blog",
+    subtitle: "Articles on law, Web3, tokenization and AI",
   },
   VIDEOS: {
     title: "Videos on Legal Engineering and Web3",
@@ -52,6 +56,7 @@ export const LIST_SEO = {
       `Page ${page} of the talks, interviews and explainers by Elif Hilal Kara on legal engineering, blockchain, data protection law (KVKK), DevRel and AI.`,
     ogTitle: "Videos and Talks by Elif Hilal Kara",
     cardTitle: "Videos",
+    subtitle: "Talks, interviews and explainers on legal engineering, Web3 and AI",
   },
   COURSES: {
     title: "Courses on Blockchain and Web3",
@@ -62,6 +67,7 @@ export const LIST_SEO = {
       `Page ${page} of the Udemy courses and workshops by legal engineer Elif Hilal Kara on blockchain, Web3, technology and financial literacy, from basics to practice.`,
     ogTitle: "Blockchain and Web3 Courses by Elif Hilal Kara",
     cardTitle: "Courses",
+    subtitle: "Courses on blockchain, Web3 and technology",
   },
   CONFERENCES: {
     title: "Conference Talks, Panels and Masterclasses",
@@ -72,6 +78,7 @@ export const LIST_SEO = {
       `Page ${page} of the conferences, panels and masterclasses where Elif Hilal Kara has spoken on legal engineering, crypto law, tokenization and AI in law.`,
     ogTitle: "Conference Talks and Panels by Elif Hilal Kara",
     cardTitle: "Conferences",
+    subtitle: "Conference talks, panels and masterclasses on legal engineering, crypto law and AI",
   },
 } as const satisfies Record<"BLOG" | "VIDEOS" | "COURSES" | "CONFERENCES", ListPageSeo>;
 
@@ -82,6 +89,7 @@ export const PAGE_SEO = {
       "Contact Elif Hilal Kara for speaking invitations, workshops, legal engineering and tokenization projects, collaborations with Karakod or Legalifi and media.",
     ogTitle: "Contact Elif Hilal Kara",
     cardTitle: "Contact",
+    subtitle: "Speaking invitations, workshops and collaborations",
   },
   NOT_FOUND: {
     title: "Page Not Found",
@@ -110,9 +118,15 @@ export function listPageSeo(seo: ListPageSeo, page: number): PageSeo {
   };
 }
 
-/** Article description when the post has no subtitle */
-export const articleFallbackDescription = (title: string, siteName: string) =>
-  `“${title}”, an article by ${siteName} on law, Web3, tokenization and AI.`;
+/** Article description when neither the subtitle nor the body gives one, in the article's language */
+export const articleFallbackDescription = (
+  title: string,
+  siteName: string,
+  language: ContentLanguage,
+) =>
+  language === "tr"
+    ? `“${title}”: ${siteName} tarafından hukuk, Web3, tokenizasyon ve yapay zekâ üzerine yazılmış bir makale.`
+    : `“${title}”, an article by ${siteName} on law, Web3, tokenization and AI.`;
 
 // Only the live site may be indexed: the same hosts as app/robots.ts and next.config.mjs (which
 // sends X-Robots-Tag: noindex everywhere else)

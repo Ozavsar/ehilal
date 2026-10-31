@@ -1,4 +1,5 @@
 import TitleSection from "@/components/title-section";
+import { PAGE_SEO } from "@/config/seo";
 import FormSection from "./sections/form-section";
 import InfoSection from "./sections/info-section";
 import type { IStrapiContactPage } from "@/types";
@@ -31,6 +32,7 @@ export default function ContactContainer({
         as="h1"
         backgroundText={content.page_title_background}
         text={content.page_title}
+        subtitle={PAGE_SEO.CONTACT.subtitle}
       />
       <div className="container grid grid-cols-1 gap-6 pb-8 sm:pb-12 md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-y-8">
         {/* @starting-style fade-in: visible without JS, still for reduced motion */}

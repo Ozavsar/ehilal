@@ -12,6 +12,7 @@ interface MobileTOCDrawerProps {
   tree: IHeadingNode[];
   activeId: string | null;
   lang?: string;
+  title: string;
   // The button that opens the drawer; it sits outside vaul, so Radix can't return focus to it itself
   returnFocusRef: RefObject<HTMLButtonElement | null>;
 }
@@ -23,6 +24,7 @@ export default function MobileTOCDrawer({
   tree,
   activeId,
   lang,
+  title,
   returnFocusRef,
 }: MobileTOCDrawerProps) {
   // Heading of the link chosen in the sheet: focus lands there once the sheet has closed
@@ -52,7 +54,9 @@ export default function MobileTOCDrawer({
       >
         <div className="mx-auto flex w-full max-w-160 flex-col gap-2 px-4 pt-2 pb-6 sm:px-6">
           <div className="flex min-h-12 items-center justify-between gap-4 ps-4">
-            <DrawerTitle className="text-on-surface type-title-large">On this page</DrawerTitle>
+            <DrawerTitle lang={lang} className="text-on-surface type-title-large">
+              {title}
+            </DrawerTitle>
             {/* M3 standard icon button */}
             <DrawerClose
               aria-label="Close"

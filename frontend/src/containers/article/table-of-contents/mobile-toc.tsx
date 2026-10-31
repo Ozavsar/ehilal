@@ -17,10 +17,13 @@ export default function MobileTOC({
   tree,
   activeId,
   lang,
+  labels,
 }: {
   tree: IHeadingNode[];
   activeId: string | null;
   lang?: string;
+  // In the article's language: the sheet title ("On this page") and the button ("Contents")
+  labels: { title: string; button: string };
 }) {
   const [open, setOpen] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -34,6 +37,7 @@ export default function MobileTOC({
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
+        lang={lang}
         onClick={() => {
           setRequested(true);
           setOpen(true);
@@ -47,7 +51,7 @@ export default function MobileTOC({
         )}
       >
         <Icon name="toc" />
-        Contents
+        {labels.button}
       </button>
       {(idle || requested) && (
         <MobileTOCDrawer
@@ -56,6 +60,7 @@ export default function MobileTOC({
           tree={tree}
           activeId={activeId}
           lang={lang}
+          title={labels.title}
           returnFocusRef={triggerRef}
         />
       )}

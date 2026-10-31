@@ -25,8 +25,10 @@ export function Icon({ name, filled, size, className }: IconProps) {
     <span
       data-slot="icon"
       aria-hidden="true"
-      // The text is a ligature name: browser translation would break the glyph
+      // The text is a ligature name: browser translation would break the glyph, and search
+      // snippets would quote it ("co_present")
       translate="no"
+      data-nosnippet
       className={cn("material-symbols", className)}
       style={style as CSSProperties}
     >

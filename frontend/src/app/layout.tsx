@@ -16,6 +16,8 @@ import {
   getThemeCandidates,
   getThemePalette,
 } from "@/lib/services";
+import { getHomePageContent } from "@/lib/services/pages";
+import { getStrapiURL } from "@/lib/api/fetchAPI";
 import { SITE_URL } from "@/config/site";
 import {
   IS_PRODUCTION_SITE,
@@ -25,7 +27,7 @@ import {
 } from "@/config/seo";
 import { siteJsonLd } from "@/lib/metadata";
 import { paletteToCss } from "@/lib/palette";
-import type { ISiteSettings } from "@/types";
+import type { IImage, ISiteSettings } from "@/types";
 
 // `geist/font/mono` with preload off: only article code blocks use it, so the browser fetches the
 // file on pages that render one instead of every page preloading it.
@@ -153,6 +155,24 @@ async function getProfileUrls(site: ISiteSettings): Promise<string[]> {
     .map((url) => url.trim());
 }
 
+// The home page photo for the Person's `image` (absolute URL), or undefined; never fails the layout
+async function getPortrait(): Promise<Pick<IImage, "url" | "width" | "height"> | undefined> {
+  const home = await getHomePageContent().catch((error: unknown) => {
+    unstable_rethrow(error);
+    console.error(
+      "The home page photo could not be loaded for the structured data:",
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  });
+  // Strapi's large format (1000px) when there is one: the original camera file is several MB
+  const image = home?.hero_image?.formats?.large ?? home?.hero_image;
+  if (!image?.url) return undefined;
+  // The S3 upload provider returns absolute URLs, the local one /uploads/... paths
+  const url = image.url.startsWith("/") ? getStrapiURL(image.url) : image.url;
+  return { url, width: image.width, height: image.height };
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -164,8 +184,9 @@ export default async function RootLayout({
     getSiteSettings(),
     draftMode(),
   ]);
-  const [profileUrls, candidates] = await Promise.all([
+  const [profileUrls, portrait, candidates] = await Promise.all([
     getProfileUrls(site),
+    getPortrait(),
     isPreview ? getThemeCandidates() : [],
   ]);
   return (
@@ -181,7 +202,7 @@ export default async function RootLayout({
         <style id="m3-palette" dangerouslySetInnerHTML={{ __html: paletteToCss(palette) }} />
         <script id="icon-font-guard" dangerouslySetInnerHTML={{ __html: iconFontGuard }} />
         {/* Person + WebSite on every page; pages add their own nodes that point to them by @id */}
-        <JsonLd data={siteJsonLd(site, profileUrls)} />
+        <JsonLd data={siteJsonLd(site, profileUrls, portrait)} />
       </head>
       {/* The page clears the fixed navigation: the rail on the left from sm, the bar at the bottom below */}
       <body
