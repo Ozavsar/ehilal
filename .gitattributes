@@ -1,0 +1,2 @@
+# LF everywhere, also in Windows checkouts (Prettier uses endOfLine: lf)
+* text=auto eol=lf

@@ -1,0 +1,5 @@
+# Generated files
+src/app/fonts/*.json
+src/config/default-palette.json
+# Local notes, kept out of git
+update.md

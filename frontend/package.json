@@ -10,8 +10,9 @@
     "start": "next start",
     "lint": "eslint .",
     "icons:subset": "node scripts/icons-subset.mjs",
-    "tw:fix": "tailwind-suggest-canonical-classes \"src/{app,containers,components}/**/*.{ts,tsx}\"",
-    "tw:check": "tailwind-suggest-canonical-classes \"src/{app,containers,components}/**/*.{ts,tsx}\" --check"
+    "tw:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@hookform/resolvers": "^6.0.2",
@@ -43,8 +44,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@laststance/tailwind-suggest-canonical-classes": "^0.1.2",
     "@next/bundle-analyzer": "16.4.3",
+    "@tailwindcss/node": "4.3.3",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^22",
@@ -54,6 +55,7 @@
     "baseline-browser-mapping": "^2.11.34",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "eslint-plugin-tailwind-canonical-classes": "1.6.0",
     "postcss": "^8.5.32",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.6.14",
