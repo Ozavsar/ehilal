@@ -121,13 +121,14 @@ export default async function BlogPage(props: { params: Promise<{ page: string }
   );
 }
 
+// Only the list pages are built ahead. Articles render on their first request and are then cached
+// (ISR): one Medium request per article from parallel build workers gets throttled (503), and a
+// failed prerender fails the whole build, which has no last good version to fall back to.
 export async function generateStaticParams() {
   try {
     const articles = await getAllArticles();
     const pageCount = Math.max(1, Math.ceil(articles.length / ITEMS_PER_PAGE));
-    const pages = Array.from({ length: pageCount }, (_, i) => ({ page: (i + 1).toString() }));
-    const slugs = articles.flatMap((article) => (article.slug ? [{ page: article.slug }] : []));
-    return [...pages, ...slugs];
+    return Array.from({ length: pageCount }, (_, i) => ({ page: (i + 1).toString() }));
   } catch {
     // Every source is down (already logged): render the pages on demand instead of failing the build
     return [];
