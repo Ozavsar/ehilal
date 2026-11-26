@@ -32,6 +32,10 @@ jobs:
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             set -e  # Exit if any command fails
 
+            export NVM_DIR="$HOME/.nvm"
+            . "$NVM_DIR/nvm.sh" --no-use
+            nvm use 24
+
             BRANCH_NAME="${{ github.ref_name }}"
             echo "Using branch with variable: $BRANCH_NAME"
             echo "Using branch: ${{ github.ref_name }}"
