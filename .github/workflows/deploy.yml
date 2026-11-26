@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
       - name: Determine secret dynamically
         id: set-secret
         run: |
@@ -40,7 +37,7 @@ jobs:
             echo "Using branch with variable: $BRANCH_NAME"
             echo "Using branch: ${{ github.ref_name }}"
             REPO_DIR="/srv/apps/${{ secrets.PROJECT_NAME }}/${{ github.event.repository.name }}_${{ github.ref_name }}"
-            REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            REPO_URL="https://github.com/${{ github.repository }}.git"
 
             # ensure repo exists
             if [ ! -d "$REPO_DIR" ]; then
@@ -51,7 +48,7 @@ jobs:
             else
            echo "Repository already exists. Pulling latest changes..."
               cd "$REPO_DIR"
-              # ensure correct remote URL with token authentication
+              # keep the remote URL in sync
               git remote set-url origin "$REPO_URL"
               git fetch origin ${{ github.ref_name }}
               git reset --hard HEAD
@@ -71,8 +68,7 @@ jobs:
             echo "DATABASE_CLIENT=${{ secrets.DATABASE_CLIENT }}" >> .env
             echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
             echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
-            DATABASE_NAME=$(echo '${{ toJson(secrets) }}' | jq -r '.["DATABASE_NAME_${{ steps.set-secret.outputs.branch_upper }}"]')
-            echo "DATABASE_NAME=$DATABASE_NAME" >> .env
+            echo "DATABASE_NAME=${{ secrets[format('DATABASE_NAME_{0}', steps.set-secret.outputs.branch_upper)] }}" >> .env
             echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
             echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
             echo "DATABASE_SSL=${{ secrets.DATABASE_SSL }}" >> .env
@@ -84,8 +80,7 @@ jobs:
             echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
             # Strapi Preview opens the frontend's draft-mode route; both sides share PREVIEW_SECRET
             echo "PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}" >> .env
-            FRONTEND_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
-            echo "FRONTEND_URL=$FRONTEND_URL" >> .env
+            echo "FRONTEND_URL=${{ secrets[format('NEXT_PUBLIC_SITE_URL_{0}', steps.set-secret.outputs.branch_upper)] }}" >> .env
 
             yarn
             yarn build
@@ -94,8 +89,7 @@ jobs:
             if pm2 describe ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} > /dev/null; then
               pm2 restart ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }}
             else
-              MAIDENS_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["BACKEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$MAIDENS_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
+              PORT="${{ secrets[format('BACKEND_PORT_{0}', steps.set-secret.outputs.branch_upper)] }}" pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_strapi_${{ github.ref_name }} -- run start
             fi
 
             #### FRONTEND BUILD ####
@@ -107,10 +101,8 @@ jobs:
             echo "BEARER_TOKEN=${{ secrets.BEARER_TOKEN }}" >> .env.local
             echo "CONTACT_TO_EMAIL=${{ secrets.CONTACT_TO_EMAIL }}" >> .env.local
             echo "PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}" >> .env.local
-            NEXT_PUBLIC_SITE_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_SITE_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
-            NEXT_PUBLIC_STRAPI_API_URL=$(echo '${{ toJson(secrets) }}' | jq -r '.["NEXT_PUBLIC_STRAPI_API_URL_${{ steps.set-secret.outputs.branch_upper }}"]')
-            echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.local
-            echo "NEXT_PUBLIC_STRAPI_API_URL=$NEXT_PUBLIC_STRAPI_API_URL" >> .env.local
+            echo "NEXT_PUBLIC_SITE_URL=${{ secrets[format('NEXT_PUBLIC_SITE_URL_{0}', steps.set-secret.outputs.branch_upper)] }}" >> .env.local
+            echo "NEXT_PUBLIC_STRAPI_API_URL=${{ secrets[format('NEXT_PUBLIC_STRAPI_API_URL_{0}', steps.set-secret.outputs.branch_upper)] }}" >> .env.local
 
             yarn
             yarn build
@@ -119,8 +111,7 @@ jobs:
             if pm2 describe ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}> /dev/null; then
               pm2 restart ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }}
             else
-              GALATA_PORT=$(echo '${{ toJson(secrets) }}' | jq -r '.["FRONTEND_PORT_${{ steps.set-secret.outputs.branch_upper }}"]')
-              PORT=$GALATA_PORT pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }} -- start
+              PORT="${{ secrets[format('FRONTEND_PORT_{0}', steps.set-secret.outputs.branch_upper)] }}" pm2 start yarn --name ${{ secrets.PROJECT_NAME }}_frontend_${{ github.ref_name }} -- start
             fi
 
             echo "(￣y▽￣)╭ Ohohoho..... Deployment completed successfully!"
